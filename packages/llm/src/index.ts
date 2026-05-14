@@ -23,8 +23,13 @@ export { LLMProviderFactory } from './factory.js';
 // Routing
 export { IntelligentLLMRouter, LLMLoadBalancer } from './routing.js';
 
+// Configuration
+export { initializeLLMSystem, initializeLLMSystemFromConfig, parseEnvConfig, getProviderStats, resetProviderStats } from './config.js';
+export type { LLMConfig } from './config.js';
+
 /**
  * Quick setup: Create all providers and return registry + router
+ * @deprecated Use initializeLLMSystem() instead
  */
 export function setupUnimatrixLLM() {
   const registry = new (require('./registry.js').LLMProviderRegistry)();

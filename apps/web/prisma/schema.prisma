@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User accounts
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String?   // nullable for OAuth users
+  name      String?
+  tier      String    @default("free") // free | pro
+
+  // Relations
+  palaces   Palace[]
+  sessions  Session[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete
+
+  @@index([email])
+  @@index([tier])
+}
+
+// Memory Palaces
+model Palace {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  isPublic    Boolean   @default(false)
+
+  // Relations
+  locations   Location[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime? // soft delete
+
+  @@unique([userId, name]) // user can't have duplicate palace names
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Locations (hierarchical folders within palaces)
+model Location {
+  id        String    @id @default(cuid())
+  palaceId  String
+  palace    Palace    @relation(fields: [palaceId], references: [id], onDelete: Cascade)
+
+  parentId  String?   // nullable for root locations
+  parent    Location? @relation("NestedLocations", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Location[]  @relation("NestedLocations")
+
+  name      String
+  description String?
+  position  Int       @default(0) // for sorting
+
+  // Relations
+  memories  Memory[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete
+
+  @@unique([palaceId, parentId, name]) // unique location name per parent
+  @@index([palaceId])
+  @@index([parentId])
+  @@index([position])
+}
+
+// Memories stored in locations
+model Memory {
+  id          String    @id @default(cuid())
+  locationId  String
+  location    Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  content     String    // markdown content
+  tags        String[]  // array of tags
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastAccessed DateTime @default(now())
+  deletedAt   DateTime? // soft delete
+
+  @@index([locationId])
+  @@index([tags])
+  @@fulltext([content]) // for full-text search
+}
+
+// Sync state for offline-first mobile app
+model SyncState {
+  id          String    @id @default(cuid())
+  userId      String
+  deviceId    String
+  deviceName  String?
+
+  lastSync    DateTime  @default(now())
+  pendingChanges Int    @default(0)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, deviceId])
+  @@index([userId])
+}
+
+// Sessions for auth (NextAuth)
+model Session {
+  id            String    @id @default(cuid())
+  sessionToken  String    @unique
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires       DateTime
+
+  createdAt     DateTime  @default(now())
+
+  @@index([userId])
+}
+
+// Verification tokens (for email verification, password reset)
+model VerificationToken {
+  identifier String
+  token      String    @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@index([identifier])
+}
