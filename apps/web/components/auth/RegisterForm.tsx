@@ -77,7 +77,7 @@ export default function RegisterForm() {
         <div className="backdrop-blur-xl bg-[#111827]/80 border border-[#334155]/30 rounded-2xl p-8 space-y-6">
           {/* Header */}
           <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold text-[#F1F5F9]">Join Mempalace</h1>
+            <h1 className="text-3xl font-bold text-[#F1F5F9]">Join Unimatrix</h1>
             <p className="text-[#94A3B8]">Create your memory palace network</p>
           </div>
 

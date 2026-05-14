@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mempalace - Your Memory Palace Network",
-  description: "Build and explore your memory palaces with Mempalace",
+  title: "Unimatrix - Your Memory Palace Network",
+  description: "Build and explore your memory palaces with Unimatrix",
 };
 
 export default function RootLayout({
