@@ -95,7 +95,6 @@ model Memory {
 
   @@index([locationId])
   @@index([tags])
-  @@fulltext([content]) // for full-text search
 }
 
 // Sync state for offline-first mobile app
