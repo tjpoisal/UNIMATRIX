@@ -1,7 +1,7 @@
 import RegisterForm from '@/components/auth/RegisterForm';
 
 export const metadata = {
-  title: 'Sign Up - Mempalace',
+  title: 'Sign Up - Unimatrix',
   description: 'Create your memory palace account',
 };
 

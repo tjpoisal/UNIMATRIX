@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00F5FF] to-[#A855F7] flex items-center justify-center">
             <span className="text-[#0A0F1C] font-bold text-sm">M</span>
           </div>
-          {isOpen && <span className="text-[#F1F5F9] font-bold">Mempalace</span>}
+          {isOpen && <span className="text-[#F1F5F9] font-bold">Unimatrix</span>}
         </div>
       </div>
 

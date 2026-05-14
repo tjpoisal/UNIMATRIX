@@ -4,7 +4,7 @@ import AppShell from '@/components/layout/AppShell';
 import PalaceGrid from '@/components/dashboard/PalaceGrid';
 
 export const metadata = {
-  title: 'Dashboard - Mempalace',
+  title: 'Dashboard - Unimatrix',
   description: 'Your memory palaces',
 };
 
