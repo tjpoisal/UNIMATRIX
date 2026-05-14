@@ -24,9 +24,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <Stack screenOptions={{ headerShown: false }}>
         {initialRoute === 'auth' ? (
-          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(auth)" options={{ gestureEnabled: false }} />
         ) : (
-          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(tabs)" options={{ gestureEnabled: false }} />
         )}
       </Stack>
     </SafeAreaProvider>

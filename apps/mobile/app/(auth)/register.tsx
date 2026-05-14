@@ -4,25 +4,37 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '@/lib/api';
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
+  const handleRegister = async () => {
+    if (!name || !email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    if (password.length < 8) {
+      Alert.alert('Error', 'Password must be at least 8 characters');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await apiClient.login(email, password);
+      const response = await apiClient.register(email, password, name);
       await AsyncStorage.setItem('authToken', response.token);
       await AsyncStorage.setItem('userId', response.user.id);
       router.replace('/(tabs)/dashboard');
     } catch (error: any) {
-      Alert.alert('Login Failed', error.response?.data?.message || 'Invalid credentials');
+      Alert.alert('Registration Failed', error.response?.data?.message || 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -30,8 +42,20 @@ export default function LoginScreen() {
 
   return (
     <View className="flex-1 bg-[#0A0F1C] justify-center px-6">
-      <Text className="text-3xl font-bold text-white mb-8 text-center">Unimatrix</Text>
-      
+      <Text className="text-3xl font-bold text-white mb-2 text-center">Create Account</Text>
+      <Text className="text-gray-400 text-center mb-8">Join Unimatrix</Text>
+
+      <View className="mb-6">
+        <Text className="text-gray-300 mb-2">Full Name</Text>
+        <TextInput
+          placeholder="John Doe"
+          placeholderTextColor="#6B7280"
+          value={name}
+          onChangeText={setName}
+          className="bg-[#1A1F35] border border-[#00F5FF]/20 rounded-lg px-4 py-3 text-white"
+        />
+      </View>
+
       <View className="mb-6">
         <Text className="text-gray-300 mb-2">Email</Text>
         <TextInput
@@ -45,7 +69,7 @@ export default function LoginScreen() {
         />
       </View>
 
-      <View className="mb-8">
+      <View className="mb-6">
         <Text className="text-gray-300 mb-2">Password</Text>
         <TextInput
           placeholder="••••••••"
@@ -55,23 +79,36 @@ export default function LoginScreen() {
           secureTextEntry
           className="bg-[#1A1F35] border border-[#00F5FF]/20 rounded-lg px-4 py-3 text-white"
         />
+        <Text className="text-gray-500 text-xs mt-1">Minimum 8 characters</Text>
+      </View>
+
+      <View className="mb-8">
+        <Text className="text-gray-300 mb-2">Confirm Password</Text>
+        <TextInput
+          placeholder="••••••••"
+          placeholderTextColor="#6B7280"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+          className="bg-[#1A1F35] border border-[#00F5FF]/20 rounded-lg px-4 py-3 text-white"
+        />
       </View>
 
       <TouchableOpacity
-        onPress={handleLogin}
+        onPress={handleRegister}
         disabled={loading}
         className="bg-[#00F5FF] rounded-lg py-3 mb-4"
       >
         {loading ? (
           <ActivityIndicator color="#0A0F1C" />
         ) : (
-          <Text className="text-[#0A0F1C] font-semibold text-center text-lg">Sign In</Text>
+          <Text className="text-[#0A0F1C] font-semibold text-center text-lg">Sign Up</Text>
         )}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push('/register')}>
+      <TouchableOpacity onPress={() => router.back()}>
         <Text className="text-gray-400 text-center">
-          Don't have an account? <Text className="text-[#00F5FF] font-semibold">Sign up</Text>
+          Already have an account? <Text className="text-[#00F5FF] font-semibold">Sign in</Text>
         </Text>
       </TouchableOpacity>
     </View>
