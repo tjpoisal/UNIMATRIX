@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import OAuthButtons from './OAuthButtons';
 
 export default function LoginForm() {
   const router = useRouter();
@@ -15,21 +16,11 @@ export default function LoginForm() {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError(result.error || 'Login failed');
-        return;
-      }
-
+      const result = await signIn('credentials', { email, password, redirect: false });
+      if (result?.error) { setError('Invalid email or password'); return; }
       router.push('/dashboard');
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -46,58 +37,44 @@ export default function LoginForm() {
             <p className="text-[#94A3B8]">One memory. Every AI. Any device.</p>
           </div>
 
-          {/* Form */}
+          {/* OAuth Buttons */}
+          <OAuthButtons />
+
+          {/* Email/password form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="bg-[#EF4444]/10 border border-[#EF4444]/30 rounded-lg p-3">
                 <p className="text-sm text-[#EF4444]">{error}</p>
               </div>
             )}
-
             <div>
-              <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
-                Email
-              </label>
+              <label className="block text-sm font-medium text-[#F1F5F9] mb-2">Email</label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-2 bg-[#0A0F1C] border border-[#334155] rounded-lg text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#00F5FF]/50 transition-all"
-                placeholder="you@example.com"
-                required
+                placeholder="you@example.com" required
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-[#F1F5F9] mb-2">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-[#F1F5F9] mb-2">Password</label>
               <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type="password" value={password} onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 bg-[#0A0F1C] border border-[#334155] rounded-lg text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#00F5FF]/50 transition-all"
-                placeholder="••••••••"
-                required
+                placeholder="••••••••" required
               />
             </div>
-
             <button
-              type="submit"
-              disabled={loading}
+              type="submit" disabled={loading}
               className="w-full py-2 px-4 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-[#00F5FF]/20 transform hover:scale-105"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          {/* Link to register */}
           <div className="text-center pt-4 border-t border-[#334155]/30">
             <p className="text-[#94A3B8]">
-              Don't have an account?{' '}
-              <a href="/auth/register" className="text-[#00F5FF] hover:text-[#00D9FF] font-medium transition-colors">
-                Sign up
-              </a>
+              Don&apos;t have an account?{' '}
+              <a href="/auth/register" className="text-[#00F5FF] hover:text-[#00D9FF] font-medium transition-colors">Sign up</a>
             </p>
           </div>
         </div>
