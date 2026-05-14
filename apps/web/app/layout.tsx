@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Unimatrix - Your Memory Palace Network",
-  description: "Build and explore your memory palaces with Unimatrix",
+  title: "Unimatrix — One memory. Every AI. Any device.",
+  description: "Switch between Claude, Grok, ChatGPT, and more — and always pick up where you left off.",
 };
 
 export default function RootLayout({
