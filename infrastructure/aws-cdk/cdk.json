@@ -1,0 +1,11 @@
+{
+  "app": "npx ts-node lib/index.ts",
+  "context": {
+    "projectName": "unimatrix",
+    "environment": "production",
+    "region": "us-east-1",
+    "enableBackups": true,
+    "enableMonitoring": true
+  },
+  "require": ["fs"]
+}

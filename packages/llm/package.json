@@ -1,0 +1,30 @@
+{
+  "name": "@unimatrix/llm",
+  "version": "0.1.0",
+  "description": "Multi-LLM provider integration with intelligent routing",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "@google/generative-ai": "^0.14.0",
+    "groq-sdk": "^0.8.0",
+    "openai": "^4.52.0",
+    "@unimatrix/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.9.2"
+  }
+}

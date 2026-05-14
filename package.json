@@ -1,0 +1,33 @@
+{
+  "name": "unimatrix",
+  "version": "0.1.0",
+  "description": "AWS-native memory palace with multi-LLM integration",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "clean": "turbo run clean && rm -rf node_modules .turbo dist",
+    "cdk": "cd infrastructure/aws-cdk && cdk",
+    "cdk:deploy": "cd infrastructure/aws-cdk && cdk deploy --require-approval=never",
+    "docker:build": "docker-compose -f infrastructure/docker-compose.yml build",
+    "docker:up": "docker-compose -f infrastructure/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f infrastructure/docker-compose.yml down",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.9.2",
+    "prettier": "^3.0.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

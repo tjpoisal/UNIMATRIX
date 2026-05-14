@@ -1,0 +1,30 @@
+{
+  "name": "@unimatrix/api",
+  "version": "0.1.0",
+  "description": "Apollo GraphQL client + AppSync + Cognito integration",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.10.0",
+    "@unimatrix/types": "workspace:*",
+    "aws-amplify": "^6.0.0",
+    "graphql": "^16.8.0",
+    "graphql-subscriptions": "^2.0.0",
+    "graphql-ws": "^5.15.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.9.2"
+  }
+}
