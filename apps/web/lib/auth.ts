@@ -27,10 +27,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId:     process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
-    Apple({
-      clientId:     process.env.APPLE_CLIENT_ID!,
-      clientSecret: process.env.APPLE_CLIENT_SECRET!,
-    }),
+    // Apple Sign In — only enabled when credentials are configured
+    ...(process.env.APPLE_CLIENT_ID && process.env.APPLE_CLIENT_SECRET
+      ? [Apple({ clientId: process.env.APPLE_CLIENT_ID, clientSecret: process.env.APPLE_CLIENT_SECRET })]
+      : []),
     Credentials({
       credentials: {
         email:    { label: "Email",    type: "email"    },
