@@ -1,0 +1,442 @@
+"""
+Unimatrix GraphQL Schema
+Core types and operations for memory palace management with multi-LLM integration
+"""
+
+# ============================================================================
+# SCALARS
+# ============================================================================
+
+scalar AWSDateTime
+scalar AWSJSON
+
+# ============================================================================
+# ENUMS
+# ============================================================================
+
+enum LLMProvider {
+  CLAUDE
+  OPENAI
+  GEMINI
+  GROQ
+  OLLAMA
+}
+
+enum RoutingStrategy {
+  CHEAPEST
+  FASTEST
+  BEST
+  ROUNDROBIN
+}
+
+enum OperationalProfile {
+  GENERAL_PUBLIC
+  UNIVERSAL_ZERO_LITERACY
+  MARINE_FISHER
+  AGRICULTURAL_FARMER
+  CONSTRUCTION_SAFETY
+  TRIBAL_REMOTE_ARCTIC
+  AVIATION_DRONE
+  NEURODIVERGENT
+  CITY_URBAN_HEALTH
+  RECOVERY_POST_DISASTER
+  COMMUTER_LOGISTICS
+  CITIZEN_SCIENCE_EAGLE
+  EVENT_ORGANIZER
+  FAMILY_MULTI_LOCATION
+  RENEWABLE_ENERGY_UTILITIES
+}
+
+# ============================================================================
+# INPUTS
+# ============================================================================
+
+input CreatePalaceInput {
+  name: String!
+  description: String
+  isPublic: Boolean
+  operationalProfile: OperationalProfile
+}
+
+input UpdatePalaceInput {
+  palaceId: String!
+  name: String
+  description: String
+  isPublic: Boolean
+}
+
+input CreateLocationInput {
+  palaceId: String!
+  parentId: String
+  name: String!
+  position: Int
+}
+
+input UpdateLocationInput {
+  locationId: String!
+  name: String
+  position: Int
+}
+
+input CreateMemoryInput {
+  locationId: String!
+  content: String!
+  tags: [String!]
+  llmProvider: LLMProvider
+  llmModel: String
+}
+
+input UpdateMemoryInput {
+  locationId: String!
+  memoryId: String!
+  content: String
+  tags: [String!]
+}
+
+input DeleteMemoryInput {
+  locationId: String!
+  memoryId: String!
+}
+
+input InviteAgentInput {
+  palaceId: String!
+  agentName: String!
+  agentIdentifier: String!
+  llmProvider: LLMProvider!
+  permissions: [String!]!
+}
+
+input QueryMemoryInput {
+  palaceId: String
+  locationId: String
+  tags: [String!]
+  query: String
+  limit: Int
+  offset: Int
+}
+
+# ============================================================================
+# TYPES
+# ============================================================================
+
+type User {
+  id: String!
+  email: String!
+  tier: String! # "free" | "pro" | "self-hosted"
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  palaceCount: Int!
+  memoryCount: Int!
+  llmUsageMetrics: LLMUsageMetrics!
+}
+
+type Palace {
+  id: String!
+  userId: String!
+  name: String!
+  description: String
+  isPublic: Boolean!
+  operationalProfile: OperationalProfile
+  locations: [Location!]!
+  agents: [AgentCollaboration!]!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  memoryCount: Int!
+}
+
+type Location {
+  id: String!
+  palaceId: String!
+  parentId: String
+  name: String!
+  position: Int!
+  children: [Location!]!
+  memories: [Memory!]!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type Memory {
+  id: String!
+  locationId: String!
+  palaceId: String!
+  userId: String!
+  content: String!
+  tags: [String!]!
+  llmProvider: LLMProvider
+  llmModel: String
+  tokensUsed: Int
+  latencyMs: Int
+  costUsd: Float
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+  lastAccessedAt: AWSDateTime
+  createdByAgent: String
+}
+
+type AgentCollaboration {
+  id: String!
+  palaceId: String!
+  agentName: String!
+  agentIdentifier: String!
+  llmProvider: LLMProvider!
+  permissions: [String!]!
+  memoriesWritten: Int!
+  memoriesRead: Int!
+  lastActivityAt: AWSDateTime!
+  createdAt: AWSDateTime!
+}
+
+type LLMUsageMetrics {
+  totalTokensUsed: Int!
+  totalCostUsd: Float!
+  byProvider: [ProviderMetrics!]!
+  currentMonth: MonthlyMetrics!
+}
+
+type ProviderMetrics {
+  provider: LLMProvider!
+  tokensUsed: Int!
+  costUsd: Float!
+  requestCount: Int!
+  avgLatencyMs: Float!
+}
+
+type MonthlyMetrics {
+  month: String!
+  tokensUsed: Int!
+  costUsd: Float!
+  requestCount: Int!
+}
+
+type SearchResult {
+  memories: [Memory!]!
+  totalCount: Int!
+  hasMore: Boolean!
+}
+
+type CompletionResult {
+  content: String!
+  tokenCount: Int!
+  latencyMs: Int!
+  costUsd: Float!
+}
+
+type SyncResult {
+  success: Boolean!
+  syncedMemories: Int!
+  syncedLocations: Int!
+  syncedPalaces: Int!
+  timestamp: AWSDateTime!
+}
+
+type ExportResult {
+  format: String!
+  data: AWSJSON!
+  url: String
+  expiresAt: AWSDateTime
+}
+
+# ============================================================================
+# QUERIES
+# ============================================================================
+
+type Query {
+  """
+  Get current authenticated user
+  """
+  me: User!
+
+  """
+  Get all palaces for current user
+  """
+  getPalaces: [Palace!]!
+
+  """
+  Get a specific palace by ID
+  """
+  getPalace(id: String!): Palace
+
+  """
+  Get memories in a specific location
+  """
+  getMemoriesByLocation(locationId: String!): [Memory!]!
+
+  """
+  Search memories across all palaces
+  """
+  searchMemories(
+    query: String!
+    palaceId: String
+    tags: [String!]
+    limit: Int
+    offset: Int
+  ): SearchResult!
+
+  """
+  Get LLM usage metrics for current user
+  """
+  getLLMUsageMetrics: LLMUsageMetrics!
+
+  """
+  Get agent collaborations for a palace
+  """
+  getAgentCollaborations(palaceId: String!): [AgentCollaboration!]!
+
+  """
+  Check health of LLM providers
+  """
+  checkLLMProvidersHealth: AWSJSON!
+
+  """
+  Get suggested routing strategy for a message
+  """
+  suggestRoutingStrategy(messageContent: String!): RoutingStrategy!
+}
+
+# ============================================================================
+# MUTATIONS
+# ============================================================================
+
+type Mutation {
+  """
+  Create a new memory palace
+  """
+  createPalace(input: CreatePalaceInput!): Palace!
+
+  """
+  Update an existing palace
+  """
+  updatePalace(input: UpdatePalaceInput!): Palace!
+
+  """
+  Delete a palace
+  """
+  deletePalace(palaceId: String!): Boolean!
+
+  """
+  Create a location (folder) within a palace
+  """
+  createLocation(input: CreateLocationInput!): Location!
+
+  """
+  Update a location
+  """
+  updateLocation(input: UpdateLocationInput!): Location!
+
+  """
+  Delete a location
+  """
+  deleteLocation(locationId: String!): Boolean!
+
+  """
+  Create a new memory
+  """
+  createMemory(input: CreateMemoryInput!): Memory!
+
+  """
+  Update an existing memory
+  """
+  updateMemory(input: UpdateMemoryInput!): Memory!
+
+  """
+  Delete a memory
+  """
+  deleteMemory(input: DeleteMemoryInput!): Boolean!
+
+  """
+  Complete a message using specified LLM provider
+  """
+  completeLLMMessage(
+    palaceId: String!
+    locationId: String!
+    message: String!
+    provider: LLMProvider
+    routingStrategy: RoutingStrategy
+  ): CompletionResult!
+
+  """
+  Stream LLM completion (via subscription)
+  """
+  streamLLMCompletion(
+    palaceId: String!
+    message: String!
+    provider: LLMProvider
+  ): String!
+
+  """
+  Invite an LLM agent to collaborate on a palace
+  """
+  inviteAgent(input: InviteAgentInput!): AgentCollaboration!
+
+  """
+  Revoke agent access to a palace
+  """
+  revokeAgentAccess(palaceId: String!, agentId: String!): Boolean!
+
+  """
+  Manually trigger sync for a device
+  """
+  syncPalaces(palaceIds: [String!]): SyncResult!
+
+  """
+  Export a palace in specified format
+  """
+  exportPalace(palaceId: String!, format: String!): ExportResult!
+
+  """
+  Import a palace from exported data
+  """
+  importPalace(data: AWSJSON!, format: String!): Palace!
+
+  """
+  Update user tier/subscription
+  """
+  updateSubscription(tier: String!): User!
+}
+
+# ============================================================================
+# SUBSCRIPTIONS
+# ============================================================================
+
+type Subscription {
+  """
+  Subscribe to memory creation events
+  """
+  onCreateMemory(palaceId: String!): Memory!
+
+  """
+  Subscribe to memory update events
+  """
+  onUpdateMemory(palaceId: String!): Memory!
+
+  """
+  Subscribe to memory deletion events
+  """
+  onDeleteMemory(palaceId: String!): Memory!
+
+  """
+  Subscribe to palace sync events
+  """
+  onPalaceSync(palaceId: String!): SyncResult!
+
+  """
+  Subscribe to agent activity
+  """
+  onAgentActivity(palaceId: String!): AgentCollaboration!
+
+  """
+  Subscribe to real-time LLM completion streams
+  """
+  onLLMStreamChunk(requestId: String!): String!
+}
+
+# ============================================================================
+# SCHEMA ROOT
+# ============================================================================
+
+schema {
+  query: Query
+  mutation: Mutation
+  subscription: Subscription
+}
