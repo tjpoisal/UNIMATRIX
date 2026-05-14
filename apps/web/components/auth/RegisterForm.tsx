@@ -78,7 +78,7 @@ export default function RegisterForm() {
           {/* Header */}
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-[#F1F5F9]">Join Unimatrix</h1>
-            <p className="text-[#94A3B8]">Create your memory palace network</p>
+            <p className="text-[#94A3B8]">Switch between Claude, Grok, ChatGPT, and more — and always pick up where you left off.</p>
           </div>
 
           {/* Form */}

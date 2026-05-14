@@ -43,7 +43,7 @@ export default function LoginForm() {
           {/* Header */}
           <div className="text-center space-y-2">
             <h1 className="text-3xl font-bold text-[#F1F5F9]">Unimatrix</h1>
-            <p className="text-[#94A3B8]">Your second brain, in memory palaces</p>
+            <p className="text-[#94A3B8]">One memory. Every AI. Any device.</p>
           </div>
 
           {/* Form */}
