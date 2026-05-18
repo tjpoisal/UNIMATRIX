@@ -44,12 +44,10 @@
   <circle cx="296" cy="302" r="11" stroke="#FFFFFF" stroke-width="9" fill="none"/>
 
   <!-- Wordmark -->
-  <text x="36" y="452"
+  <text x="200" y="452"
         font-family="'Arial Black', 'Inter', Impact, sans-serif"
-        font-size="76" font-weight="900" letter-spacing="-1"
-        fill="#00F5FF">UNI</text>
-  <text x="188" y="452"
-        font-family="'Arial Black', 'Inter', Impact, sans-serif"
-        font-size="76" font-weight="900" letter-spacing="-1"
-        fill="#FFFFFF">MATRIX</text>
+        font-size="64" font-weight="900" letter-spacing="-1"
+        text-anchor="middle">
+    <tspan fill="#00F5FF">UNI</tspan><tspan fill="#FFFFFF">MATRIX</tspan>
+  </text>
 </svg>
