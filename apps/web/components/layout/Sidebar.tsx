@@ -18,6 +18,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     { label: 'Dashboard', href: '/dashboard', icon: '🏠' },
     { label: 'Palaces', href: '/palaces', icon: '🏛️' },
     { label: 'Search', href: '/search', icon: '🔍' },
+    { label: 'Friends', href: '/friends', icon: '👥' },
     { label: 'Connect AIs', href: '/onboarding', icon: '🔌' },
     { label: 'Settings', href: '/settings', icon: '⚙️' },
   ];

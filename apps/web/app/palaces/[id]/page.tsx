@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import AppShell from '@/components/layout/AppShell';
 import LocationTree from '@/components/palace/LocationTree';
+import SharePanel from '@/components/palace/SharePanel';
 
 interface Memory {
   id: string;
@@ -34,6 +35,7 @@ export default function PalaceViewPage() {
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showShare, setShowShare] = useState(false);
 
   useEffect(() => {
     const fetchPalace = async () => {
@@ -81,10 +83,22 @@ export default function PalaceViewPage() {
 
   return (
     <AppShell>
+      {showShare && (
+        <SharePanel palaceId={palaceId} onClose={() => setShowShare(false)} />
+      )}
       <div className="flex h-full overflow-hidden">
         {/* Left Sidebar - Location Tree */}
         <div className="w-80 bg-[#111827]/60 border-r border-[#334155]/30 overflow-y-auto p-6">
-          <h2 className="text-lg font-bold text-[#F1F5F9] mb-6">{palace.name}</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-bold text-[#F1F5F9] truncate">{palace.name}</h2>
+            <button
+              onClick={() => setShowShare(true)}
+              title="Share palace"
+              className="flex-shrink-0 px-3 py-1.5 text-xs bg-[#1F2937] hover:bg-[#2D3748] text-[#94A3B8] hover:text-[#F1F5F9] rounded-lg transition-colors"
+            >
+              Share
+            </button>
+          </div>
           <LocationTree locations={palace.locations} onSelectMemory={setSelectedMemory} />
         </div>
 

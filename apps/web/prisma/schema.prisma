@@ -22,6 +22,12 @@ model User {
   sessions  Session[]
   apiKeys   ApiKey[]
 
+  // Social
+  friendRequestsSent     Friendship[]  @relation("FriendRequests")
+  friendRequestsReceived Friendship[]  @relation("FriendAddressees")
+  palacesSharedByMe      PalaceShare[] @relation("SharedByUser")
+  palacesSharedWithMe    PalaceShare[] @relation("SharedWithUser")
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime? // soft delete
@@ -62,6 +68,7 @@ model Palace {
   isPublic    Boolean   @default(false)
 
   locations   Location[]
+  shares      PalaceShare[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -172,4 +179,49 @@ model ApiKey {
 
   @@index([userId])
   @@index([keyHash])
+}
+
+// Friend connections between users
+model Friendship {
+  id          String   @id @default(cuid())
+
+  requesterId String
+  requester   User     @relation("FriendRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  addresseeId String
+  addressee   User     @relation("FriendAddressees", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  status      String   @default("pending") // pending | accepted | blocked
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId])
+  @@index([addresseeId])
+  @@index([status])
+}
+
+// Palace sharing with specific users and permission levels
+model PalaceShare {
+  id           String   @id @default(cuid())
+
+  palaceId     String
+  palace       Palace   @relation(fields: [palaceId], references: [id], onDelete: Cascade)
+
+  sharedById   String
+  sharedBy     User     @relation("SharedByUser", fields: [sharedById], references: [id], onDelete: Cascade)
+
+  sharedWithId String
+  sharedWith   User     @relation("SharedWithUser", fields: [sharedWithId], references: [id], onDelete: Cascade)
+
+  permission   String   @default("view") // view | edit
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([palaceId, sharedWithId])
+  @@index([palaceId])
+  @@index([sharedById])
+  @@index([sharedWithId])
 }
