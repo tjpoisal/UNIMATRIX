@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import OAuthButtons from './OAuthButtons';
 
@@ -43,9 +44,9 @@ export default function RegisterForm() {
       <div className="w-full max-w-md">
         <div className="backdrop-blur-xl bg-[#111827]/80 border border-[#334155]/30 rounded-2xl p-8 space-y-6">
           {/* Header */}
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold text-[#F1F5F9]">Join Unimatrix</h1>
-            <p className="text-[#94A3B8] text-sm">Switch between Claude, Grok, ChatGPT, and more — and always pick up where you left off.</p>
+          <div className="flex flex-col items-center gap-3">
+            <Image src="/logo.svg" alt="Unimatrix" width={100} height={120} priority />
+            <p className="text-[#94A3B8] text-sm text-center">One memory. Every AI. Any device.</p>
           </div>
 
           {/* OAuth Buttons */}

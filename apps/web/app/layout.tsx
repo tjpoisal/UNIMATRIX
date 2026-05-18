@@ -15,8 +15,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Unimatrix — One memory. Every AI. Any device.",
-  description: "Switch between Claude, Grok, ChatGPT, and more — and always pick up where you left off.",
+  title: {
+    default: "Unimatrix — One memory. Every AI. Any device.",
+    template: "%s | Unimatrix",
+  },
+  description: "Switch between Claude, ChatGPT, Grok, Gemini, and more — and always pick up where you left off.",
+  keywords: ["AI memory", "MCP", "cross-AI memory", "Claude", "ChatGPT", "Grok", "Gemini"],
+  icons: {
+    icon: "/logo-icon.svg",
+    apple: "/logo-icon.svg",
+  },
+  openGraph: {
+    title: "Unimatrix — One memory. Every AI. Any device.",
+    description: "Your memories follow you across every AI. Connect Claude, ChatGPT, Grok, Gemini and more.",
+    siteName: "Unimatrix",
+    images: [{ url: "/logo.svg", width: 400, height: 480, alt: "Unimatrix" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Unimatrix — One memory. Every AI. Any device.",
+    description: "Your memories follow you across every AI.",
+    images: ["/logo.svg"],
+  },
 };
 
 export default function RootLayout({
