@@ -4,8 +4,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
+  if (id === "new") {
+    return NextResponse.json({ error: "Not Found" }, { status: 404 });
+  }
+
   try {
     const session = await auth();
 
@@ -14,7 +20,7 @@ export async function GET(
     }
 
     const palace = await prisma.palace.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         locations: {
           where: { deletedAt: null },
@@ -49,8 +55,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   try {
     const session = await auth();
 
@@ -62,7 +70,7 @@ export async function PUT(
 
     // Check ownership
     const palace = await prisma.palace.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { userId: true },
     });
 
@@ -71,7 +79,7 @@ export async function PUT(
     }
 
     const updated = await prisma.palace.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(description !== undefined && { description }),
@@ -91,8 +99,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+
   try {
     const session = await auth();
 
@@ -102,7 +112,7 @@ export async function DELETE(
 
     // Check ownership
     const palace = await prisma.palace.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { userId: true },
     });
 
@@ -112,7 +122,7 @@ export async function DELETE(
 
     // Soft delete
     await prisma.palace.update({
-      where: { id: params.id },
+      where: { id },
       data: { deletedAt: new Date() },
     });
 
