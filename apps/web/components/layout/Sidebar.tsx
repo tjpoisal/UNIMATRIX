@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 
@@ -31,10 +32,19 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       {/* Logo */}
       <div className="p-6 border-b border-[#334155]/30">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00F5FF] to-[#A855F7] flex items-center justify-center">
-            <span className="text-[#0A0F1C] font-bold text-sm">M</span>
-          </div>
-          {isOpen && <span className="text-[#F1F5F9] font-bold">Unimatrix</span>}
+          <Image
+            src="/logo-icon.svg"
+            alt="Unimatrix"
+            width={36}
+            height={36}
+            className="flex-shrink-0"
+          />
+          {isOpen && (
+            <span className="font-black text-lg tracking-tight leading-none">
+              <span className="text-[#00F5FF]">UNI</span>
+              <span className="text-[#8892A4]">MATRIX</span>
+            </span>
+          )}
         </div>
       </div>
 

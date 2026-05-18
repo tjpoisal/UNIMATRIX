@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 480" fill="none">
+  <!-- Black background -->
+  <rect width="400" height="480" fill="#000000"/>
+
+  <!-- Outer PCB frame: rounded square -->
+  <rect x="44" y="28" width="312" height="312" rx="36" ry="36"
+        stroke="#132030" stroke-width="20" fill="none"/>
+
+  <!-- Horizontal trace: left arm -->
+  <line x1="44" y1="184" x2="130" y2="184" stroke="#132030" stroke-width="18" stroke-linecap="round"/>
+  <!-- Horizontal trace: right arm -->
+  <line x1="270" y1="184" x2="356" y2="184" stroke="#132030" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- Vertical trace: top arm -->
+  <line x1="200" y1="28" x2="200" y2="120" stroke="#132030" stroke-width="18" stroke-linecap="round"/>
+  <!-- Vertical trace: bottom arm -->
+  <line x1="200" y1="250" x2="200" y2="340" stroke="#132030" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- Inner horizontal trace connecting left to right via center -->
+  <line x1="130" y1="184" x2="270" y2="184" stroke="#132030" stroke-width="18" stroke-linecap="round"/>
+
+  <!-- Filled terminal dots (connection pads) -->
+  <circle cx="200" cy="184" r="13" fill="#132030"/>
+  <circle cx="200" cy="78" r="13" fill="#132030"/>
+  <circle cx="200" cy="290" r="13" fill="#132030"/>
+
+  <!-- Top-left L-trace -->
+  <path d="M90 90 L90 148 L152 148" stroke="#132030" stroke-width="16"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Top-right L-trace -->
+  <path d="M310 76 L310 138 L248 138" stroke="#132030" stroke-width="16"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Bottom-left L-trace -->
+  <path d="M124 290 L124 248 L168 248" stroke="#132030" stroke-width="16"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Bottom-right L-trace -->
+  <path d="M296 302 L296 252 L244 252" stroke="#132030" stroke-width="16"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Via rings (hollow) -->
+  <circle cx="90" cy="90" r="11" stroke="#132030" stroke-width="9" fill="none"/>
+  <circle cx="310" cy="76" r="11" stroke="#132030" stroke-width="9" fill="none"/>
+  <circle cx="124" cy="290" r="11" stroke="#132030" stroke-width="9" fill="none"/>
+  <circle cx="296" cy="302" r="11" stroke="#132030" stroke-width="9" fill="none"/>
+
+  <!-- Wordmark -->
+  <text x="36" y="452"
+        font-family="'Arial Black', 'Inter', Impact, sans-serif"
+        font-size="76" font-weight="900" letter-spacing="-1"
+        fill="#00F5FF">UNI</text>
+  <text x="188" y="452"
+        font-family="'Arial Black', 'Inter', Impact, sans-serif"
+        font-size="76" font-weight="900" letter-spacing="-1"
+        fill="#132030">MATRIX</text>
+</svg>
