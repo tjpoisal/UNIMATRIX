@@ -20,6 +20,7 @@ model User {
   accounts  Account[]
   palaces   Palace[]
   sessions  Session[]
+  apiKeys   ApiKey[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -153,4 +154,22 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@index([identifier])
+}
+
+// API keys for LLM/MCP integrations
+model ApiKey {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name      String    // e.g. "Claude Desktop", "My ChatGPT Key"
+  keyHash   String    @unique  // bcrypt hash of the actual key
+  keyPrefix String    // first 8 chars shown in UI e.g. "umx_a1b2"
+  lastUsed  DateTime?
+
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@index([keyHash])
 }
