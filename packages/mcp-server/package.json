@@ -1,0 +1,41 @@
+{
+  "name": "@unimatrix/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Unimatrix — universal memory palace API. Connect Claude Desktop, Claude Code, Ollama, and any MCP-compatible AI to your memory palaces.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "unimatrix-mcp-server": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "memory",
+    "memory-palace",
+    "ai",
+    "claude",
+    "unimatrix"
+  ],
+  "author": "Unimatrix",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "axios": "^1.7.9",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
