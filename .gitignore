@@ -1,7 +1,7 @@
 # Dependencies
 node_modules/
 .pnpm-store/
-pnpm-lock.yaml
+# pnpm-lock.yaml must NOT be ignored — Vercel requires it to detect pnpm and run workspace installs
 
 # Build outputs
 dist/

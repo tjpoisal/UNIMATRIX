@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <rect width="200" height="200" fill="#000000"/>
+
+  <!-- Outer frame -->
+  <rect x="16" y="16" width="168" height="168" rx="20" ry="20"
+        stroke="#132030" stroke-width="11" fill="none"/>
+
+  <!-- Horizontal traces -->
+  <line x1="16" y1="100" x2="60" y2="100" stroke="#132030" stroke-width="10" stroke-linecap="round"/>
+  <line x1="140" y1="100" x2="184" y2="100" stroke="#132030" stroke-width="10" stroke-linecap="round"/>
+  <line x1="60" y1="100" x2="140" y2="100" stroke="#132030" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Vertical traces -->
+  <line x1="100" y1="16" x2="100" y2="62" stroke="#132030" stroke-width="10" stroke-linecap="round"/>
+  <line x1="100" y1="138" x2="100" y2="184" stroke="#132030" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Center pad -->
+  <circle cx="100" cy="100" r="7" fill="#132030"/>
+  <circle cx="100" cy="40" r="7" fill="#132030"/>
+  <circle cx="100" cy="160" r="7" fill="#132030"/>
+
+  <!-- L-traces -->
+  <path d="M44 44 L44 76 L72 76" stroke="#132030" stroke-width="9"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M156 38 L156 70 L128 70" stroke="#132030" stroke-width="9"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M58 156 L58 130 L82 130" stroke="#132030" stroke-width="9"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M148 160 L148 132 L122 132" stroke="#132030" stroke-width="9"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Via rings -->
+  <circle cx="44" cy="44" r="6" stroke="#132030" stroke-width="5" fill="none"/>
+  <circle cx="156" cy="38" r="6" stroke="#132030" stroke-width="5" fill="none"/>
+  <circle cx="58" cy="156" r="6" stroke="#132030" stroke-width="5" fill="none"/>
+  <circle cx="148" cy="160" r="6" stroke="#132030" stroke-width="5" fill="none"/>
+</svg>
