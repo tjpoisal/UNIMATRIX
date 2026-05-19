@@ -40,6 +40,20 @@ class ApiClient {
     return response.data;
   }
 
+  async forgotPassword(email: string) {
+    const response = await this.client.post('/auth/forgot-password', { email });
+    return response.data;
+  }
+
+  async resetPassword(token: string, email: string, password: string) {
+    const response = await this.client.post('/auth/reset-password', {
+      token,
+      email,
+      password,
+    });
+    return response.data;
+  }
+
   // Palaces
   async getPalaces() {
     const response = await this.client.get('/palaces');
