@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 // POST /api/stripe/portal — redirect to Stripe customer portal (manage/cancel subscription)
 export async function POST(request: NextRequest) {
@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
 
   const origin = request.headers.get("origin") ?? process.env.NEXTAUTH_URL ?? "https://unimatrix-flax.vercel.app";
 
+  const stripe = getStripe();
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: user.stripeCustomerId,
     return_url: `${origin}/settings`,

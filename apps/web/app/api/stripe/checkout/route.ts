@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { stripe, PRICE_IDS } from "@/lib/stripe";
+import { getStripe, PRICE_IDS } from "@/lib/stripe";
 
 // POST /api/stripe/checkout — create a Stripe Checkout session
 export async function POST(request: NextRequest) {
@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
   // Re-use or create Stripe customer
   let customerId = user.stripeCustomerId ?? undefined;
   if (!customerId) {
-    const customer = await stripe.customers.create({
+    const stripe = getStripe();
+  const customer = await stripe.customers.create({
       email: user.email ?? undefined,
       name: user.name ?? undefined,
       metadata: { unimatrixUserId: user.id },
