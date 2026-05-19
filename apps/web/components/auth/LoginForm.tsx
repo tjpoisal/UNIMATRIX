@@ -57,7 +57,10 @@ export default function LoginForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#F1F5F9] mb-2">Password</label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-sm font-medium text-[#F1F5F9]">Password</label>
+                <a href="/auth/forgot-password" className="text-xs text-[#00F5FF] hover:text-[#00D9FF] transition-colors">Forgot password?</a>
+              </div>
               <input
                 type="password" value={password} onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-2 bg-[#0A0F1C] border border-[#334155] rounded-lg text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#00F5FF]/50 transition-all"
