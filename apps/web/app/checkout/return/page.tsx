@@ -9,11 +9,15 @@ function ReturnContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
-  const [status, setStatus] = useState<'loading' | 'complete' | 'open' | 'error'>('loading');
+  // Initialise to 'error' immediately if there's no session_id — avoids calling
+  // setState synchronously inside a useEffect (React Compiler lint rule).
+  const [status, setStatus] = useState<'loading' | 'complete' | 'open' | 'error'>(
+    sessionId ? 'loading' : 'error'
+  );
   const [email, setEmail] = useState('');
 
   useEffect(() => {
-    if (!sessionId) { setStatus('error'); return; }
+    if (!sessionId) return;
 
     fetch(`/api/stripe/checkout-status?session_id=${sessionId}`)
       .then((r) => r.json())
