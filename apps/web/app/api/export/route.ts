@@ -2,7 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-function formatAsMarkdown(palace: any): string {
+interface MemoryItem { content: string }
+interface LocationItem {
+  name: string;
+  description?: string | null;
+  memories?: MemoryItem[];
+  children?: LocationItem[];
+}
+interface PalaceExport {
+  name: string;
+  description?: string | null;
+  locations?: LocationItem[];
+}
+
+function formatAsMarkdown(palace: PalaceExport): string {
   let markdown = `# ${palace.name}\n\n`;
 
   if (palace.description) {
@@ -11,7 +24,7 @@ function formatAsMarkdown(palace: any): string {
 
   markdown += `*Exported: ${new Date().toISOString()}*\n\n`;
 
-  function renderLocation(location: any, depth: number = 1): string {
+  function renderLocation(location: LocationItem, depth: number = 1): string {
     const heading = "#".repeat(depth + 1);
     let content = `${heading} ${location.name}\n\n`;
 

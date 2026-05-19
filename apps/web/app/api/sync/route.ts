@@ -8,8 +8,19 @@ interface SyncChange {
   id?: string;
   palaceId?: string;
   locationId?: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   timestamp: number;
+}
+
+interface SyncResult {
+  id: string;
+  cloudId?: string;
+  type: string;
+}
+
+interface SyncError {
+  change: SyncChange;
+  error: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -20,7 +31,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { deviceId, deviceName, changes } = await request.json();
+    const { deviceId, deviceName, changes } = await request.json() as {
+      deviceId: string;
+      deviceName?: string;
+      changes: SyncChange[];
+    };
 
     if (!deviceId || !Array.isArray(changes)) {
       return NextResponse.json(
@@ -44,8 +59,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const results: any[] = [];
-    const errors: any[] = [];
+    const results: SyncResult[] = [];
+    const errors: SyncError[] = [];
 
     // Process each change in order (respects timestamp order)
     for (const change of changes.sort((a, b) => a.timestamp - b.timestamp)) {
