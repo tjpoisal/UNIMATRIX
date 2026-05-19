@@ -65,10 +65,10 @@ export async function POST(request: NextRequest) {
       data: {
         status: 'complete',
         providers: result.responses.map(r => `${r.provider}:${r.model}`),
-        result: {
+        result: JSON.parse(JSON.stringify({
           synthesis: result.synthesis,
           responses: result.responses,
-        },
+        })),
         memoryIds: result.memoryId ? [result.memoryId] : [],
       },
     });
