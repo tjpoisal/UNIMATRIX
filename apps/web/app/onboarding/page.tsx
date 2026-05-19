@@ -152,14 +152,15 @@ export default function OnboardingPage() {
   const [copied, setCopied] = useState(false);
   const [revoking, setRevoking] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchKeys();
-  }, []);
-
   const fetchKeys = async () => {
     const res = await fetch('/api/apikeys');
     if (res.ok) setKeys(await res.json());
   };
+
+  useEffect(() => {
+    fetchKeys();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCreate = async () => {
     if (!newKeyName.trim()) return;

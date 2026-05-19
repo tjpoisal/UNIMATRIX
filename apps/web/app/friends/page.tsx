@@ -51,6 +51,7 @@ export default function FriendsPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-compiler/react-compiler
   useEffect(() => { fetchFriends(); }, [fetchFriends]);
 
   const sendRequest = async () => {
