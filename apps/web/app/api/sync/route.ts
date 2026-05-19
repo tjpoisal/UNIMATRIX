@@ -62,8 +62,14 @@ export async function POST(request: NextRequest) {
     const results: SyncResult[] = [];
     const errors: SyncError[] = [];
 
+    // Helper to extract typed primitives from the unstructured client payload
+    const str = (v: unknown): string => String(v ?? '');
+    const strOrNull = (v: unknown): string | null => (v == null ? null : String(v));
+    const num = (v: unknown): number => Number(v ?? 0);
+
     // Process each change in order (respects timestamp order)
     for (const change of changes.sort((a, b) => a.timestamp - b.timestamp)) {
+      const d = change.data ?? {};
       try {
         switch (change.type) {
           case "palace":
@@ -71,23 +77,23 @@ export async function POST(request: NextRequest) {
               const palace = await prisma.palace.create({
                 data: {
                   userId: session.user.id,
-                  name: change.data?.name,
-                  description: change.data?.description,
+                  name: str(d.name),
+                  description: strOrNull(d.description),
                 },
               });
-              results.push({ id: change.id || palace.id, cloudId: palace.id, type: "palace" });
+              results.push({ id: change.id ?? palace.id, cloudId: palace.id, type: "palace" });
             } else if (change.operation === "update") {
               await prisma.palace.update({
-                where: { id: change.id },
-                data: change.data,
+                where: { id: change.id! },
+                data: { name: str(d.name), description: strOrNull(d.description) },
               });
-              results.push({ id: change.id, type: "palace" });
+              results.push({ id: change.id!, type: "palace" });
             } else if (change.operation === "delete") {
               await prisma.palace.update({
-                where: { id: change.id },
+                where: { id: change.id! },
                 data: { deletedAt: new Date() },
               });
-              results.push({ id: change.id, type: "palace" });
+              results.push({ id: change.id!, type: "palace" });
             }
             break;
 
@@ -96,25 +102,25 @@ export async function POST(request: NextRequest) {
               const location = await prisma.location.create({
                 data: {
                   palaceId: change.palaceId!,
-                  parentId: change.data?.parentId || null,
-                  name: change.data?.name,
-                  description: change.data?.description,
-                  position: change.data?.position || 0,
+                  parentId: strOrNull(d.parentId),
+                  name: str(d.name),
+                  description: strOrNull(d.description),
+                  position: num(d.position),
                 },
               });
-              results.push({ id: change.id || location.id, cloudId: location.id, type: "location" });
+              results.push({ id: change.id ?? location.id, cloudId: location.id, type: "location" });
             } else if (change.operation === "update") {
               await prisma.location.update({
-                where: { id: change.id },
-                data: change.data,
+                where: { id: change.id! },
+                data: { name: str(d.name), description: strOrNull(d.description), position: num(d.position) },
               });
-              results.push({ id: change.id, type: "location" });
+              results.push({ id: change.id!, type: "location" });
             } else if (change.operation === "delete") {
               await prisma.location.update({
-                where: { id: change.id },
+                where: { id: change.id! },
                 data: { deletedAt: new Date() },
               });
-              results.push({ id: change.id, type: "location" });
+              results.push({ id: change.id!, type: "location" });
             }
             break;
 
@@ -123,23 +129,23 @@ export async function POST(request: NextRequest) {
               const memory = await prisma.memory.create({
                 data: {
                   locationId: change.locationId!,
-                  content: change.data?.content,
-                  tags: change.data?.tags || [],
+                  content: str(d.content),
+                  tags: Array.isArray(d.tags) ? d.tags.map(String) : [],
                 },
               });
-              results.push({ id: change.id || memory.id, cloudId: memory.id, type: "memory" });
+              results.push({ id: change.id ?? memory.id, cloudId: memory.id, type: "memory" });
             } else if (change.operation === "update") {
               await prisma.memory.update({
-                where: { id: change.id },
-                data: change.data,
+                where: { id: change.id! },
+                data: { content: str(d.content), tags: Array.isArray(d.tags) ? d.tags.map(String) : [] },
               });
-              results.push({ id: change.id, type: "memory" });
+              results.push({ id: change.id!, type: "memory" });
             } else if (change.operation === "delete") {
               await prisma.memory.update({
-                where: { id: change.id },
+                where: { id: change.id! },
                 data: { deletedAt: new Date() },
               });
-              results.push({ id: change.id, type: "memory" });
+              results.push({ id: change.id!, type: "memory" });
             }
             break;
         }
