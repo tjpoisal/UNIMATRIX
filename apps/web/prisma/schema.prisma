@@ -14,13 +14,23 @@ model User {
   password  String?   // nullable for OAuth users
   name      String?
   image     String?   // profile image from OAuth
-  tier      String    @default("free") // free | pro
+  tier                 String    @default("free") // free | pro
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
 
   // Relations
-  accounts  Account[]
-  palaces   Palace[]
-  sessions  Session[]
-  apiKeys   ApiKey[]
+  accounts      Account[]
+  palaces       Palace[]
+  sessions      Session[]
+  apiKeys       ApiKey[]
+  llmProviders  LLMProvider[]
+  agentRuns     AgentRun[]
+
+  // Social
+  friendRequestsSent     Friendship[]  @relation("FriendRequests")
+  friendRequestsReceived Friendship[]  @relation("FriendAddressees")
+  palacesSharedByMe      PalaceShare[] @relation("SharedByUser")
+  palacesSharedWithMe    PalaceShare[] @relation("SharedWithUser")
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -62,6 +72,7 @@ model Palace {
   isPublic    Boolean   @default(false)
 
   locations   Location[]
+  shares      PalaceShare[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -172,4 +183,96 @@ model ApiKey {
 
   @@index([userId])
   @@index([keyHash])
+}
+
+// User-connected LLM providers (encrypted API keys)
+model LLMProvider {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider     String   // claude | openai | gemini | groq | ollama
+  model        String   // e.g. "claude-opus-4-6", "gpt-4o", "gemini-pro"
+  label        String?  // user-friendly name e.g. "My Claude Key"
+  keyEncrypted String   // AES-256-GCM encrypted API key
+  keyIv        String   // initialization vector for decryption
+  keyPrefix    String   // first 8 chars for display
+  isActive     Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([provider])
+  @@unique([userId, provider, model])
+}
+
+// Collaborative agent run sessions
+model AgentRun {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  task      String   // the question or task submitted
+  mode      String   @default("parallel") // parallel | sequential | debate
+  providers String[] // provider names that participated
+
+  result      Json?    // final synthesized result { synthesis, responses[] }
+  memoryIds   String[] // IDs of Memory records created from this run
+  palaceId    String?  // palace where memories were saved
+
+  status    String   @default("pending") // pending | running | complete | error
+  errorMsg  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Friend connections between users
+model Friendship {
+  id          String   @id @default(cuid())
+
+  requesterId String
+  requester   User     @relation("FriendRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  addresseeId String
+  addressee   User     @relation("FriendAddressees", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  status      String   @default("pending") // pending | accepted | blocked
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId])
+  @@index([addresseeId])
+  @@index([status])
+}
+
+// Palace sharing with specific users and permission levels
+model PalaceShare {
+  id           String   @id @default(cuid())
+
+  palaceId     String
+  palace       Palace   @relation(fields: [palaceId], references: [id], onDelete: Cascade)
+
+  sharedById   String
+  sharedBy     User     @relation("SharedByUser", fields: [sharedById], references: [id], onDelete: Cascade)
+
+  sharedWithId String
+  sharedWith   User     @relation("SharedWithUser", fields: [sharedWithId], references: [id], onDelete: Cascade)
+
+  permission   String   @default("view") // view | edit
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([palaceId, sharedWithId])
+  @@index([palaceId])
+  @@index([sharedById])
+  @@index([sharedWithId])
 }

@@ -12,6 +12,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       image?: string | null;
+      tier: string;
     };
   }
 }
@@ -59,15 +60,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return true;
     },
-    async jwt({ token, user, account }) {
-      if (user?.email) {
-        const dbUser = await prisma.user.findUnique({ where: { email: user.email } });
-        if (dbUser) token.id = dbUser.id;
+    async jwt({ token, user, trigger }) {
+      // Refresh DB user on sign-in or explicit session update
+      if (user?.email || trigger === "update") {
+        const email = (user?.email ?? token.email) as string | undefined;
+        if (email) {
+          const dbUser = await prisma.user.findUnique({ where: { email } });
+          if (dbUser) {
+            token.id = dbUser.id;
+            token.tier = dbUser.tier;
+          }
+        }
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) session.user.id = token.id as string;
+      if (session.user) {
+        session.user.id   = token.id   as string;
+        session.user.tier = (token.tier as string | undefined) ?? "free";
+      }
       return session;
     },
   },

@@ -18,6 +18,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     { label: 'Dashboard', href: '/dashboard', icon: '🏠' },
     { label: 'Palaces', href: '/palaces', icon: '🏛️' },
     { label: 'Search', href: '/search', icon: '🔍' },
+    { label: 'Friends', href: '/friends', icon: '👥' },
     { label: 'Connect AIs', href: '/onboarding', icon: '🔌' },
     { label: 'Settings', href: '/settings', icon: '⚙️' },
   ];
@@ -66,6 +67,26 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           </Link>
         ))}
       </nav>
+
+      {/* Upgrade CTA — shown only for free users */}
+      {session?.user?.tier !== 'pro' && (
+        <div className="px-4 pb-3">
+          <Link
+            href="/pricing"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-[#A855F7]/20 to-[#00F5FF]/10 border border-[#A855F7]/30 hover:border-[#A855F7]/60 transition-all duration-200 ${
+              isOpen ? '' : 'justify-center'
+            }`}
+          >
+            <span className="text-base flex-shrink-0">⚡</span>
+            {isOpen && (
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-[#A855F7]">Upgrade to Pro</p>
+                <p className="text-[10px] text-[#64748B] truncate">Unlimited palaces &amp; sharing</p>
+              </div>
+            )}
+          </Link>
+        </div>
+      )}
 
       {/* User Section */}
       <div className="p-4 border-t border-[#334155]/30 space-y-3">

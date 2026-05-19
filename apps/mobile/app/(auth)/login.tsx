@@ -45,7 +45,7 @@ export default function LoginScreen() {
         />
       </View>
 
-      <View className="mb-8">
+      <View className="mb-2">
         <Text className="text-gray-300 mb-2">Password</Text>
         <TextInput
           placeholder="••••••••"
@@ -56,6 +56,10 @@ export default function LoginScreen() {
           className="bg-[#1A1F35] border border-[#00F5FF]/20 rounded-lg px-4 py-3 text-white"
         />
       </View>
+
+      <TouchableOpacity onPress={() => router.push('/forgot-password')} className="self-end mb-6">
+        <Text className="text-[#00F5FF] text-sm">Forgot password?</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         onPress={handleLogin}
