@@ -19,10 +19,12 @@ model User {
   stripeSubscriptionId String?
 
   // Relations
-  accounts  Account[]
-  palaces   Palace[]
-  sessions  Session[]
-  apiKeys   ApiKey[]
+  accounts      Account[]
+  palaces       Palace[]
+  sessions      Session[]
+  apiKeys       ApiKey[]
+  llmProviders  LLMProvider[]
+  agentRuns     AgentRun[]
 
   // Social
   friendRequestsSent     Friendship[]  @relation("FriendRequests")
@@ -181,6 +183,53 @@ model ApiKey {
 
   @@index([userId])
   @@index([keyHash])
+}
+
+// User-connected LLM providers (encrypted API keys)
+model LLMProvider {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider     String   // claude | openai | gemini | groq | ollama
+  model        String   // e.g. "claude-opus-4-6", "gpt-4o", "gemini-pro"
+  label        String?  // user-friendly name e.g. "My Claude Key"
+  keyEncrypted String   // AES-256-GCM encrypted API key
+  keyIv        String   // initialization vector for decryption
+  keyPrefix    String   // first 8 chars for display
+  isActive     Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([provider])
+  @@unique([userId, provider, model])
+}
+
+// Collaborative agent run sessions
+model AgentRun {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  task      String   // the question or task submitted
+  mode      String   @default("parallel") // parallel | sequential | debate
+  providers String[] // provider names that participated
+
+  result      Json?    // final synthesized result { synthesis, responses[] }
+  memoryIds   String[] // IDs of Memory records created from this run
+  palaceId    String?  // palace where memories were saved
+
+  status    String   @default("pending") // pending | running | complete | error
+  errorMsg  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 // Friend connections between users
