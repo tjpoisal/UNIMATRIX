@@ -3,10 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import Stripe from "stripe";
 
-// Vercel / Next.js: must export config to disable body parser for raw Stripe signature
-export const config = { api: { bodyParser: false } };
-
 // POST /api/stripe/webhook — handle Stripe events
+// App Router route handlers receive the raw Request body — no body-parser config needed
 export async function POST(request: NextRequest) {
   const rawBody = await request.text();
   const sig = request.headers.get("stripe-signature");
