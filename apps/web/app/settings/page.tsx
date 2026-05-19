@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import AppShell from '@/components/layout/AppShell';
 
 interface Palace {
@@ -11,11 +13,20 @@ interface Palace {
 
 export default function SettingsPage() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const upgraded = searchParams.get('upgraded') === '1';
+
   const [palaces, setPalaces] = useState<Palace[]>([]);
   const [selectedPalaceId, setSelectedPalaceId] = useState('');
   const [exportFormat, setExportFormat] = useState<'json' | 'markdown'>('json');
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState('');
+
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [billingError, setBillingError] = useState('');
+
+  const tier = session?.user?.tier ?? 'free';
+  const isPro = tier === 'pro';
 
   useEffect(() => {
     fetch('/api/palaces')
@@ -62,9 +73,40 @@ export default function SettingsPage() {
     }
   };
 
+  const handleManageBilling = async () => {
+    setBillingLoading(true);
+    setBillingError('');
+    try {
+      const res = await fetch('/api/stripe/portal', { method: 'POST' });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setBillingError(data.error ?? 'Could not open billing portal.');
+      }
+    } catch {
+      setBillingError('Network error. Please try again.');
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
   return (
     <AppShell>
       <div className="p-8 max-w-2xl mx-auto space-y-8">
+        {/* Upgrade success banner */}
+        {upgraded && (
+          <div className="flex items-center gap-3 px-5 py-4 bg-[#00F5FF]/10 border border-[#00F5FF]/30 rounded-2xl">
+            <span className="text-[#00F5FF] text-lg">✓</span>
+            <div>
+              <p className="text-[#00F5FF] font-semibold">You&apos;re now on Pro!</p>
+              <p className="text-sm text-[#64748B] mt-0.5">
+                All limits have been lifted. Enjoy unlimited palaces, memories, and sharing.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-[#F1F5F9]">Settings</h1>
@@ -83,6 +125,54 @@ export default function SettingsPage() {
               <p className="text-sm text-[#64748B]">{session?.user?.email || '—'}</p>
             </div>
           </div>
+        </section>
+
+        {/* Billing Section */}
+        <section className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-6">
+          <h2 className="text-lg font-semibold text-[#F1F5F9] mb-1">Plan &amp; Billing</h2>
+          <p className="text-sm text-[#94A3B8] mb-5">
+            {isPro
+              ? 'You\'re on the Pro plan. Manage or cancel your subscription any time.'
+              : 'You\'re on the Free plan. Upgrade to unlock unlimited palaces, memories, and sharing.'}
+          </p>
+
+          <div className="flex items-center gap-3 mb-5">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                isPro
+                  ? 'bg-[#00F5FF]/10 text-[#00F5FF] border border-[#00F5FF]/30'
+                  : 'bg-[#334155]/40 text-[#94A3B8] border border-[#334155]/40'
+              }`}
+            >
+              {isPro ? '⚡ Pro' : 'Free'}
+            </span>
+            {isPro && (
+              <span className="text-xs text-[#64748B]">
+                Unlimited palaces · Unlimited memories · 20 API keys
+              </span>
+            )}
+          </div>
+
+          {billingError && (
+            <p className="text-sm text-[#EF4444] mb-3">{billingError}</p>
+          )}
+
+          {isPro ? (
+            <button
+              onClick={handleManageBilling}
+              disabled={billingLoading}
+              className="px-5 py-2.5 bg-[#1F2937] hover:bg-[#2D3748] disabled:opacity-50 disabled:cursor-not-allowed text-[#F1F5F9] text-sm font-medium rounded-lg transition-colors"
+            >
+              {billingLoading ? 'Opening portal…' : 'Manage Subscription'}
+            </button>
+          ) : (
+            <Link
+              href="/pricing"
+              className="inline-block px-5 py-2.5 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] text-sm font-bold rounded-lg transition-colors shadow-lg shadow-[#00F5FF]/20"
+            >
+              Upgrade to Pro →
+            </Link>
+          )}
         </section>
 
         {/* Export Section */}
@@ -146,7 +236,7 @@ export default function SettingsPage() {
           )}
         </section>
 
-        {/* Danger Zone */}
+        {/* Account */}
         <section className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-6">
           <h2 className="text-lg font-semibold text-[#F1F5F9] mb-1">Account</h2>
           <p className="text-sm text-[#94A3B8] mb-5">Sign out of Unimatrix</p>
