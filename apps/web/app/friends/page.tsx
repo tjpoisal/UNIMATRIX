@@ -41,8 +41,8 @@ export default function FriendsPage() {
   const [sendSuccess, setSendSuccess] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // fetchFriends only sets state after async work — no synchronous setState in effects
   const fetchFriends = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch('/api/friends');
       if (res.ok) setData(await res.json());
@@ -51,7 +51,6 @@ export default function FriendsPage() {
     }
   }, []);
 
-  // eslint-disable-next-line react-compiler/react-compiler
   useEffect(() => { fetchFriends(); }, [fetchFriends]);
 
   const sendRequest = async () => {
