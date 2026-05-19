@@ -42,7 +42,7 @@ function ResetPasswordForm() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || 'Something went wrong. Please try again.');
+        setSubmitError(data.message || 'Something went wrong. Please try again.');
         return;
       }
       setSuccess(true);
