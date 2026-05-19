@@ -26,37 +26,17 @@ const FEATURES_PRO = [
 export default function PricingPage() {
   const { data: session } = useSession();
   const [interval, setInterval] = useState<'monthly' | 'yearly'>('monthly');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const price = interval === 'monthly' ? '$9' : '$79';
   const perLabel = interval === 'monthly' ? '/month' : '/year';
   const savings = interval === 'yearly' ? 'Save $29 vs monthly' : '';
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = () => {
     if (!session) {
-      window.location.href = '/auth/login?callbackUrl=/pricing';
+      window.location.href = `/auth/login?callbackUrl=/checkout?interval=${interval}`;
       return;
     }
-    setLoading(true);
-    setError('');
-    try {
-      const res = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ interval }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setError(data.error ?? 'Something went wrong. Please try again.');
-      }
-    } catch {
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    window.location.href = `/checkout?interval=${interval}`;
   };
 
   return (
@@ -195,16 +175,11 @@ export default function PricingPage() {
               ))}
             </ul>
 
-            {error && (
-              <p className="relative text-xs text-[#EF4444] mb-3">{error}</p>
-            )}
-
             <button
               onClick={handleUpgrade}
-              disabled={loading}
-              className="relative py-3 bg-[#00F5FF] hover:bg-[#00D9FF] disabled:opacity-60 disabled:cursor-not-allowed text-[#0A0F1C] font-bold rounded-xl text-sm transition-all shadow-lg shadow-[#00F5FF]/20"
+              className="relative py-3 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-bold rounded-xl text-sm transition-all shadow-lg shadow-[#00F5FF]/20"
             >
-              {loading ? 'Redirecting…' : session ? 'Upgrade to Pro' : 'Start Pro — free 7-day trial'}
+              {session ? 'Upgrade to Pro →' : 'Start Pro — free 7-day trial →'}
             </button>
           </div>
         </div>
