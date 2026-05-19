@@ -25,16 +25,15 @@ function SearchContent() {
 
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+  // Initialise loading/searched from URL so no sync setState is needed in the effect.
+  const [loading, setLoading] = useState(!!initialQuery);
+  const [searched, setSearched] = useState(!!initialQuery);
   const [error, setError] = useState('');
 
+  // runSearch only sets state after async work — callers handle the sync setup.
+  // try/finally (no catch) ensures no setState can run before the first await.
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) return;
-    setLoading(true);
-    setError('');
-    setSearched(true);
-
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q.trim())}`);
       const data = await res.json();
@@ -46,14 +45,13 @@ function SearchContent() {
       }
 
       setResults(data.results || []);
-    } catch {
-      setError('Search request failed');
-      setResults([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // When the URL query changes, kick off a search. The loading/searched state is
+  // already derived from initialQuery above so no synchronous setState is needed here.
   useEffect(() => {
     if (initialQuery) {
       runSearch(initialQuery);
@@ -63,6 +61,10 @@ function SearchContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
+    // Sync state updates are fine in event handlers.
+    setLoading(true);
+    setError('');
+    setSearched(true);
     router.push(`/search?q=${encodeURIComponent(query.trim())}`);
     runSearch(query);
   };

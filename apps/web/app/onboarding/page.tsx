@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AppShell from '@/components/layout/AppShell';
 
 interface ApiKey {
@@ -152,15 +152,16 @@ export default function OnboardingPage() {
   const [copied, setCopied] = useState(false);
   const [revoking, setRevoking] = useState<string | null>(null);
 
-  const fetchKeys = async () => {
-    const res = await fetch('/api/apikeys');
-    if (res.ok) setKeys(await res.json());
-  };
-
-  useEffect(() => {
-    fetchKeys();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchKeys = useCallback(async () => {
+    try {
+      const res = await fetch('/api/apikeys');
+      if (res.ok) setKeys(await res.json());
+    } finally {
+      // fetch complete
+    }
   }, []);
+
+  useEffect(() => { fetchKeys(); }, [fetchKeys]);
 
   const handleCreate = async () => {
     if (!newKeyName.trim()) return;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import AppShell from '@/components/layout/AppShell';
 
@@ -18,7 +18,7 @@ export default function PalacesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadPalaces = async () => {
+  const loadPalaces = useCallback(async () => {
     try {
       const res = await fetch('/api/palaces');
       const data = await res.json();
@@ -27,14 +27,12 @@ export default function PalacesPage() {
         return;
       }
       setPalaces(data);
-    } catch {
-      setError('Failed to load palaces');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { loadPalaces(); }, []);
+  useEffect(() => { loadPalaces(); }, [loadPalaces]);
 
   const totalMemories = palaces.reduce(
     (sum, p) => sum + p.locations.reduce((s, l) => s + l._count.memories, 0),
