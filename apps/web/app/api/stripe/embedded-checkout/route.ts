@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe, PRICE_IDS } from "@/lib/stripe";
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
   }
 
   const checkoutSession = await stripe.checkout.sessions.create({
-    ui_mode: "embedded" as const,
+    ui_mode: "embedded" as Stripe.Checkout.SessionCreateParams.UiMode,
     customer: customerId,
     payment_method_types: ["card"],
     mode: "subscription",
