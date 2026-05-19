@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import type Stripe from "stripe";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe, PRICE_IDS } from "@/lib/stripe";
@@ -57,7 +56,9 @@ export async function POST(request: NextRequest) {
   }
 
   const checkoutSession = await stripe.checkout.sessions.create({
-    ui_mode: "embedded" as Stripe.Checkout.SessionCreateParams.UiMode,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore — embedded is valid in Stripe v22 API; types don't expose it under Checkout namespace
+    ui_mode: "embedded",
     customer: customerId,
     payment_method_types: ["card"],
     mode: "subscription",
