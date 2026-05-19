@@ -1,11 +1,17 @@
 import Stripe from "stripe";
 
-// Use empty string as fallback so Next.js can analyse the module at build time
-// without throwing. Runtime calls will fail with an auth error if the key is
-// not set, which is the correct behaviour.
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-  apiVersion: "2026-04-22.dahlia",
-});
+// Lazy singleton — Next.js evaluates modules at build time; calling new Stripe()
+// with an empty key throws immediately. Defer until the first real request.
+let _stripe: Stripe | null = null;
+
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+    _stripe = new Stripe(key, { apiVersion: "2026-04-22.dahlia" });
+  }
+  return _stripe;
+}
 
 // Price IDs — set these in your Stripe dashboard and add to env
 export const PRICE_IDS = {
