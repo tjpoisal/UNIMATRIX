@@ -1,12 +1,10 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not set");
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-04-30.basil",
-  typescript: true,
+// Use empty string as fallback so Next.js can analyse the module at build time
+// without throwing. Runtime calls will fail with an auth error if the key is
+// not set, which is the correct behaviour.
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
+  apiVersion: "2026-04-22.dahlia",
 });
 
 // Price IDs — set these in your Stripe dashboard and add to env
