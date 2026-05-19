@@ -274,7 +274,6 @@ export default function ProvidersPage() {
                     </div>
                     <button
                       onClick={() => isOpen ? setAdding(null) : openAdd(def.id)}
-                      style={{ color: isOpen ? '#EF4444' : def.color }}
                       className="text-sm font-medium px-4 py-2 rounded-lg border transition-all"
                       style={{
                         color: isOpen ? '#EF4444' : def.color,
