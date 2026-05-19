@@ -14,7 +14,9 @@ model User {
   password  String?   // nullable for OAuth users
   name      String?
   image     String?   // profile image from OAuth
-  tier      String    @default("free") // free | pro
+  tier                 String    @default("free") // free | pro
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?
 
   // Relations
   accounts  Account[]
