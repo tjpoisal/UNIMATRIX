@@ -44,7 +44,7 @@ export default function TopBar({ onMenuClick }: TopBarProps) {
         {/* Quick Actions */}
         <div className="flex items-center gap-2">
           <button
-            onClick={() => router.push('/palaces/new')}
+            onClick={() => router.push('/palace')}
             className="px-4 py-2 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20 transform hover:scale-105 text-sm"
           >
             + New Palace
