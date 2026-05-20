@@ -5,7 +5,7 @@ import PalaceGrid from '@/components/dashboard/PalaceGrid';
 
 export const metadata = {
   title: 'Dashboard - Unimatrix',
-  description: 'Your memory palaces',
+  description: 'Your AI memory workspaces',
 };
 
 export default async function DashboardPage() {

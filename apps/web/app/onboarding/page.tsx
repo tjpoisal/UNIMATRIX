@@ -63,7 +63,7 @@ Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://un
 Authorization: Bearer ${key}
 
 Endpoints:
-  GET  /palaces           — list your memory palaces
+  GET  /palaces           — list your memory workspaces
   GET  /memories          — search memories
   POST /memories          — store a new memory
   GET  /search?q=...      — full-text search
@@ -85,7 +85,7 @@ Authorization Header: Bearer ${key}
 Example function declaration for Gemini:
 {
   "name": "search_memories",
-  "description": "Search the user's Unimatrix memory palace",
+  "description": "Search the user's Unimatrix memory — returns relevant context from all AI sessions",
   "parameters": {
     "type": "object",
     "properties": {
@@ -113,7 +113,7 @@ Add as a tool in your Grok system prompt:
   "type": "function",
   "function": {
     "name": "query_memory",
-    "description": "Query the user's personal memory palace stored in Unimatrix",
+    "description": "Query the user's persistent AI memory stored in Unimatrix",
     "parameters": {
       "type": "object",
       "properties": {
@@ -356,7 +356,7 @@ export default function OnboardingPage() {
             <h2 className="text-lg font-semibold text-[#F1F5F9]">Test the Connection</h2>
           </div>
           <p className="text-sm text-[#94A3B8] mb-4">
-            After configuring your AI, ask it: <span className="text-[#F1F5F9] font-medium">&quot;What&apos;s in my Unimatrix memory palace?&quot;</span>
+            After configuring your AI, ask it: <span className="text-[#F1F5F9] font-medium">&quot;What do you remember from my previous conversations?&quot;</span>
           </p>
           <div className="p-4 bg-[#0A0F1C]/40 border border-[#334155]/30 rounded-xl">
             <p className="text-xs text-[#64748B] font-mono">

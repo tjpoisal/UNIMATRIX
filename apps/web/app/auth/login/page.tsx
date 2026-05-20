@@ -2,7 +2,7 @@ import LoginForm from '@/components/auth/LoginForm';
 
 export const metadata = {
   title: 'Sign In - Unimatrix',
-  description: 'Sign in to your memory palace',
+  description: 'Sign in to Unimatrix',
 };
 
 export default function LoginPage() {

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const FEATURES_FREE = [
-  '3 memory palaces',
+  '3 memory workspaces',
   '200 memories',
   'Full-text search',
   '1 API key for AI connections',
@@ -14,7 +14,7 @@ const FEATURES_FREE = [
 ];
 
 const FEATURES_PRO = [
-  'Unlimited memory palaces',
+  'Unlimited memory workspaces',
   'Unlimited memories',
   'Friends & palace sharing',
   '20 API keys',

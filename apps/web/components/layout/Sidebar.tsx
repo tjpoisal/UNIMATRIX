@@ -16,7 +16,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: '🏠' },
-    { label: 'Palaces', href: '/palace', icon: '🏛️' },
+    { label: 'Workspaces', href: '/palace', icon: '🧠' },
     { label: 'Search', href: '/search', icon: '🔍' },
     { label: 'Friends', href: '/friends', icon: '👥' },
     { label: 'Connect AIs', href: '/onboarding', icon: '🔌' },
@@ -81,7 +81,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
             {isOpen && (
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[#A855F7]">Upgrade to Pro</p>
-                <p className="text-[10px] text-[#64748B] truncate">Unlimited palaces &amp; sharing</p>
+                <p className="text-[10px] text-[#64748B] truncate">Unlimited workspaces &amp; memory</p>
               </div>
             )}
           </Link>

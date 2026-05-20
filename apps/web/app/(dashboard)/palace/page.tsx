@@ -18,10 +18,10 @@ interface Palace {
   locations: PalaceLocation[];
 }
 
-const PALACE_EMOJIS = ['🏛️', '🏰', '🗼', '🌌', '🏯', '🕌', '🗽', '🌆', '🏟️', '🛕'];
+const WORKSPACE_EMOJIS = ['🏛️', '🏰', '🗼', '🌌', '🏯', '🕌', '🗽', '🌆', '🏟️', '🛕'];
 
-function getPalaceEmoji(name: string): string {
-  const idx = name.charCodeAt(0) % PALACE_EMOJIS.length;
+function getWorkspaceEmoji(name: string): string {
+  const idx = name.charCodeAt(0) % WORKSPACE_EMOJIS.length;
   return PALACE_EMOJIS[idx];
 }
 
@@ -51,7 +51,7 @@ function CreateModal({ onClose, onCreate }: CreateModalProps) {
         body: JSON.stringify({ name: name.trim(), description: description.trim() || undefined }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to create palace');
+      if (!res.ok) throw new Error(data.error || 'Failed to create workspace');
       onCreate({ ...data, locations: [] });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -64,7 +64,7 @@ function CreateModal({ onClose, onCreate }: CreateModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-[#111827] border border-[#334155]/50 rounded-2xl p-8 w-full max-w-md shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-[#F1F5F9]">Create New Palace</h2>
+          <h2 className="text-xl font-bold text-[#F1F5F9]">Create New Workspace</h2>
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#1F2937] transition-colors"
@@ -74,12 +74,12 @@ function CreateModal({ onClose, onCreate }: CreateModalProps) {
         </div>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm text-[#94A3B8] mb-1.5">Palace Name</label>
+            <label className="block text-sm text-[#94A3B8] mb-1.5">Workspace Name</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder="e.g. World History, Programming Concepts…"
+              placeholder="e.g. Project Research, Work Context, Personal Notes…"
               autoFocus
               className="w-full bg-[#0A0F1C] border border-[#334155] rounded-lg px-4 py-2.5 text-[#F1F5F9] placeholder-[#475569] text-sm focus:outline-none focus:ring-2 focus:ring-[#00F5FF]/40 transition-all"
             />
@@ -91,7 +91,7 @@ function CreateModal({ onClose, onCreate }: CreateModalProps) {
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              placeholder="What will you store in this palace?"
+              placeholder="What will this AI memory workspace be used for?"
               rows={3}
               className="w-full bg-[#0A0F1C] border border-[#334155] rounded-lg px-4 py-2.5 text-[#F1F5F9] placeholder-[#475569] text-sm focus:outline-none focus:ring-2 focus:ring-[#00F5FF]/40 transition-all resize-none"
             />
@@ -177,7 +177,7 @@ export default function PalaceListPage() {
       <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
         <div className="flex items-center gap-3 text-[#94A3B8]">
           <div className="w-5 h-5 border-2 border-[#00F5FF]/30 border-t-[#00F5FF] rounded-full animate-spin" />
-          Loading palaces…
+          Loading workspaces…
         </div>
       </div>
     );
@@ -193,10 +193,10 @@ export default function PalaceListPage() {
         {/* Header */}
         <div className="flex items-start justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-1">Memory Palaces</h1>
+            <h1 className="text-3xl font-bold text-white mb-1">AI Memory Workspaces</h1>
             {!loading && (
               <p className="text-[#94A3B8] text-sm">
-                {palaces.length} palace{palaces.length !== 1 ? 's' : ''} · {totalMemories} memor{totalMemories !== 1 ? 'ies' : 'y'}
+                {palaces.length} workspace{palaces.length !== 1 ? 's' : ''} · {totalMemories} memor{totalMemories !== 1 ? 'ies' : 'y'}
               </p>
             )}
           </div>
@@ -204,7 +204,7 @@ export default function PalaceListPage() {
             onClick={() => setShowCreate(true)}
             className="px-5 py-2.5 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-xl transition-colors flex items-center gap-2 text-sm"
           >
-            <span className="text-base leading-none">+</span> New Palace
+            <span className="text-base leading-none">+</span> New Workspace
           </button>
         </div>
 
@@ -221,15 +221,15 @@ export default function PalaceListPage() {
             <div className="w-20 h-20 bg-[#1F2937] rounded-2xl flex items-center justify-center mx-auto mb-5">
               <span className="text-4xl">🏛️</span>
             </div>
-            <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">No palaces yet</h2>
+            <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">No workspaces yet</h2>
             <p className="text-[#94A3B8] mb-8 text-sm max-w-sm mx-auto">
-              Create your first memory palace to start organizing your knowledge using the Method of Loci.
+              Create your first AI memory workspace. Any AI you connect will automatically store context here.
             </p>
             <button
               onClick={() => setShowCreate(true)}
               className="px-8 py-3 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-xl transition-colors text-sm"
             >
-              Create Your First Palace
+              Create Your First Workspace
             </button>
           </div>
         )}
@@ -239,7 +239,7 @@ export default function PalaceListPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {palaces.map(palace => {
               const memoryCount = palace.locations.reduce((s, l) => s + l._count.memories, 0);
-              const emoji = getPalaceEmoji(palace.name);
+              const emoji = getWorkspaceEmoji(palace.name);
               const isConfirmingDelete = confirmDelete === palace.id;
 
               return (
@@ -334,7 +334,7 @@ export default function PalaceListPage() {
               <div className="w-12 h-12 rounded-xl bg-[#1F2937] group-hover:bg-[#00F5FF]/10 border border-[#334155]/30 group-hover:border-[#00F5FF]/30 flex items-center justify-center transition-all duration-200">
                 <span className="text-[#64748B] group-hover:text-[#00F5FF] text-2xl transition-colors">+</span>
               </div>
-              <span className="text-sm text-[#64748B] group-hover:text-[#94A3B8] transition-colors">New Palace</span>
+              <span className="text-sm text-[#64748B] group-hover:text-[#94A3B8] transition-colors">New Workspace</span>
             </button>
           </div>
         )}
