@@ -104,7 +104,7 @@ export default function FriendsPage() {
         <div>
           <h1 className="text-3xl font-bold text-[#F1F5F9]">Friends</h1>
           <p className="text-[#94A3B8] mt-1">
-            Connect with others to share memory palaces.
+            Connect with others to share AI memory workspaces.
           </p>
         </div>
 

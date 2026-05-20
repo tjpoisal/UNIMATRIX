@@ -44,7 +44,7 @@ export default function PalaceGrid() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-[#94A3B8]">Loading your palaces...</div>
+        <div className="text-[#94A3B8]">Loading your AI memories…</div>
       </div>
     );
   }
@@ -65,20 +65,20 @@ export default function PalaceGrid() {
           Welcome back, {session?.user?.name}
         </h1>
         <p className="text-[#94A3B8]">
-          You have {palaces.length} palace{palaces.length !== 1 ? 's' : ''}
+          You have {palaces.length} workspace{palaces.length !== 1 ? 's' : ''}
         </p>
       </div>
 
       {/* Palaces Grid */}
       {palaces.length === 0 ? (
         <div className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-12 text-center">
-          <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">No palaces yet</h2>
-          <p className="text-[#94A3B8] mb-6">Create your first memory palace to get started</p>
+          <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">No workspaces yet</h2>
+          <p className="text-[#94A3B8] mb-6">Connect an AI via MCP and it will start storing context here automatically.</p>
           <Link
             href="/palaces/new"
             className="inline-block px-6 py-3 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20 transform hover:scale-105"
           >
-            Create Your First Palace
+            Create Your First Workspace
           </Link>
         </div>
       ) : (

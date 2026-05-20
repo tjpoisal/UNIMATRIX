@@ -13,7 +13,7 @@ const EmbeddedCheckoutForm = dynamic(
 );
 
 const PRO_FEATURES = [
-  'Unlimited memory palaces',
+  'Unlimited memory workspaces',
   'Unlimited memories',
   'Friends & palace sharing',
   '20 API keys for all your AIs',

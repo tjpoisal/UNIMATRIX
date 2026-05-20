@@ -370,7 +370,7 @@ export default function PalaceEditorPage() {
       <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
         <div className="flex items-center gap-3 text-[#94A3B8]">
           <div className="w-5 h-5 border-2 border-[#00F5FF]/30 border-t-[#00F5FF] rounded-full animate-spin" />
-          Loading palace…
+          Loading workspace…
         </div>
       </div>
     );
@@ -380,7 +380,7 @@ export default function PalaceEditorPage() {
     return (
       <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
         <div className="bg-[#EF4444]/10 border border-[#EF4444]/30 rounded-xl p-6 max-w-md text-center">
-          <p className="text-[#EF4444] mb-4">{error || 'Palace not found'}</p>
+          <p className="text-[#EF4444] mb-4">{error || 'Workspace not found'}</p>
           <button onClick={() => router.push('/palace')} className="px-4 py-2 border border-[#334155]/50 text-[#94A3B8] hover:text-[#F1F5F9] rounded-lg text-sm transition-colors">
             Back to Palaces
           </button>
@@ -397,7 +397,7 @@ export default function PalaceEditorPage() {
           onClick={() => router.push('/palace')}
           className="text-[#94A3B8] hover:text-[#F1F5F9] transition-colors text-sm"
         >
-          ← Palaces
+          ← Workspaces
         </button>
         <span className="text-[#334155]/60">|</span>
         <h1 className="text-base font-bold text-[#F1F5F9] truncate">{palace.name}</h1>
