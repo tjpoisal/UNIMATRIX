@@ -16,14 +16,14 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard', icon: '🏠' },
-    { label: 'Palaces', href: '/palaces', icon: '🏛️' },
+    { label: 'Palaces', href: '/palace', icon: '🏛️' },
     { label: 'Search', href: '/search', icon: '🔍' },
     { label: 'Friends', href: '/friends', icon: '👥' },
     { label: 'Connect AIs', href: '/onboarding', icon: '🔌' },
     { label: 'Settings', href: '/settings', icon: '⚙️' },
   ];
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => href === '/dashboard' ? pathname === href : pathname.startsWith(href);
 
   return (
     <div
