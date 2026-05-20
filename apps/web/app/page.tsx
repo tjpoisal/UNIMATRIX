@@ -217,8 +217,8 @@ export default async function Home() {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Every Platform. One Memory.</h2>
             <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto">
-              Download Unimatrix for your device. Every version includes the collaborative AI room
-              where multiple LLMs work together simultaneously.
+              Download Unimatrix for your device. Every platform connects to the same MCP memory
+              layer — your context follows you everywhere.
             </p>
           </div>
 
@@ -331,65 +331,60 @@ export default async function Home() {
       </section>
 
       {/* ── Collaborative AI Room ────────────────────────────────────────── */}
-      <section className="py-24 px-6 border-t border-[#334155]/20 relative overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 bg-gradient-radial from-[#00F5FF]/3 via-transparent to-transparent pointer-events-none" />
-
-        <div className="max-w-5xl mx-auto relative">
+      <section className="py-24 px-6 border-t border-[#334155]/20">
+        <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#A855F7]/10 border border-[#A855F7]/30 rounded-full text-xs text-[#A855F7] font-medium mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7] animate-pulse" />
-              All platforms · Coming Soon
+              <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7]" />
+              Desktop App — In Development
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               The Collaborative{' '}
               <span className="text-[#A855F7]">AI Room</span>
             </h2>
             <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto">
-              Multiple AIs in one conversation, simultaneously. Each LLM chimes in when it has a
-              relevant point, a better answer, or a different perspective. Like a room full of
-              brilliant experts — always on, always listening.
+              We&apos;re building a desktop app where multiple AIs participate in your conversation
+              simultaneously — each one with full context from Unimatrix. Claude, GPT-4, Gemini,
+              and others in the same room, each chiming in when they have something useful to add.
             </p>
           </div>
 
-          {/* Mock conversation UI */}
-          <div className="bg-[#111827] border border-[#334155]/40 rounded-2xl overflow-hidden shadow-2xl max-w-3xl mx-auto">
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-[#334155]/40 bg-[#0D1117]">
-              <div className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
-              <span className="text-xs text-[#475569] font-mono">Collaborative Session — 3 AIs Active</span>
-              <div className="ml-auto flex gap-1.5">
-                <span className="px-2 py-0.5 text-xs bg-[#0066FF]/20 text-[#60A5FA] rounded-md border border-[#0066FF]/20">Claude</span>
-                <span className="px-2 py-0.5 text-xs bg-[#22C55E]/20 text-[#86EFAC] rounded-md border border-[#22C55E]/20">GPT-4</span>
-                <span className="px-2 py-0.5 text-xs bg-[#F59E0B]/20 text-[#FCD34D] rounded-md border border-[#F59E0B]/20">Gemini</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {[
+              {
+                icon: '🧠',
+                title: 'Shared Memory',
+                desc: 'Every AI in the room reads from the same Unimatrix context. No one starts cold.',
+              },
+              {
+                icon: '💡',
+                title: 'Async Contributions',
+                desc: 'Each LLM chimes in when it has a relevant point — you get the best answer, not just the first one.',
+              },
+              {
+                icon: '🏠',
+                title: 'Self-Hosted Option',
+                desc: 'Run the room on your own hardware. Your data stays on your server. Total privacy.',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="bg-[#111827] border border-[#A855F7]/20 rounded-2xl p-6 text-center"
+              >
+                <div className="text-3xl mb-4">{item.icon}</div>
+                <h3 className="text-base font-bold text-[#F1F5F9] mb-2">{item.title}</h3>
+                <p className="text-sm text-[#94A3B8] leading-relaxed">{item.desc}</p>
               </div>
-            </div>
-            <div className="p-5 space-y-4 text-sm">
-              {/* User */}
-              <div className="flex justify-end">
-                <div className="bg-[#1E293B] rounded-xl rounded-tr-sm px-4 py-2.5 max-w-sm">
-                  <p className="text-[#F1F5F9]">What&apos;s the best approach for the auth architecture I was designing yesterday?</p>
-                </div>
-              </div>
-              {/* Claude */}
-              <div className="flex gap-3">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-[#0066FF]/20 border border-[#0066FF]/30 flex items-center justify-center text-xs text-[#60A5FA] font-bold">C</span>
-                <div className="bg-[#161F2E] rounded-xl rounded-tl-sm px-4 py-2.5 max-w-sm">
-                  <p className="text-xs text-[#60A5FA] font-semibold mb-1">Claude</p>
-                  <p className="text-[#94A3B8] text-xs leading-relaxed">Based on your session from yesterday, you were leaning toward JWT with refresh tokens. Given the cross-device sync requirements you mentioned, I&apos;d recommend...</p>
-                </div>
-              </div>
-              {/* GPT-4 */}
-              <div className="flex gap-3">
-                <span className="shrink-0 w-7 h-7 rounded-full bg-[#22C55E]/20 border border-[#22C55E]/30 flex items-center justify-center text-xs text-[#86EFAC] font-bold">G</span>
-                <div className="bg-[#161F2E] rounded-xl rounded-tl-sm px-4 py-2.5 max-w-sm">
-                  <p className="text-xs text-[#86EFAC] font-semibold mb-1">GPT-4o</p>
-                  <p className="text-[#94A3B8] text-xs leading-relaxed">I&apos;d add — your self-hosted constraint changes the calculus. With your home server setup, you have more control over token revocation than a typical cloud setup...</p>
-                </div>
-              </div>
-            </div>
-            <div className="px-5 pb-4 border-t border-[#334155]/30 pt-4">
-              <p className="text-xs text-[#334155] font-mono text-center">All AIs share full conversation history via Unimatrix</p>
-            </div>
+            ))}
+          </div>
+
+          <div className="mt-10 text-center">
+            <p className="text-sm text-[#475569]">
+              The MCP memory layer is live today.{' '}
+              <Link href="/auth/register" className="text-[#A855F7] hover:text-[#C084FC] transition-colors">
+                Sign up to get early access to the desktop app →
+              </Link>
+            </p>
           </div>
         </div>
       </section>
@@ -397,27 +392,30 @@ export default async function Home() {
       {/* ── AI Agents ───────────────────────────────────────────────────── */}
       <section className="py-24 px-6 bg-[#080D19] border-t border-[#334155]/20">
         <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#F59E0B]/10 border border-[#F59E0B]/30 rounded-full text-xs text-[#F59E0B] font-medium mb-6">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
-                Agentic Mode
+                <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
+                Enterprise Tier — Roadmap
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 AIs That Work{' '}
                 <span className="text-[#F59E0B]">For You</span>
               </h2>
               <p className="text-[#94A3B8] leading-relaxed mb-6">
-                Unimatrix agents can operate your devices on your behalf — where you allow it.
-                Research, draft, search, organize, send — all while you focus on what matters.
+                The Enterprise tier will let Unimatrix agents operate your devices on your behalf,
+                with your explicit permission for every class of action. Because Unimatrix already
+                holds full context of your work, the agents have everything they need to act —
+                not just respond.
               </p>
               <ul className="space-y-3">
                 {[
-                  'Operate apps and workflows on your desktop',
+                  'Operate apps and desktop workflows on your behalf',
                   'Browse and synthesize the web in the background',
-                  'Draft and send communications on your behalf',
-                  'Manage files, calendars, and tasks autonomously',
-                  'Full audit log of every action taken',
+                  'Draft and queue communications for your review',
+                  'Manage files, calendars, and task lists',
+                  'Every action gated by explicit user permission',
+                  'Full tamper-proof audit log of every action taken',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 text-sm text-[#94A3B8]">
                     <span className="text-[#F59E0B] mt-0.5 text-xs">▶</span>
@@ -426,25 +424,49 @@ export default async function Home() {
                 ))}
               </ul>
             </div>
-            <div className="bg-[#111827] border border-[#334155]/30 rounded-2xl p-6 space-y-4">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-[#F59E0B] text-lg">⚙️</span>
-                <span className="text-sm font-semibold text-[#F1F5F9]">Agent Activity</span>
-                <span className="ml-auto w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
-              </div>
-              {[
-                { action: 'Searching web for Q2 competitor pricing', status: '✓', color: '#22C55E' },
-                { action: 'Drafting follow-up email to design team', status: '✓', color: '#22C55E' },
-                { action: 'Organizing project files in Downloads/', status: '…', color: '#F59E0B' },
-                { action: 'Summarizing 3 pending Slack threads', status: '⏳', color: '#475569' },
-              ].map((task) => (
-                <div key={task.action} className="flex items-center gap-3 text-xs">
-                  <span style={{ color: task.color }}>{task.status}</span>
-                  <span className="text-[#64748B] font-mono">{task.action}</span>
-                </div>
-              ))}
-              <div className="pt-2 border-t border-[#334155]/30 text-xs text-[#334155] font-mono text-center">
-                Permission-gated · Full audit trail
+
+            {/* What's real today */}
+            <div>
+              <p className="text-xs text-[#475569] font-bold tracking-widest uppercase mb-4">Live Today via MCP</p>
+              <div className="space-y-3">
+                {[
+                  {
+                    tool: 'unimatrix.remember()',
+                    desc: 'Store a memory from any LLM conversation',
+                    live: true,
+                  },
+                  {
+                    tool: 'unimatrix.recall(query)',
+                    desc: 'Semantic search across all your memories from every LLM',
+                    live: true,
+                  },
+                  {
+                    tool: 'unimatrix.get_recent()',
+                    desc: 'Fetch last N memories across all devices and LLMs',
+                    live: true,
+                  },
+                  {
+                    tool: 'unimatrix.continue_from()',
+                    desc: 'Load full context of a prior session into a new one',
+                    live: true,
+                  },
+                  {
+                    tool: 'unimatrix.list_contexts()',
+                    desc: 'List all active workspaces',
+                    live: true,
+                  },
+                ].map((t) => (
+                  <div
+                    key={t.tool}
+                    className="bg-[#111827] border border-[#334155]/30 rounded-xl px-4 py-3"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs text-[#22C55E] font-bold">✓ LIVE</span>
+                      <code className="text-xs text-[#00F5FF] font-mono">{t.tool}</code>
+                    </div>
+                    <p className="text-xs text-[#64748B]">{t.desc}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
