@@ -541,7 +541,7 @@ export default function PalaceEditorPage() {
           ) : (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center max-w-sm">
-                <div className="text-5xl mb-4">💡</div>
+                <div className="text-5xl mb-4 font-bold text-[#334155]">MEM</div>
                 <h2 className="text-lg font-semibold text-[#F1F5F9] mb-2">Select a memory</h2>
                 <p className="text-sm text-[#94A3B8] mb-6">
                   Click any memory in the tree to edit it, or select a location and use the AI panel to get suggestions.

@@ -16,7 +16,7 @@ interface SendEmailOptions {
 export async function sendEmail({ to, subject, html }: SendEmailOptions) {
   // Dev fallback — log to console if no API key is set
   if (!RESEND_API_KEY) {
-    console.log('\n📧 [EMAIL — dev mode, no RESEND_API_KEY set]');
+    console.log('\n[EMAIL — dev mode, no RESEND_API_KEY set]');
     console.log(`To: ${to}`);
     console.log(`Subject: ${subject}`);
     console.log(`Body:\n${html}\n`);

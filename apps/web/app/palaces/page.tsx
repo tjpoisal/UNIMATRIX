@@ -78,7 +78,7 @@ export default function PalacesPage() {
         {!loading && !error && palaces.length === 0 && (
           <div className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-12 text-center">
             <div className="w-16 h-16 bg-[#1F2937] rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">🏛️</span>
+              <span className="text-2xl font-bold text-[#00F5FF]">W</span>
             </div>
             <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">No workspaces yet</h2>
             <p className="text-[#94A3B8] mb-6">Connect an AI via MCP and it will start storing context here automatically.</p>
@@ -107,7 +107,7 @@ export default function PalacesPage() {
                   <div className="relative space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00F5FF]/20 to-[#A855F7]/20 border border-[#334155]/30 flex items-center justify-center">
-                        <span className="text-lg">🏛️</span>
+                        <span className="text-xs font-black text-[#00F5FF]">{palace.name.charAt(0).toUpperCase()}</span>
                       </div>
                       {palace.isPublic && (
                         <span className="px-2 py-0.5 text-xs bg-[#A855F7]/10 border border-[#A855F7]/30 text-[#A855F7] rounded-full">

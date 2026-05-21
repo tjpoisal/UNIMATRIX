@@ -16,7 +16,7 @@ const start = async () => {
   try {
     const port = parseInt(process.env.PORT ?? '3000', 10);
     await fastify.listen({ port, host: '0.0.0.0' });
-    console.log(`🧠 Unimatrix MCP Server running on http://localhost:${port}/mcp`);
+    console.log(`[Unimatrix] MCP Server running on http://localhost:${port}/mcp`);
   } catch (err) {
     console.error(err);
     process.exit(1);

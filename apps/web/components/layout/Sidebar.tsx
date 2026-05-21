@@ -15,12 +15,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const pathname = usePathname();
 
   const navItems = [
-    { label: 'Dashboard', href: '/dashboard', icon: '🏠' },
-    { label: 'Workspaces', href: '/palace', icon: '🧠' },
-    { label: 'Search', href: '/search', icon: '🔍' },
-    { label: 'Friends', href: '/friends', icon: '👥' },
-    { label: 'Connect AIs', href: '/onboarding', icon: '🔌' },
-    { label: 'Settings', href: '/settings', icon: '⚙️' },
+    { label: 'Dashboard', href: '/dashboard', icon: '~' },
+    { label: 'Workspaces', href: '/palace', icon: 'W' },
+    { label: 'Search', href: '/search', icon: 'S' },
+    { label: 'Friends', href: '/friends', icon: 'F' },
+    { label: 'Connect AIs', href: '/onboarding', icon: '+' },
+    { label: 'Settings', href: '/settings', icon: '=' },
   ];
 
   const isActive = (href: string) => href === '/dashboard' ? pathname === href : pathname.startsWith(href);
@@ -62,7 +62,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                 : 'text-[#94A3B8] hover:bg-[#1F2937] hover:text-[#F1F5F9]'
             }`}
           >
-            <span className="text-lg">{item.icon}</span>
+            <span className="text-sm font-bold font-mono w-5 text-center flex-shrink-0">{item.icon}</span>
             {isOpen && <span className="text-sm font-medium">{item.label}</span>}
           </Link>
         ))}
@@ -77,7 +77,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
               isOpen ? '' : 'justify-center'
             }`}
           >
-            <span className="text-base flex-shrink-0">⚡</span>
+            <span className="text-xs font-bold text-[#A855F7] flex-shrink-0">PRO</span>
             {isOpen && (
               <div className="min-w-0">
                 <p className="text-xs font-bold text-[#A855F7]">Upgrade to Pro</p>

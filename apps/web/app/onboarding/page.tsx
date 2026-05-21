@@ -15,7 +15,7 @@ const AI_SYSTEMS = [
   {
     id: 'claude-desktop',
     name: 'Claude Desktop',
-    icon: '🤖',
+    icon: 'CD',
     description: 'Connect via MCP server',
     color: '#CC785C',
     instructions: (key: string) => `Add this to your Claude Desktop config file:
@@ -39,7 +39,7 @@ Windows: %APPDATA%\\Claude\\claude_desktop_config.json
   {
     id: 'claude-code',
     name: 'Claude Code',
-    icon: '💻',
+    icon: 'CC',
     description: 'Connect via CLI',
     color: '#CC785C',
     instructions: (key: string) => `Run this command in your terminal:
@@ -54,7 +54,7 @@ Then restart Claude Code and your memories will be available.`,
   {
     id: 'chatgpt',
     name: 'ChatGPT',
-    icon: '🟢',
+    icon: 'GP',
     description: 'Connect via REST API',
     color: '#10A37F',
     instructions: (key: string) => `Use the Unimatrix REST API directly in your ChatGPT actions or custom GPTs.
@@ -74,7 +74,7 @@ ${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-fl
   {
     id: 'gemini',
     name: 'Gemini',
-    icon: '✨',
+    icon: 'GM',
     description: 'Connect via REST API',
     color: '#4285F4',
     instructions: (key: string) => `Use the Unimatrix REST API with Gemini function calling.
@@ -127,7 +127,7 @@ Add as a tool in your Grok system prompt:
   {
     id: 'ollama',
     name: 'Ollama',
-    icon: '🦙',
+    icon: 'OL',
     description: 'Local LLM via MCP',
     color: '#A855F7',
     instructions: (key: string) => `For local models via Ollama + Open WebUI:
@@ -227,7 +227,7 @@ export default function OnboardingPage() {
           {newlyCreatedKey && (
             <div className="mb-4 p-4 bg-[#00F5FF]/5 border border-[#00F5FF]/30 rounded-xl">
               <p className="text-sm text-[#00F5FF] font-medium mb-2">
-                ✅ Key created — copy it now, it won&apos;t be shown again
+                Key created — copy it now, it won&apos;t be shown again
               </p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 text-sm font-mono text-[#F1F5F9] bg-[#0A0F1C] px-3 py-2 rounded-lg break-all">

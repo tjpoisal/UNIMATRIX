@@ -144,7 +144,7 @@ function SettingsContent() {
                 : 'bg-[#334155]/40 text-[#94A3B8] border border-[#334155]/40'
             }`}
           >
-            {isPro ? '⚡ Pro' : 'Free'}
+            {isPro ? 'Pro' : 'Free'}
           </span>
           {isPro && (
             <span className="text-xs text-[#64748B]">
