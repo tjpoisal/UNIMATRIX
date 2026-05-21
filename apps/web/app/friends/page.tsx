@@ -189,7 +189,7 @@ export default function FriendsPage() {
             </div>
           ) : data.friends.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-4xl mb-3">👥</p>
+              <p className="text-sm font-bold text-[#334155] mb-3">NO FRIENDS YET</p>
               <p className="text-[#94A3B8] text-sm">No friends yet — send a request above.</p>
             </div>
           ) : (

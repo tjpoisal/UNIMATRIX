@@ -92,7 +92,7 @@ function SearchContent() {
         <form onSubmit={handleSubmit} className="mb-8">
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] text-lg">🔍</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] text-sm font-bold">S</span>
               <input
                 type="text"
                 value={query}
@@ -183,7 +183,7 @@ function SearchContent() {
         {/* Initial empty state */}
         {!loading && !searched && (
           <div className="text-center pt-16">
-            <div className="text-5xl mb-4">🔍</div>
+            <div className="text-5xl mb-4 font-bold text-[#334155]">SEARCH</div>
             <p className="text-[#64748B] text-lg">Enter a query to search your memories</p>
             <p className="text-[#475569] text-sm mt-2">Searches across content and tags in all your palaces</p>
           </div>

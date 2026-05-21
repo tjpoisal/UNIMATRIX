@@ -180,26 +180,26 @@ export default async function Home() {
                 step: '01',
                 title: 'Connect to Your AI',
                 desc: 'Add a single MCP config to Claude Desktop, Cursor, or any MCP-compatible LLM client. Takes 60 seconds.',
-                icon: '🔌',
+                icon: '01',
               },
               {
                 step: '02',
                 title: 'Have Conversations Normally',
                 desc: 'Every AI automatically saves context to Unimatrix in the background. You do nothing differently.',
-                icon: '💬',
+                icon: '02',
               },
               {
                 step: '03',
                 title: 'Continue Anywhere, Any AI',
                 desc: 'Open any AI on any device and it calls get_recent() at session start — picking up exactly where you left off.',
-                icon: '⚡',
+                icon: '03',
               },
             ].map((item) => (
               <div
                 key={item.step}
                 className="relative bg-[#111827] border border-[#334155]/30 rounded-2xl p-8 hover:border-[#00F5FF]/30 transition-all duration-200"
               >
-                <div className="text-5xl mb-5">{item.icon}</div>
+                <div className="text-5xl font-black text-[#00F5FF]/20 mb-5">{item.icon}</div>
                 <div className="text-xs text-[#00F5FF] font-bold tracking-widest mb-3">
                   STEP {item.step}
                 </div>
@@ -229,7 +229,7 @@ export default async function Home() {
               {[
                 {
                   os: 'macOS',
-                  icon: '🍎',
+                  icon: 'MAC',
                   sub: 'macOS 13 Ventura or later',
                   ext: '.dmg',
                   href: '#download-macos',
@@ -237,7 +237,7 @@ export default async function Home() {
                 },
                 {
                   os: 'Windows',
-                  icon: '🪟',
+                  icon: 'WIN',
                   sub: 'Windows 10/11 x64',
                   ext: '.exe',
                   href: '#download-windows',
@@ -245,7 +245,7 @@ export default async function Home() {
                 },
                 {
                   os: 'Linux',
-                  icon: '🐧',
+                  icon: 'LNX',
                   sub: 'Ubuntu, Fedora, Debian',
                   ext: '.AppImage / .deb',
                   href: '#download-linux',
@@ -262,7 +262,9 @@ export default async function Home() {
                       {p.badge}
                     </span>
                   )}
-                  <span className="text-4xl">{p.icon}</span>
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#00F5FF]/15 to-[#334155]/20 border border-[#334155]/30 flex items-center justify-center">
+                    <span className="text-xs font-black text-[#00F5FF] tracking-wider">{p.icon}</span>
+                  </div>
                   <div>
                     <p className="font-bold text-[#F1F5F9] group-hover:text-[#00F5FF] transition-colors">{p.os}</p>
                     <p className="text-xs text-[#475569] mt-0.5">{p.sub}</p>
@@ -282,14 +284,14 @@ export default async function Home() {
               {[
                 {
                   os: 'iOS',
-                  icon: '📱',
+                  icon: 'iOS',
                   sub: 'iPhone & iPad · iOS 16+',
                   label: 'App Store',
                   href: '#download-ios',
                 },
                 {
                   os: 'Android',
-                  icon: '🤖',
+                  icon: 'APK',
                   sub: 'Android 10+',
                   label: 'Google Play',
                   href: '#download-android',
@@ -300,7 +302,9 @@ export default async function Home() {
                   href={p.href}
                   className="group flex flex-col items-center gap-3 bg-[#111827] border border-[#334155]/30 hover:border-[#00F5FF]/50 rounded-2xl p-6 text-center transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/10"
                 >
-                  <span className="text-4xl">{p.icon}</span>
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#00F5FF]/15 to-[#334155]/20 border border-[#334155]/30 flex items-center justify-center">
+                    <span className="text-xs font-black text-[#00F5FF] tracking-wider">{p.icon}</span>
+                  </div>
                   <div>
                     <p className="font-bold text-[#F1F5F9] group-hover:text-[#00F5FF] transition-colors">{p.os}</p>
                     <p className="text-xs text-[#475569] mt-0.5">{p.sub}</p>
@@ -352,17 +356,17 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
               {
-                icon: '🧠',
+                icon: 'MEM',
                 title: 'Shared Memory',
                 desc: 'Every AI in the room reads from the same Unimatrix context. No one starts cold.',
               },
               {
-                icon: '💡',
+                icon: 'AI',
                 title: 'Async Contributions',
                 desc: 'Each LLM chimes in when it has a relevant point — you get the best answer, not just the first one.',
               },
               {
-                icon: '🏠',
+                icon: 'SLF',
                 title: 'Self-Hosted Option',
                 desc: 'Run the room on your own hardware. Your data stays on your server. Total privacy.',
               },
@@ -371,7 +375,7 @@ export default async function Home() {
                 key={item.title}
                 className="bg-[#111827] border border-[#A855F7]/20 rounded-2xl p-6 text-center"
               >
-                <div className="text-3xl mb-4">{item.icon}</div>
+                <div className="text-xs font-black text-[#A855F7] tracking-widest mb-4">{item.icon}</div>
                 <h3 className="text-base font-bold text-[#F1F5F9] mb-2">{item.title}</h3>
                 <p className="text-sm text-[#94A3B8] leading-relaxed">{item.desc}</p>
               </div>
@@ -484,32 +488,32 @@ export default async function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: '🔄',
+                icon: 'XLM',
                 title: 'Cross-LLM Memory',
                 desc: 'Start with ChatGPT. Continue with Claude. Switch to Gemini. Same context, always. No re-explaining.',
               },
               {
-                icon: '📱',
+                icon: 'SYN',
                 title: 'Cross-Device Sync',
                 desc: 'iPhone → iPad → desktop → home server. The conversation thread never breaks, no matter what device.',
               },
               {
-                icon: '🔒',
+                icon: 'PVT',
                 title: 'Private Cloud',
                 desc: 'Run Unimatrix on your own hardware for complete data sovereignty. Or use our secure cloud.',
               },
               {
-                icon: '🤖',
+                icon: 'ANY',
                 title: 'Works with Any AI',
                 desc: 'Claude, ChatGPT, Gemini, Groq, Ollama. If it supports MCP, it works with Unimatrix.',
               },
               {
-                icon: '🫥',
+                icon: 'SLT',
                 title: 'Invisible by Design',
                 desc: 'No new app to open. No copy-paste. No manual summaries. Unimatrix runs silently in the background.',
               },
               {
-                icon: '🧑‍💻',
+                icon: 'MCP',
                 title: 'MCP Native',
                 desc: 'Remember, recall, continue_from, get_recent — standard MCP tools that any LLM can call.',
               },
@@ -518,7 +522,7 @@ export default async function Home() {
                 key={feature.title}
                 className="group bg-[#111827] border border-[#334155]/30 rounded-2xl p-6 hover:border-[#00F5FF]/30 transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/5"
               >
-                <div className="text-3xl mb-4">{feature.icon}</div>
+                <div className="text-xs font-black text-[#00F5FF]/60 tracking-widest mb-4">{feature.icon}</div>
                 <h3 className="text-base font-bold text-[#F1F5F9] mb-2 group-hover:text-[#00F5FF] transition-colors">
                   {feature.title}
                 </h3>

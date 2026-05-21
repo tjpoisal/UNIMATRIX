@@ -102,7 +102,7 @@ export default function LocationTree({
                   onClick={e => { e.stopPropagation(); onAddMemory(location.id); }}
                   className="w-6 h-6 flex items-center justify-center rounded-md bg-[#00F5FF]/10 hover:bg-[#00F5FF]/20 text-[#00F5FF] text-xs font-bold transition-colors"
                 >
-                  📝
+                  +M
                 </button>
               )}
               {onAddChild && (
@@ -133,7 +133,7 @@ export default function LocationTree({
             className="flex items-start gap-2 px-3 py-2 rounded-lg hover:bg-[#1F2937]/60 cursor-pointer transition-colors border-l-2 border-[#334155]/20 hover:border-[#00F5FF]/40 ml-2"
             style={{ paddingLeft: `${16 + (depth + 1) * 14}px` }}
           >
-            <span className="text-xs mt-0.5 flex-shrink-0">💡</span>
+            <span className="text-xs mt-0.5 flex-shrink-0 text-[#00F5FF]/50">–</span>
             <p className="text-xs text-[#94A3B8] hover:text-[#F1F5F9] leading-relaxed line-clamp-2 transition-colors">
               {memory.content.length > 60 ? memory.content.slice(0, 60) + '…' : memory.content}
             </p>

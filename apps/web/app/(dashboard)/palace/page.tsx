@@ -18,11 +18,26 @@ interface Palace {
   locations: PalaceLocation[];
 }
 
-const WORKSPACE_EMOJIS = ['🏛️', '🏰', '🗼', '🌌', '🏯', '🕌', '🗽', '🌆', '🏟️', '🛕'];
+const WORKSPACE_COLORS = [
+  'from-[#00F5FF]/20 to-[#A855F7]/10',
+  'from-[#A855F7]/20 to-[#00F5FF]/10',
+  'from-[#22C55E]/20 to-[#00F5FF]/10',
+  'from-[#F59E0B]/20 to-[#EF4444]/10',
+  'from-[#EF4444]/20 to-[#A855F7]/10',
+  'from-[#3B82F6]/20 to-[#22C55E]/10',
+  'from-[#00F5FF]/20 to-[#22C55E]/10',
+  'from-[#F59E0B]/20 to-[#A855F7]/10',
+  'from-[#A855F7]/20 to-[#EF4444]/10',
+  'from-[#22C55E]/20 to-[#F59E0B]/10',
+];
 
-function getWorkspaceEmoji(name: string): string {
-  const idx = name.charCodeAt(0) % WORKSPACE_EMOJIS.length;
-  return PALACE_EMOJIS[idx];
+function getWorkspaceInitial(name: string): string {
+  return name.trim().charAt(0).toUpperCase() || 'W';
+}
+
+function getWorkspaceColor(name: string): string {
+  const idx = name.charCodeAt(0) % WORKSPACE_COLORS.length;
+  return WORKSPACE_COLORS[idx];
 }
 
 interface CreateModalProps {
@@ -218,8 +233,8 @@ export default function PalaceListPage() {
         {/* Empty State */}
         {!error && palaces.length === 0 && (
           <div className="bg-[#111827] border border-[#334155]/30 rounded-2xl p-16 text-center">
-            <div className="w-20 h-20 bg-[#1F2937] rounded-2xl flex items-center justify-center mx-auto mb-5">
-              <span className="text-4xl">🏛️</span>
+            <div className="w-20 h-20 bg-gradient-to-br from-[#00F5FF]/15 to-[#A855F7]/10 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-[#334155]/30">
+              <span className="text-3xl font-bold text-[#00F5FF]">W</span>
             </div>
             <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">No workspaces yet</h2>
             <p className="text-[#94A3B8] mb-8 text-sm max-w-sm mx-auto">
@@ -239,7 +254,8 @@ export default function PalaceListPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {palaces.map(palace => {
               const memoryCount = palace.locations.reduce((s, l) => s + l._count.memories, 0);
-              const emoji = getWorkspaceEmoji(palace.name);
+              const initial = getWorkspaceInitial(palace.name);
+              const colorClass = getWorkspaceColor(palace.name);
               const isConfirmingDelete = confirmDelete === palace.id;
 
               return (
@@ -253,8 +269,8 @@ export default function PalaceListPage() {
                   <div className="relative flex-1">
                     {/* Icon + badge row */}
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#00F5FF]/15 to-[#A855F7]/10 border border-[#334155]/30 flex items-center justify-center text-2xl">
-                        {emoji}
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${colorClass} border border-[#334155]/30 flex items-center justify-center`}>
+                        <span className="text-lg font-bold text-[#00F5FF]">{initial}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {palace.isPublic && (
@@ -278,11 +294,11 @@ export default function PalaceListPage() {
                     {/* Stats */}
                     <div className="flex items-center gap-4 text-xs text-[#64748B] pt-4 border-t border-[#334155]/30 mt-auto">
                       <span className="flex items-center gap-1">
-                        <span>📍</span>
+                        <span className="text-[#00F5FF]/60">loc</span>
                         {palace.locations.length} location{palace.locations.length !== 1 ? 's' : ''}
                       </span>
                       <span className="flex items-center gap-1">
-                        <span>💡</span>
+                        <span className="text-[#00F5FF]/60">mem</span>
                         {memoryCount} memor{memoryCount !== 1 ? 'ies' : 'y'}
                       </span>
                     </div>
