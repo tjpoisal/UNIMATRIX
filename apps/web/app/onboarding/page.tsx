@@ -30,7 +30,7 @@ Windows: %APPDATA%\\Claude\\claude_desktop_config.json
       "args": ["-y", "@unimatrix/mcp-server"],
       "env": {
         "UNIMATRIX_API_KEY": "${key}",
-        "UNIMATRIX_API_URL": "${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api"
+        "UNIMATRIX_API_URL": "${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api"
       }
     }
   }
@@ -47,7 +47,7 @@ Windows: %APPDATA%\\Claude\\claude_desktop_config.json
 claude mcp add unimatrix \\
   --command "npx -y @unimatrix/mcp-server" \\
   --env UNIMATRIX_API_KEY="${key}" \\
-  --env UNIMATRIX_API_URL="${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api"
+  --env UNIMATRIX_API_URL="${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api"
 
 Then restart Claude Code and your memories will be available.`,
   },
@@ -59,7 +59,7 @@ Then restart Claude Code and your memories will be available.`,
     color: '#10A37F',
     instructions: (key: string) => `Use the Unimatrix REST API directly in your ChatGPT actions or custom GPTs.
 
-Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api
+Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 Authorization: Bearer ${key}
 
 Endpoints:
@@ -69,7 +69,7 @@ Endpoints:
   GET  /search?q=...      — full-text search
 
 Add the OpenAPI spec to your GPT Actions:
-${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api/openapi.json`,
+${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api/openapi.json`,
   },
   {
     id: 'gemini',
@@ -79,7 +79,7 @@ ${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-fl
     color: '#4285F4',
     instructions: (key: string) => `Use the Unimatrix REST API with Gemini function calling.
 
-Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api
+Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 Authorization Header: Bearer ${key}
 
 Example function declaration for Gemini:
@@ -105,7 +105,7 @@ Make requests to: GET /api/search?q={query}`,
     color: '#E7E9EA',
     instructions: (key: string) => `Use the Unimatrix REST API with xAI / Grok tool calling.
 
-Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api
+Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 Authorization: Bearer ${key}
 
 Add as a tool in your Grok system prompt:
@@ -137,7 +137,7 @@ Add as a tool in your Grok system prompt:
 
 2. Add to your Open WebUI MCP config:
    UNIMATRIX_API_KEY=${key}
-   UNIMATRIX_API_URL=${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api
+   UNIMATRIX_API_URL=${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 
 3. Or call the REST API directly from your Ollama system prompt context using the endpoints above.`,
   },
@@ -361,7 +361,7 @@ export default function OnboardingPage() {
           <div className="p-4 bg-[#0A0F1C]/40 border border-[#334155]/30 rounded-xl">
             <p className="text-xs text-[#64748B] font-mono">
               curl -H &quot;Authorization: Bearer {activeKey ? `${activeKey.keyPrefix}...` : 'YOUR_KEY'}&quot; \<br />
-              &nbsp;&nbsp;{typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api/palaces
+              &nbsp;&nbsp;{typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api/palaces
             </p>
           </div>
         </section>

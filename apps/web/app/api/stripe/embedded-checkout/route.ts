@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
   const origin =
     request.headers.get("origin") ??
     process.env.NEXTAUTH_URL ??
-    "https://unimatrix-flax.vercel.app";
+    "https://deployunimatrix.com";
 
   const stripe = getStripe();
 
