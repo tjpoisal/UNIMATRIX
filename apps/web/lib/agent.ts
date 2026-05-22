@@ -11,8 +11,20 @@
  *   debate     — LLMs argue positions, then synthesize consensus
  */
 
+import { generateText } from 'ai';
 import { decryptApiKey } from './crypto';
 import { prisma } from './prisma';
+
+// ─── AI Gateway synthesis (uses Vercel OIDC — no API key needed) ─────────────
+async function synthesizeWithGateway(system: string, prompt: string): Promise<string> {
+  const { text } = await generateText({
+    model: 'openai/gpt-4o-mini',
+    system,
+    prompt,
+    maxTokens: 2048,
+  });
+  return text;
+}
 
 export type AgentMode = 'parallel' | 'sequential' | 'debate';
 
@@ -242,10 +254,7 @@ Answer the task thoroughly. You have access to the user's memory palace context 
     const combined = goodResponses
       .map(r => `### ${r.provider} (${r.model})\n${r.response}`)
       .join('\n\n');
-    synthesis = await callLLM(
-      synthProvider.provider,
-      synthProvider.model,
-      synthProvider.apiKey,
+    synthesis = await synthesizeWithGateway(
       'You are a synthesis AI. Combine the following agent responses into a single, comprehensive, non-redundant answer. Highlight where agents agree and note any meaningful differences.',
       `Task: ${task}\n\nAgent responses:\n${combined}`
     );
@@ -350,8 +359,7 @@ async function runDebate(
 
   let synthesis: string;
   try {
-    synthesis = await callLLM(
-      synthProvider.provider, synthProvider.model, synthProvider.apiKey,
+    synthesis = await synthesizeWithGateway(
       'Synthesize this multi-agent debate into a balanced, nuanced final answer that incorporates the strongest points from all perspectives.',
       synthInput
     );
