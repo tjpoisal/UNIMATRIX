@@ -151,7 +151,7 @@ export default async function Home() {
 {`{
   "mcpServers": {
     `}<span className="text-[#00F5FF]">"unimatrix"</span>{`: {
-      "url": `}<span className="text-[#86EFAC]">"https://unimatrix.vercel.app/api/mcp"</span>{`,
+      "url": `}<span className="text-[#86EFAC]">"https://deployunimatrix.com/api/mcp"</span>{`,
       "apiKey": `}<span className="text-[#FCD34D]">"YOUR_API_KEY"</span>{`
     }
   }

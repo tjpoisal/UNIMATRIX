@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const origin =
-    process.env.NEXTAUTH_URL ?? "https://unimatrix-flax.vercel.app";
+    process.env.NEXTAUTH_URL ?? "https://deployunimatrix.com";
 
   const spec = {
     openapi: "3.1.0",
