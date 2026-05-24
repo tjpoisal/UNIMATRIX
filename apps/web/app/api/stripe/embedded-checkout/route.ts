@@ -3,24 +3,25 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getStripe, PRICE_IDS } from "@/lib/stripe";
 
-// POST /api/stripe/embedded-checkout — create an embedded Checkout Session
-// Returns clientSecret used by EmbeddedCheckoutProvider
 export async function POST(request: NextRequest) {
   const session = await auth();
   if (!session?.user?.id || !session.user.email) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { interval = "monthly" } = (await request.json()) as {
+  const { interval = "monthly", plan = "pro" } = (await request.json()) as {
     interval?: "monthly" | "yearly";
+    plan?: "pro" | "enterprise";
   };
 
   const priceId =
-    interval === "yearly" ? PRICE_IDS.pro_yearly : PRICE_IDS.pro_monthly;
+    plan === "enterprise"
+      ? interval === "yearly" ? PRICE_IDS.enterprise_yearly : PRICE_IDS.enterprise_monthly
+      : interval === "yearly" ? PRICE_IDS.pro_yearly        : PRICE_IDS.pro_monthly;
 
   if (!priceId) {
     return NextResponse.json(
-      { error: "Stripe price IDs not configured. Set STRIPE_PRICE_PRO_MONTHLY / STRIPE_PRICE_PRO_YEARLY." },
+      { error: `Stripe price not configured. Set STRIPE_PRICE_${plan.toUpperCase()}_${interval.toUpperCase()}.` },
       { status: 500 }
     );
   }
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-  if (user.tier === "pro") return NextResponse.json({ error: "Already on Pro plan" }, { status: 409 });
+  if (user.tier === plan) return NextResponse.json({ error: `Already on ${plan} plan` }, { status: 409 });
 
   const origin =
     request.headers.get("origin") ??
@@ -40,7 +41,6 @@ export async function POST(request: NextRequest) {
 
   const stripe = getStripe();
 
-  // Re-use or create Stripe customer
   let customerId = user.stripeCustomerId ?? undefined;
   if (!customerId) {
     const customer = await stripe.customers.create({
@@ -56,8 +56,7 @@ export async function POST(request: NextRequest) {
   }
 
   const checkoutSession = await stripe.checkout.sessions.create({
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore — embedded is valid in Stripe v22 API; types don't expose it under Checkout namespace
+    // @ts-ignore
     ui_mode: "embedded",
     customer: customerId,
     payment_method_types: ["card"],
@@ -66,7 +65,7 @@ export async function POST(request: NextRequest) {
     return_url: `${origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
     allow_promotion_codes: true,
     subscription_data: {
-      metadata: { unimatrixUserId: user.id },
+      metadata: { unimatrixUserId: user.id, plan },
     },
   });
 
