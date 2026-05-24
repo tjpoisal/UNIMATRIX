@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       model: 'openai/gpt-4o-mini',
       system: SYSTEM_PROMPT,
       prompt: userPrompt,
-      maxTokens: 1024,
+      maxOutputTokens: 1024,
       temperature: 0.8,
     });
 
