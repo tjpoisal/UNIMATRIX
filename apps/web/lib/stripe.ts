@@ -1,7 +1,5 @@
 import Stripe from "stripe";
 
-// Lazy singleton — Next.js evaluates modules at build time; calling new Stripe()
-// with an empty key throws immediately. Defer until the first real request.
 let _stripe: Stripe | null = null;
 
 export function getStripe(): Stripe {
@@ -13,25 +11,38 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-// Price IDs — set these in your Stripe dashboard and add to env
+// Price IDs — set in Stripe dashboard and add to Vercel env vars
 export const PRICE_IDS = {
-  pro_monthly: process.env.STRIPE_PRICE_PRO_MONTHLY ?? "",
-  pro_yearly:  process.env.STRIPE_PRICE_PRO_YEARLY  ?? "",
+  pro_monthly:          process.env.STRIPE_PRICE_PRO_MONTHLY          ?? "",
+  pro_yearly:           process.env.STRIPE_PRICE_PRO_YEARLY           ?? "",
+  enterprise_monthly:   process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY   ?? "",
+  enterprise_yearly:    process.env.STRIPE_PRICE_ENTERPRISE_YEARLY    ?? "",
 };
 
-// Tier limits
 export const TIER_LIMITS = {
   free: {
-    palaces:   3,
-    memories:  200,
-    apiKeys:   1,
-    sharing:   false,
+    palaces:  3,
+    memories: 200,
+    apiKeys:  1,
+    sharing:  false,
+    agents:   false,
+    selfHost: false,
   },
   pro: {
-    palaces:   Infinity,
-    memories:  Infinity,
-    apiKeys:   20,
-    sharing:   true,
+    palaces:  Infinity,
+    memories: Infinity,
+    apiKeys:  20,
+    sharing:  true,
+    agents:   false,
+    selfHost: false,
+  },
+  enterprise: {
+    palaces:  Infinity,
+    memories: Infinity,
+    apiKeys:  100,
+    sharing:  true,
+    agents:   true,
+    selfHost: true,
   },
 } as const;
 
