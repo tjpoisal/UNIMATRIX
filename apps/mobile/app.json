@@ -13,9 +13,13 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTabletMode": true
+      "supportsTabletMode": true,
+      "bundleIdentifier": "com.getstackmax.unimatrix",
+      "buildNumber": "1"
     },
     "android": {
+      "package": "com.getstackmax.unimatrix",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0F1C"
@@ -27,14 +31,12 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [],
-    "schemes": ["myapp"],
+    "scheme": "unimatrix",
     "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "your-eas-project-id"
-      }
-    }
+      "router": { "origin": false },
+      "eas": { "projectId": "your-eas-project-id" },
+      "apiUrl": "https://deployunimatrix.com"
+    },
+    "owner": "tjpoisal"
   }
 }
