@@ -29,7 +29,7 @@ export default function PalaceGrid() {
         }
 
         setPalaces(data);
-      } catch (err) {
+      } catch {
         setError('Failed to load palaces');
       } finally {
         setLoading(false);

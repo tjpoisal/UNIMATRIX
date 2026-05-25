@@ -112,9 +112,9 @@ export default async function Home() {
             <pre className="p-6 text-sm font-mono text-[#94A3B8] leading-relaxed overflow-x-auto">
 {`{
   "mcpServers": {
-    `}<span className="text-[#00F5FF]">"unimatrix"</span>{`: {
-      "url": `}<span className="text-[#86EFAC]">"https://deployunimatrix.com/api/mcp"</span>{`,
-      "apiKey": `}<span className="text-[#FCD34D]">"YOUR_API_KEY"</span>{`
+    `}<span className="text-[#00F5FF]">&quot;unimatrix&quot;</span>{`: {
+      "url": `}<span className="text-[#86EFAC]">&quot;https://deployunimatrix.com/api/mcp&quot;</span>{`,
+      "apiKey": `}<span className="text-[#FCD34D]">&quot;YOUR_API_KEY&quot;</span>{`
     }
   }
 }`}
