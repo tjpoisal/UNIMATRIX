@@ -50,7 +50,7 @@ jobs:
         run: pnpm build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://placeholder:placeholder@localhost/placeholder' }}
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET || 'ci-secret-32-chars-minimum-length-x' }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET != '' && secrets.NEXTAUTH_SECRET || 'ci-secret-32-chars-minimum-length-x' }}
           NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL || 'http://localhost:3000' }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY || 're_placeholder' }}
           EMAIL_FROM: ${{ secrets.EMAIL_FROM || 'noreply@example.com' }}
