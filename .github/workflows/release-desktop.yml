@@ -18,15 +18,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: apps/desktop/package-lock.json
 
       - name: Install dependencies
         working-directory: apps/desktop
-        run: npm ci
+        run: npm install
 
       - name: Import Mac certificate
-        if: ${{ env.MAC_CERTS != \'\' }}
+        if: ${{ env.MAC_CERTS != '' }}
         env:
           MAC_CERTS: ${{ secrets.MAC_CERTS }}
           MAC_CERTS_PASSWORD: ${{ secrets.MAC_CERTS_PASSWORD }}
@@ -50,8 +48,8 @@ jobs:
 
       - name: Rename artifacts
         run: |
-          mv apps/desktop/dist/*.dmg apps/desktop/dist/Unimatrix-mac.dmg || true
-          mv apps/desktop/dist/*-mac.zip apps/desktop/dist/Unimatrix-mac.zip || true
+          mv apps/desktop/dist/*.dmg apps/desktop/dist/Unimatrix-mac.dmg 2>/dev/null || true
+          mv apps/desktop/dist/*-mac.zip apps/desktop/dist/Unimatrix-mac.zip 2>/dev/null || true
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -69,12 +67,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: apps/desktop/package-lock.json
 
       - name: Install dependencies
         working-directory: apps/desktop
-        run: npm ci
+        run: npm install
 
       - name: Build Windows (.exe)
         working-directory: apps/desktop
@@ -85,8 +81,10 @@ jobs:
         run: npm run dist:win
 
       - name: Rename artifact
-        run: Rename-Item -Path (Get-ChildItem apps/desktop/dist/*.exe | Select-Object -First 1).FullName -NewName "Unimatrix-Setup-win.exe"
         shell: powershell
+        run: |
+          $exe = Get-ChildItem apps/desktop/dist/*.exe | Select-Object -First 1
+          if ($exe) { Rename-Item $exe.FullName "Unimatrix-Setup-win.exe" }
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
@@ -102,12 +100,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: apps/desktop/package-lock.json
 
       - name: Install dependencies
         working-directory: apps/desktop
-        run: npm ci
+        run: npm install
 
       - name: Build Linux (.AppImage + .deb)
         working-directory: apps/desktop
@@ -117,8 +113,8 @@ jobs:
 
       - name: Rename artifacts
         run: |
-          mv apps/desktop/dist/*.AppImage apps/desktop/dist/Unimatrix-linux.AppImage || true
-          mv apps/desktop/dist/*.deb apps/desktop/dist/Unimatrix-linux.deb || true
+          mv apps/desktop/dist/*.AppImage apps/desktop/dist/Unimatrix-linux.AppImage 2>/dev/null || true
+          mv apps/desktop/dist/*.deb apps/desktop/dist/Unimatrix-linux.deb 2>/dev/null || true
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
