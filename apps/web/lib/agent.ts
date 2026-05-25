@@ -21,7 +21,7 @@ async function synthesizeWithGateway(system: string, prompt: string): Promise<st
     model: 'openai/gpt-4o-mini',
     system,
     prompt,
-    maxTokens: 2048,
+    maxOutputTokens: 2048,
   });
   return text;
 }
