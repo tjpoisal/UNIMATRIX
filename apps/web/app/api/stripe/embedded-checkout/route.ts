@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
     });
   }
 
+  // @ts-expect-error stripe-node v22 UiMode type excludes 'embedded'; valid at runtime
   const checkoutSession = await stripe.checkout.sessions.create({
-    // @ts-expect-error ui_mode is valid for embedded checkout but missing from stripe types
     ui_mode: "embedded",
     customer: customerId,
     payment_method_types: ["card"],
