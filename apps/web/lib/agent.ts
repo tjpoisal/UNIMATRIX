@@ -250,7 +250,6 @@ Answer the task thoroughly. You have access to the user's memory palace context 
   } else if (goodResponses.length === 1) {
     synthesis = goodResponses[0].response;
   } else {
-    const synthProvider = providers[0];
     const combined = goodResponses
       .map(r => `### ${r.provider} (${r.model})\n${r.response}`)
       .join('\n\n');
@@ -354,7 +353,6 @@ async function runDebate(
   const allResponses = [...round1, ...round2];
 
   // Synthesis
-  const synthProvider = providers[0];
   const synthInput = `Task: ${task}\n\nRound 1 perspectives:\n${round1Summary}\n\nRound 2 cross-responses:\n${round2.filter(r => !r.error).map(r => r.response).join('\n---\n')}`;
 
   let synthesis: string;
