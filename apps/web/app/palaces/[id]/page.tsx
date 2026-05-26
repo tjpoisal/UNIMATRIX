@@ -49,7 +49,7 @@ export default function PalaceViewPage() {
         }
 
         setPalace(data);
-      } catch (err) {
+      } catch {
         setError('Failed to load palace');
       } finally {
         setLoading(false);

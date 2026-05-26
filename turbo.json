@@ -11,10 +11,14 @@
     "NODE_ENV",
     "AUTH_SECRET",
     "NEXTAUTH_URL",
+    "NEXTAUTH_SECRET",
     "GOOGLE_CLIENT_ID",
     "GOOGLE_CLIENT_SECRET",
     "GITHUB_CLIENT_ID",
-    "GITHUB_CLIENT_SECRET"
+    "GITHUB_CLIENT_SECRET",
+    "STRIPE_SECRET_KEY",
+    "RESEND_API_KEY",
+    "EMAIL_FROM"
   ],
   "tasks": {
     "build": {
