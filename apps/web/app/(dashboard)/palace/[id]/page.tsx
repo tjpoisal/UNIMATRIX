@@ -250,23 +250,6 @@ export default function PalaceEditorPage() {
   const [newMemoryLocationId, setNewMemoryLocationId] = useState<string | null>(null);
   const [isCreatingMemory, setIsCreatingMemory] = useState(false);
 
-  const fetchPalace = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/palaces/${palaceId}`);
-      const data = await res.json();
-      if (!res.ok) { setError(data.error || 'Failed to fetch palace'); return; }
-      // Build location tree with children (API returns flat list with parentId)
-      const locations = buildLocationTree((data.locations || []) as LocationRaw[]);
-      setPalace({ ...data, locations });
-    } catch {
-      setError('Failed to load palace');
-    } finally {
-      setLoading(false);
-    }
-  }, [palaceId]);
-
-  useEffect(() => { fetchPalace(); }, [fetchPalace]);
-
   function buildLocationTree(flat: LocationRaw[]): Location[] {
     const byId: Record<string, Location> = {};
     flat.forEach(loc => {
@@ -282,6 +265,37 @@ export default function PalaceEditorPage() {
     });
     return roots;
   }
+
+  const fetchPalace = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/palaces/${palaceId}`);
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || 'Failed to fetch palace'); return; }
+      const locations = buildLocationTree((data.locations || []) as LocationRaw[]);
+      setPalace({ ...data, locations });
+    } catch {
+      setError('Failed to load palace');
+    } finally {
+      setLoading(false);
+    }
+  }, [palaceId]);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch(`/api/palaces/${palaceId}`);
+        const data = await res.json();
+        if (!res.ok) { setError(data.error || 'Failed to fetch palace'); return; }
+        const locations = buildLocationTree((data.locations || []) as LocationRaw[]);
+        setPalace({ ...data, locations });
+      } catch {
+        setError('Failed to load palace');
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [palaceId]);
 
   const handleSelectMemory = (memory: Memory) => {
     setSelectedMemory(memory);

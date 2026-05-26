@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface PalaceLocation {
@@ -145,23 +145,21 @@ export default function PalaceListPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
-  const loadPalaces = useCallback(async () => {
-    try {
-      const res = await fetch('/api/palaces');
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || 'Failed to fetch palaces');
-        return;
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/palaces');
+        const data = await res.json();
+        if (!res.ok) { setError(data.error || 'Failed to fetch palaces'); return; }
+        setPalaces(Array.isArray(data) ? data : []);
+      } catch {
+        setError('Failed to load palaces');
+      } finally {
+        setLoading(false);
       }
-      setPalaces(Array.isArray(data) ? data : []);
-    } catch {
-      setError('Failed to load palaces');
-    } finally {
-      setLoading(false);
     }
+    load();
   }, []);
-
-  useEffect(() => { loadPalaces(); }, [loadPalaces]);
 
   const handleCreate = (palace: Palace) => {
     setPalaces(prev => [palace, ...prev]);
