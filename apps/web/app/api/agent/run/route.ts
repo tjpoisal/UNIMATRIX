@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { runAgentTask, AgentMode } from '@/lib/agent';
@@ -67,8 +68,13 @@ export async function POST(request: NextRequest) {
         providers: result.responses.map(r => `${r.provider}:${r.model}`),
         result: {
           synthesis: result.synthesis,
-          responses: result.responses,
-        },
+          responses: result.responses.map(r => ({
+            provider: r.provider,
+            model: r.model,
+            response: r.response,
+            ...(r.error !== undefined ? { error: r.error } : {}),
+          })),
+        } as unknown as Prisma.InputJsonValue,
         memoryIds: result.memoryId ? [result.memoryId] : [],
       },
     });

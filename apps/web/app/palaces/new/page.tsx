@@ -53,7 +53,7 @@ export default function NewPalacePage() {
           </button>
           <h1 className="text-3xl font-bold text-[#F1F5F9]">New Memory Palace</h1>
           <p className="text-[#94A3B8] mt-2">
-            A memory palace is a mental space where you store and organize your memories.
+            A memory workspace is where your AI stores context from your conversations.
           </p>
         </div>
 

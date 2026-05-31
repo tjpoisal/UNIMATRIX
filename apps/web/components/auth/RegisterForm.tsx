@@ -45,7 +45,7 @@ export default function RegisterForm() {
         <div className="backdrop-blur-xl bg-[#111827]/80 border border-[#334155]/30 rounded-2xl p-8 space-y-6">
           {/* Header */}
           <div className="flex flex-col items-center gap-3">
-            <Image src="/logo.svg" alt="Unimatrix" width={100} height={120} priority />
+            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={100} height={110} priority />
             <p className="text-[#94A3B8] text-sm text-center">One memory. Every AI. Any device.</p>
           </div>
 

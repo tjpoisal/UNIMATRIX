@@ -1,0 +1,124 @@
+name: Release Desktop
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-mac:
+    name: macOS (universal)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: apps/desktop
+        run: npm install
+
+      - name: Import Mac certificate
+        if: ${{ env.MAC_CERTS != '' }}
+        env:
+          MAC_CERTS: ${{ secrets.MAC_CERTS }}
+          MAC_CERTS_PASSWORD: ${{ secrets.MAC_CERTS_PASSWORD }}
+        run: |
+          echo "$MAC_CERTS" | base64 --decode > /tmp/certs.p12
+          security create-keychain -p "" build.keychain
+          security import /tmp/certs.p12 -k build.keychain -P "$MAC_CERTS_PASSWORD" -T /usr/bin/codesign
+          security list-keychains -s build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+
+      - name: Build macOS (universal .dmg)
+        working-directory: apps/desktop
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run dist:mac
+
+      - name: Rename artifacts
+        run: |
+          mv apps/desktop/dist/*.dmg apps/desktop/dist/Unimatrix-mac.dmg 2>/dev/null || true
+          mv apps/desktop/dist/*-mac.zip apps/desktop/dist/Unimatrix-mac.zip 2>/dev/null || true
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            apps/desktop/dist/Unimatrix-mac.dmg
+            apps/desktop/dist/Unimatrix-mac.zip
+
+  build-win:
+    name: Windows (x64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: apps/desktop
+        run: npm install
+
+      - name: Build Windows (.exe)
+        working-directory: apps/desktop
+        env:
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run dist:win
+
+      - name: Rename artifact
+        shell: powershell
+        run: |
+          $exe = Get-ChildItem apps/desktop/dist/*.exe | Select-Object -First 1
+          if ($exe) { Rename-Item $exe.FullName "Unimatrix-Setup-win.exe" }
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: apps/desktop/dist/Unimatrix-Setup-win.exe
+
+  build-linux:
+    name: Linux (x64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        working-directory: apps/desktop
+        run: npm install
+
+      - name: Build Linux (.AppImage + .deb)
+        working-directory: apps/desktop
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run dist:linux
+
+      - name: Rename artifacts
+        run: |
+          mv apps/desktop/dist/*.AppImage apps/desktop/dist/Unimatrix-linux.AppImage 2>/dev/null || true
+          mv apps/desktop/dist/*.deb apps/desktop/dist/Unimatrix-linux.deb 2>/dev/null || true
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            apps/desktop/dist/Unimatrix-linux.AppImage
+            apps/desktop/dist/Unimatrix-linux.deb

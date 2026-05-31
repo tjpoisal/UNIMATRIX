@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -14,25 +14,22 @@ function ResetPasswordForm() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [submitError, setSubmitError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    if (!token || !email) {
-      setError('Invalid reset link. Please request a new one.');
-    }
-  }, [token, email]);
+  const invalidLink = !token || !email;
+  const error = invalidLink ? 'Invalid reset link. Please request a new one.' : submitError;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setSubmitError('');
 
     if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
+      setSubmitError('Password must be at least 8 characters.');
       return;
     }
     if (password !== confirm) {
-      setError('Passwords do not match.');
+      setSubmitError('Passwords do not match.');
       return;
     }
 
@@ -45,13 +42,13 @@ function ResetPasswordForm() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.message || 'Something went wrong. Please try again.');
+        setSubmitError(data.message || 'Something went wrong. Please try again.');
         return;
       }
       setSuccess(true);
       setTimeout(() => router.push('/auth/login'), 3000);
     } catch {
-      setError('An error occurred. Please try again.');
+      setSubmitError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -63,7 +60,7 @@ function ResetPasswordForm() {
         <div className="backdrop-blur-xl bg-[#111827]/80 border border-[#334155]/30 rounded-2xl p-8 space-y-6">
           {/* Header */}
           <div className="flex flex-col items-center gap-3">
-            <Image src="/logo.svg" alt="Unimatrix" width={100} height={120} priority />
+            <Image src="/logo.png" alt="Unimatrix" width={100} height={120} priority />
             <h1 className="text-[#F1F5F9] text-xl font-semibold">Choose a new password</h1>
             {email && (
               <p className="text-[#94A3B8] text-sm text-center">for <span className="text-[#F1F5F9]">{email}</span></p>

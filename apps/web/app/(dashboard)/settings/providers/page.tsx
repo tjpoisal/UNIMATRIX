@@ -67,7 +67,7 @@ const PROVIDERS = [
   {
     id: 'groq',
     name: 'Groq',
-    icon: '⚡',
+    icon: 'GQ',
     color: '#F55036',
     bg: 'bg-[#F55036]/10 border-[#F55036]/40',
     badge: 'bg-[#F55036]/20 text-[#F55036]',
@@ -84,7 +84,7 @@ const PROVIDERS = [
   {
     id: 'ollama',
     name: 'Ollama',
-    icon: '🦙',
+    icon: 'OL',
     color: '#7C3AED',
     bg: 'bg-[#7C3AED]/10 border-[#7C3AED]/40',
     badge: 'bg-[#7C3AED]/20 text-[#7C3AED]',
@@ -274,7 +274,6 @@ export default function ProvidersPage() {
                     </div>
                     <button
                       onClick={() => isOpen ? setAdding(null) : openAdd(def.id)}
-                      style={{ color: isOpen ? '#EF4444' : def.color }}
                       className="text-sm font-medium px-4 py-2 rounded-lg border transition-all"
                       style={{
                         color: isOpen ? '#EF4444' : def.color,

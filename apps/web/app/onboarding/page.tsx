@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AppShell from '@/components/layout/AppShell';
 
 interface ApiKey {
@@ -15,7 +15,7 @@ const AI_SYSTEMS = [
   {
     id: 'claude-desktop',
     name: 'Claude Desktop',
-    icon: '🤖',
+    icon: 'CD',
     description: 'Connect via MCP server',
     color: '#CC785C',
     instructions: (key: string) => `Add this to your Claude Desktop config file:
@@ -30,7 +30,7 @@ Windows: %APPDATA%\\Claude\\claude_desktop_config.json
       "args": ["-y", "@unimatrix/mcp-server"],
       "env": {
         "UNIMATRIX_API_KEY": "${key}",
-        "UNIMATRIX_API_URL": "${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api"
+        "UNIMATRIX_API_URL": "${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api"
       }
     }
   }
@@ -39,7 +39,7 @@ Windows: %APPDATA%\\Claude\\claude_desktop_config.json
   {
     id: 'claude-code',
     name: 'Claude Code',
-    icon: '💻',
+    icon: 'CC',
     description: 'Connect via CLI',
     color: '#CC785C',
     instructions: (key: string) => `Run this command in your terminal:
@@ -47,45 +47,45 @@ Windows: %APPDATA%\\Claude\\claude_desktop_config.json
 claude mcp add unimatrix \\
   --command "npx -y @unimatrix/mcp-server" \\
   --env UNIMATRIX_API_KEY="${key}" \\
-  --env UNIMATRIX_API_URL="${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api"
+  --env UNIMATRIX_API_URL="${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api"
 
 Then restart Claude Code and your memories will be available.`,
   },
   {
     id: 'chatgpt',
     name: 'ChatGPT',
-    icon: '🟢',
+    icon: 'GP',
     description: 'Connect via REST API',
     color: '#10A37F',
     instructions: (key: string) => `Use the Unimatrix REST API directly in your ChatGPT actions or custom GPTs.
 
-Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api
+Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 Authorization: Bearer ${key}
 
 Endpoints:
-  GET  /palaces           — list your memory palaces
+  GET  /palaces           — list your memory workspaces
   GET  /memories          — search memories
   POST /memories          — store a new memory
   GET  /search?q=...      — full-text search
 
 Add the OpenAPI spec to your GPT Actions:
-${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api/openapi.json`,
+${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api/openapi.json`,
   },
   {
     id: 'gemini',
     name: 'Gemini',
-    icon: '✨',
+    icon: 'GM',
     description: 'Connect via REST API',
     color: '#4285F4',
     instructions: (key: string) => `Use the Unimatrix REST API with Gemini function calling.
 
-Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api
+Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 Authorization Header: Bearer ${key}
 
 Example function declaration for Gemini:
 {
   "name": "search_memories",
-  "description": "Search the user's Unimatrix memory palace",
+  "description": "Search the user's Unimatrix memory — returns relevant context from all AI sessions",
   "parameters": {
     "type": "object",
     "properties": {
@@ -105,7 +105,7 @@ Make requests to: GET /api/search?q={query}`,
     color: '#E7E9EA',
     instructions: (key: string) => `Use the Unimatrix REST API with xAI / Grok tool calling.
 
-Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api
+Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 Authorization: Bearer ${key}
 
 Add as a tool in your Grok system prompt:
@@ -113,7 +113,7 @@ Add as a tool in your Grok system prompt:
   "type": "function",
   "function": {
     "name": "query_memory",
-    "description": "Query the user's personal memory palace stored in Unimatrix",
+    "description": "Query the user's persistent AI memory stored in Unimatrix",
     "parameters": {
       "type": "object",
       "properties": {
@@ -127,7 +127,7 @@ Add as a tool in your Grok system prompt:
   {
     id: 'ollama',
     name: 'Ollama',
-    icon: '🦙',
+    icon: 'OL',
     description: 'Local LLM via MCP',
     color: '#A855F7',
     instructions: (key: string) => `For local models via Ollama + Open WebUI:
@@ -137,7 +137,7 @@ Add as a tool in your Grok system prompt:
 
 2. Add to your Open WebUI MCP config:
    UNIMATRIX_API_KEY=${key}
-   UNIMATRIX_API_URL=${typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api
+   UNIMATRIX_API_URL=${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 
 3. Or call the REST API directly from your Ollama system prompt context using the endpoints above.`,
   },
@@ -152,14 +152,16 @@ export default function OnboardingPage() {
   const [copied, setCopied] = useState(false);
   const [revoking, setRevoking] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchKeys();
+  const fetchKeys = useCallback(async () => {
+    try {
+      const res = await fetch('/api/apikeys');
+      if (res.ok) setKeys(await res.json());
+    } finally {
+      // fetch complete
+    }
   }, []);
 
-  const fetchKeys = async () => {
-    const res = await fetch('/api/apikeys');
-    if (res.ok) setKeys(await res.json());
-  };
+  useEffect(() => { fetchKeys(); }, [fetchKeys]);
 
   const handleCreate = async () => {
     if (!newKeyName.trim()) return;
@@ -225,7 +227,7 @@ export default function OnboardingPage() {
           {newlyCreatedKey && (
             <div className="mb-4 p-4 bg-[#00F5FF]/5 border border-[#00F5FF]/30 rounded-xl">
               <p className="text-sm text-[#00F5FF] font-medium mb-2">
-                ✅ Key created — copy it now, it won&apos;t be shown again
+                Key created — copy it now, it won&apos;t be shown again
               </p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 text-sm font-mono text-[#F1F5F9] bg-[#0A0F1C] px-3 py-2 rounded-lg break-all">
@@ -354,12 +356,12 @@ export default function OnboardingPage() {
             <h2 className="text-lg font-semibold text-[#F1F5F9]">Test the Connection</h2>
           </div>
           <p className="text-sm text-[#94A3B8] mb-4">
-            After configuring your AI, ask it: <span className="text-[#F1F5F9] font-medium">&quot;What&apos;s in my Unimatrix memory palace?&quot;</span>
+            After configuring your AI, ask it: <span className="text-[#F1F5F9] font-medium">&quot;What do you remember from my previous conversations?&quot;</span>
           </p>
           <div className="p-4 bg-[#0A0F1C]/40 border border-[#334155]/30 rounded-xl">
             <p className="text-xs text-[#64748B] font-mono">
               curl -H &quot;Authorization: Bearer {activeKey ? `${activeKey.keyPrefix}...` : 'YOUR_KEY'}&quot; \<br />
-              &nbsp;&nbsp;{typeof window !== 'undefined' ? window.location.origin : 'https://unimatrix-flax.vercel.app'}/api/palaces
+              &nbsp;&nbsp;{typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api/palaces
             </p>
           </div>
         </section>

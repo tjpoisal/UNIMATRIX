@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
         <div className="backdrop-blur-xl bg-[#111827]/80 border border-[#334155]/30 rounded-2xl p-8 space-y-6">
           {/* Header */}
           <div className="flex flex-col items-center gap-3">
-            <Image src="/logo.svg" alt="Unimatrix" width={100} height={120} priority />
+            <Image src="/logo.png" alt="Unimatrix" width={100} height={120} priority />
             <h1 className="text-[#F1F5F9] text-xl font-semibold">Reset your password</h1>
             <p className="text-[#94A3B8] text-sm text-center">
               Enter your email and we&apos;ll send you a link to reset your password.

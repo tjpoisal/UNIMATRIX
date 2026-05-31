@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const origin =
-    process.env.NEXTAUTH_URL ?? "https://unimatrix-flax.vercel.app";
+    process.env.NEXTAUTH_URL ?? "https://deployunimatrix.com";
 
   const spec = {
     openapi: "3.1.0",
@@ -10,7 +10,7 @@ export async function GET() {
       title: "Unimatrix API",
       version: "1.0.0",
       description:
-        "Universal memory palace API — store, retrieve, and share memories across any AI system.",
+        "Universal AI memory layer API — store and retrieve context across all LLMs and devices.",
     },
     servers: [{ url: `${origin}/api` }],
     security: [{ bearerAuth: [] }],
@@ -76,8 +76,8 @@ export async function GET() {
       "/palaces": {
         get: {
           operationId: "listPalaces",
-          summary: "List memory palaces",
-          description: "Returns all memory palaces owned by the authenticated user.",
+          summary: "List memory workspaces",
+          description: "Returns all memory workspaces owned by the authenticated user.",
           responses: {
             "200": {
               description: "List of palaces",
@@ -95,7 +95,7 @@ export async function GET() {
         },
         post: {
           operationId: "createPalace",
-          summary: "Create a memory palace",
+          summary: "Create a memory workspace",
           requestBody: {
             required: true,
             content: {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -22,21 +23,21 @@ export const metadata: Metadata = {
   description: "Switch between Claude, ChatGPT, Grok, Gemini, and more — and always pick up where you left off.",
   keywords: ["AI memory", "MCP", "cross-AI memory", "Claude", "ChatGPT", "Grok", "Gemini"],
   icons: {
-    icon: "/logo-icon.svg",
-    apple: "/logo-icon.svg",
+    icon: "/logo-icon.png",
+    apple: "/logo-icon.png",
   },
   openGraph: {
     title: "Unimatrix — One memory. Every AI. Any device.",
     description: "Your memories follow you across every AI. Connect Claude, ChatGPT, Grok, Gemini and more.",
     siteName: "Unimatrix",
-    images: [{ url: "/logo.svg", width: 400, height: 480, alt: "Unimatrix" }],
+    images: [{ url: "/logo.png", width: 400, height: 480, alt: "Unimatrix" }],
     type: "website",
   },
   twitter: {
     card: "summary",
     title: "Unimatrix — One memory. Every AI. Any device.",
     description: "Your memories follow you across every AI.",
-    images: ["/logo.svg"],
+    images: ["/logo.png"],
   },
 };
 
@@ -58,6 +59,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>{children}</Providers>
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>

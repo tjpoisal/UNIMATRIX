@@ -25,16 +25,15 @@ function SearchContent() {
 
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+  // Initialise loading/searched from URL so no sync setState is needed in the effect.
+  const [loading, setLoading] = useState(!!initialQuery);
+  const [searched, setSearched] = useState(!!initialQuery);
   const [error, setError] = useState('');
 
+  // runSearch only sets state after async work — callers handle the sync setup.
+  // try/finally (no catch) ensures no setState can run before the first await.
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) return;
-    setLoading(true);
-    setError('');
-    setSearched(true);
-
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q.trim())}`);
       const data = await res.json();
@@ -46,14 +45,13 @@ function SearchContent() {
       }
 
       setResults(data.results || []);
-    } catch {
-      setError('Search request failed');
-      setResults([]);
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // When the URL query changes, kick off a search. The loading/searched state is
+  // already derived from initialQuery above so no synchronous setState is needed here.
   useEffect(() => {
     if (initialQuery) {
       runSearch(initialQuery);
@@ -63,6 +61,10 @@ function SearchContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
+    // Sync state updates are fine in event handlers.
+    setLoading(true);
+    setError('');
+    setSearched(true);
     router.push(`/search?q=${encodeURIComponent(query.trim())}`);
     runSearch(query);
   };
@@ -90,7 +92,7 @@ function SearchContent() {
         <form onSubmit={handleSubmit} className="mb-8">
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] text-lg">🔍</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#64748B] text-sm font-bold">S</span>
               <input
                 type="text"
                 value={query}
@@ -181,7 +183,7 @@ function SearchContent() {
         {/* Initial empty state */}
         {!loading && !searched && (
           <div className="text-center pt-16">
-            <div className="text-5xl mb-4">🔍</div>
+            <div className="text-5xl mb-4 font-bold text-[#334155]">SEARCH</div>
             <p className="text-[#64748B] text-lg">Enter a query to search your memories</p>
             <p className="text-[#475569] text-sm mt-2">Searches across content and tags in all your palaces</p>
           </div>
