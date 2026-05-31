@@ -35,10 +35,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       <div className="p-6 border-b border-[#334155]/30">
         <div className="flex items-center gap-3">
           <Image
-            src="/logo-icon.png"
+            src="/LOGO_DARK_BACKGROUND.png"
             alt="Unimatrix"
             width={36}
-            height={36}
+            height={40}
             className="flex-shrink-0"
           />
           {isOpen && (
