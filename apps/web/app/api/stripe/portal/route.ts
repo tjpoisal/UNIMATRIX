@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No billing account found" }, { status: 404 });
   }
 
-  const origin = request.headers.get("origin") ?? process.env.NEXTAUTH_URL ?? "https://unimatrix-flax.vercel.app";
+  const origin = request.headers.get("origin") ?? process.env.NEXTAUTH_URL ?? "https://deployunimatrix.com";
 
   const stripe = getStripe();
   const portalSession = await stripe.billingPortal.sessions.create({

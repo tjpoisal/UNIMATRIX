@@ -44,8 +44,8 @@ const PROVIDER_ICONS: Record<string, string> = {
   claude: '◆',
   openai: '⬡',
   gemini: '✦',
-  groq:   '⚡',
-  ollama: '🦙',
+  groq:   'GQ',
+  ollama: 'OL',
 };
 
 const MODE_DESCRIPTIONS: Record<string, string> = {

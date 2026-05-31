@@ -23,18 +23,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Build where clause
-    const where: any = {
-      location: {
-        palace: {
-          userId: session.user.id,
-        },
-      },
-      deletedAt: null,
-    };
+    const palaceFilter = palaceId
+      ? { userId: session.user.id, id: palaceId }
+      : { userId: session.user.id };
 
-    if (palaceId) {
-      where.location.palace.id = palaceId;
-    }
+    const where = {
+      location: { palace: palaceFilter },
+      deletedAt: null as null,
+    };
 
     // Simple text search (PostgreSQL LIKE)
     // For full-text search, you'd use: to_tsvector('english', content) @@ plainto_tsquery(...)

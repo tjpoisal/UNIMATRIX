@@ -385,7 +385,7 @@ Examples:
       return {
         content: [{
           type: "text",
-          text: `✅ Memory stored successfully.\n\n**ID**: \`${memory.id}\`\n**Content**: ${memory.content}\n**Tags**: ${memory.tags.join(", ") || "none"}`,
+          text: `Memory stored successfully.\n\n**ID**: \`${memory.id}\`\n**Content**: ${memory.content}\n**Tags**: ${memory.tags.join(", ") || "none"}`,
         }],
         structuredContent: memory,
       };
@@ -524,7 +524,7 @@ Examples:
       return {
         content: [{
           type: "text",
-          text: `✅ Palace created: **${palace.name}** (\`${palace.id}\`)\n\nNext: create locations inside it with unimatrix_create_location.`,
+          text: `Palace created: **${palace.name}** (\`${palace.id}\`)\n\nNext: create locations inside it with unimatrix_create_location.`,
         }],
         structuredContent: palace,
       };
@@ -585,7 +585,7 @@ Examples:
       return {
         content: [{
           type: "text",
-          text: `✅ Location created: **${location.name}** (\`${location.id}\`) in palace \`${location.palaceId}\`\n\nNext: store memories here with unimatrix_store_memory using location_id: "${location.id}".`,
+          text: `Location created: **${location.name}** (\`${location.id}\`) in palace \`${location.palaceId}\`\n\nNext: store memories here with unimatrix_store_memory using location_id: "${location.id}".`,
         }],
         structuredContent: location,
       };
@@ -639,7 +639,7 @@ Examples:
       return {
         content: [{
           type: "text",
-          text: `✅ Memory updated.\n\n**ID**: \`${memory.id}\`\n**Content**: ${memory.content}\n**Tags**: ${memory.tags.join(", ") || "none"}`,
+          text: `Memory updated.\n\n**ID**: \`${memory.id}\`\n**Content**: ${memory.content}\n**Tags**: ${memory.tags.join(", ") || "none"}`,
         }],
         structuredContent: memory,
       };

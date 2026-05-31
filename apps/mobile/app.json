@@ -13,12 +13,21 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTabletMode": true
+      "supportsTablet": true,
+      "bundleIdentifier": "app.unimatrix.app"
     },
     "android": {
+      "package": "app.unimatrix.app",
+      "supportsTabletMode": true,
+      "bundleIdentifier": "com.getstackmax.unimatrix",
+      "buildNumber": "1"
+    },
+    "android": {
+      "package": "com.getstackmax.unimatrix",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0A0F1C"
+        "foreground": "./assets/images/android-icon-foreground.png",
+        "background": "./assets/images/android-icon-background.png"
       }
     },
     "web": {
@@ -26,15 +35,33 @@
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [],
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardAtBack": true
+          }
+        }
+      ]
+    ],
     "schemes": ["myapp"],
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "your-eas-project-id"
+        "projectId": "c3f8a2b1-9d4e-4f5a-b6c7-d8e9f0a1b2c3"
       }
     }
+    "plugins": [],
+    "scheme": "unimatrix",
+    "extra": {
+      "router": { "origin": false },
+      "eas": { "projectId": "your-eas-project-id" },
+      "apiUrl": "https://deployunimatrix.com"
+    },
+    "owner": "tjpoisal"
   }
 }

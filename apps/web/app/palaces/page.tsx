@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import AppShell from '@/components/layout/AppShell';
 
@@ -18,7 +18,7 @@ export default function PalacesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadPalaces = async () => {
+  const loadPalaces = useCallback(async () => {
     try {
       const res = await fetch('/api/palaces');
       const data = await res.json();
@@ -27,14 +27,12 @@ export default function PalacesPage() {
         return;
       }
       setPalaces(data);
-    } catch {
-      setError('Failed to load palaces');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { loadPalaces(); }, []);
+  useEffect(() => { loadPalaces(); }, [loadPalaces]);
 
   const totalMemories = palaces.reduce(
     (sum, p) => sum + p.locations.reduce((s, l) => s + l._count.memories, 0),
@@ -47,10 +45,10 @@ export default function PalacesPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#F1F5F9]">Memory Palaces</h1>
+            <h1 className="text-3xl font-bold text-[#F1F5F9]">AI Memory Workspaces</h1>
             {!loading && (
               <p className="text-[#94A3B8] mt-1">
-                {palaces.length} palace{palaces.length !== 1 ? 's' : ''} · {totalMemories} memor{totalMemories !== 1 ? 'ies' : 'y'}
+                {palaces.length} workspace{palaces.length !== 1 ? 's' : ''} · {totalMemories} memor{totalMemories !== 1 ? 'ies' : 'y'}
               </p>
             )}
           </div>
@@ -58,7 +56,7 @@ export default function PalacesPage() {
             href="/palaces/new"
             className="px-5 py-2.5 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20 flex items-center gap-2"
           >
-            <span>+</span> New Palace
+            <span>+</span> New Workspace
           </Link>
         </div>
 
@@ -80,15 +78,15 @@ export default function PalacesPage() {
         {!loading && !error && palaces.length === 0 && (
           <div className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-12 text-center">
             <div className="w-16 h-16 bg-[#1F2937] rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">🏛️</span>
+              <span className="text-2xl font-bold text-[#00F5FF]">W</span>
             </div>
-            <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">No palaces yet</h2>
-            <p className="text-[#94A3B8] mb-6">Create your first memory palace to start organizing your knowledge.</p>
+            <h2 className="text-xl font-semibold text-[#F1F5F9] mb-2">No workspaces yet</h2>
+            <p className="text-[#94A3B8] mb-6">Connect an AI via MCP and it will start storing context here automatically.</p>
             <Link
               href="/palaces/new"
               className="inline-block px-6 py-3 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
             >
-              Create Your First Palace
+              Create Your First Workspace
             </Link>
           </div>
         )}
@@ -109,7 +107,7 @@ export default function PalacesPage() {
                   <div className="relative space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00F5FF]/20 to-[#A855F7]/20 border border-[#334155]/30 flex items-center justify-center">
-                        <span className="text-lg">🏛️</span>
+                        <span className="text-xs font-black text-[#00F5FF]">{palace.name.charAt(0).toUpperCase()}</span>
                       </div>
                       {palace.isPublic && (
                         <span className="px-2 py-0.5 text-xs bg-[#A855F7]/10 border border-[#A855F7]/30 text-[#A855F7] rounded-full">
@@ -147,7 +145,7 @@ export default function PalacesPage() {
               <div className="w-10 h-10 rounded-xl bg-[#1F2937] group-hover:bg-[#00F5FF]/10 border border-[#334155]/30 group-hover:border-[#00F5FF]/30 flex items-center justify-center transition-all duration-200">
                 <span className="text-[#64748B] group-hover:text-[#00F5FF] text-xl transition-colors">+</span>
               </div>
-              <span className="text-sm text-[#64748B] group-hover:text-[#94A3B8] transition-colors">New Palace</span>
+              <span className="text-sm text-[#64748B] group-hover:text-[#94A3B8] transition-colors">New Workspace</span>
             </Link>
           </div>
         )}

@@ -22,6 +22,7 @@ interface SharePanelProps {
 export default function SharePanel({ palaceId, onClose }: SharePanelProps) {
   const [shares, setShares] = useState<ShareEntry[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
+  // Start in loading state — avoids synchronous setLoading(true) inside the effect.
   const [loading, setLoading] = useState(true);
   const [selectedFriendId, setSelectedFriendId] = useState('');
   const [permission, setPermission] = useState<'view' | 'edit'>('view');
@@ -30,7 +31,6 @@ export default function SharePanel({ palaceId, onClose }: SharePanelProps) {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
     try {
       const [sharesRes, friendsRes] = await Promise.all([
         fetch(`/api/palaces/${palaceId}/share`),

@@ -41,8 +41,8 @@ export default function FriendsPage() {
   const [sendSuccess, setSendSuccess] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
+  // fetchFriends only sets state after async work — no synchronous setState in effects
   const fetchFriends = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch('/api/friends');
       if (res.ok) setData(await res.json());
@@ -104,7 +104,7 @@ export default function FriendsPage() {
         <div>
           <h1 className="text-3xl font-bold text-[#F1F5F9]">Friends</h1>
           <p className="text-[#94A3B8] mt-1">
-            Connect with others to share memory palaces.
+            Connect with others to share AI memory workspaces.
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export default function FriendsPage() {
             </div>
           ) : data.friends.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-4xl mb-3">👥</p>
+              <p className="text-sm font-bold text-[#334155] mb-3">NO FRIENDS YET</p>
               <p className="text-[#94A3B8] text-sm">No friends yet — send a request above.</p>
             </div>
           ) : (
