@@ -43,7 +43,7 @@ export default async function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#334155]/30 bg-[#0A0F1C]/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/logo-icon-light.svg" alt="Unimatrix" width={36} height={27} className="opacity-90" />
+            <Image src="/logo-icon.png" alt="Unimatrix" width={36} height={27} className="opacity-90" />
             <span className="font-black text-lg tracking-tight leading-none">
               <span className="text-[#00F5FF]">UNI</span>
               <span className="text-[#F1F5F9]">MATRIX</span>
@@ -76,7 +76,7 @@ export default async function Home() {
             Universal AI Memory &middot; MCP Protocol &middot; Cross-LLM &middot; All Platforms
           </div>
           <div className="flex justify-center mb-8">
-            <Image src="/logo-icon-cyan.svg" alt="Unimatrix" width={80} height={60}
+            <Image src="/logo-icon.png" alt="Unimatrix" width={80} height={60}
               className="opacity-80 drop-shadow-[0_0_24px_rgba(0,245,255,0.4)]" />
           </div>
           <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight mb-6">
@@ -418,7 +418,7 @@ export default async function Home() {
       <section className="py-20 px-6 bg-gradient-to-r from-[#00F5FF]/5 via-[#0A0F1C] to-[#A855F7]/5 border-t border-[#334155]/20">
         <div className="max-w-3xl mx-auto text-center">
           <div className="flex justify-center mb-8">
-            <Image src="/logo-icon-cyan.svg" alt="Unimatrix" width={56} height={42}
+            <Image src="/logo-icon.png" alt="Unimatrix" width={56} height={42}
               className="opacity-60 drop-shadow-[0_0_16px_rgba(0,245,255,0.3)]" />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Stop re-explaining yourself to every AI.</h2>
@@ -443,7 +443,7 @@ export default async function Home() {
       <footer className="py-10 px-6 border-t border-[#334155]/30">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <Image src="/logo-icon-light.svg" alt="Unimatrix" width={28} height={21} className="opacity-60" />
+            <Image src="/logo-icon.png" alt="Unimatrix" width={28} height={21} className="opacity-60" />
             <div>
               <span className="font-black text-base tracking-tight">
                 <span className="text-[#00F5FF]">UNI</span>

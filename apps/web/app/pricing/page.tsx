@@ -44,7 +44,7 @@ export default function PricingPage() {
       {/* Nav */}
       <nav className="border-b border-[#334155]/30 px-8 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/logo-icon.svg" alt="Unimatrix" width={32} height={32} />
+          <Image src="/logo-icon.png" alt="Unimatrix" width={32} height={32} />
           <span className="font-black text-lg tracking-tight">
             <span className="text-[#00F5FF]">UNI</span>
             <span className="text-[#8892A4]">MATRIX</span>

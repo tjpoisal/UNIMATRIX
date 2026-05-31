@@ -32,7 +32,7 @@ function ReturnContent() {
     return (
       <div className="flex flex-col items-center gap-4">
         <Image
-          src="/logo-icon.svg"
+          src="/logo-icon.png"
           alt="Unimatrix"
           width={56}
           height={56}
@@ -89,7 +89,7 @@ function ReturnContent() {
         <div className="absolute w-24 h-24 rounded-full border border-[#00F5FF]/20" />
         <div className="w-20 h-20 rounded-2xl bg-[#0A0F1C] border border-[#00F5FF]/30 flex items-center justify-center shadow-lg shadow-[#00F5FF]/20">
           <Image
-            src="/logo-icon.svg"
+            src="/logo-icon.png"
             alt="Unimatrix"
             width={44}
             height={44}
@@ -138,7 +138,7 @@ export default function CheckoutReturnPage() {
       {/* Nav */}
       <nav className="border-b border-[#334155]/20 px-6 py-4 flex items-center">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/logo-icon.svg" alt="Unimatrix" width={32} height={32} className="drop-shadow-[0_0_8px_rgba(0,245,255,0.4)]" />
+          <Image src="/logo-icon.png" alt="Unimatrix" width={32} height={32} className="drop-shadow-[0_0_8px_rgba(0,245,255,0.4)]" />
           <span className="font-black text-lg tracking-tight">
             <span className="text-[#00F5FF]">UNI</span>
             <span className="text-[#8892A4]">MATRIX</span>
@@ -149,7 +149,7 @@ export default function CheckoutReturnPage() {
       <div className="flex-1 flex items-center justify-center px-6 py-16">
         <Suspense fallback={
           <div className="flex flex-col items-center gap-4">
-            <Image src="/logo-icon.svg" alt="" width={48} height={48} className="animate-pulse drop-shadow-[0_0_16px_rgba(0,245,255,0.5)]" />
+            <Image src="/logo-icon.png" alt="" width={48} height={48} className="animate-pulse drop-shadow-[0_0_16px_rgba(0,245,255,0.5)]" />
             <p className="text-[#64748B] text-sm">Loading…</p>
           </div>
         }>
