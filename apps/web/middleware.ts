@@ -1,80 +1,48 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createClerkClient } from "@clerk/nextjs/server";
-
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-  publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-});
 
 const publicPaths = [
-  "/auth/*",
+  "/auth/login",
+  "/auth/register",
+  "/auth/forgot-password",
+  "/auth/reset-password",
   "/",
-  "/api/auth/*",
-  "/api/webhooks/*",
-  "/api/openapi.json",
   "/pricing",
-  "/sign-in",
-  "/sign-up",
+  "/api/auth",
+  "/api/webhooks",
+  "/api/mcp",
+  "/api/openapi.json",
 ];
 
 function isPublicPath(pathname: string): boolean {
   return publicPaths.some((pattern) => {
-    if (pattern.endsWith("/*")) {
-      const prefix = pattern.slice(0, -1);
-      return pathname.startsWith(prefix);
-    }
-    return pathname === pattern;
+    return pathname === pattern || pathname.startsWith(pattern + "/") || pathname.startsWith(pattern + "?");
   });
 }
 
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public paths without authentication
   if (isPublicPath(pathname)) {
-    // Special handling for root path: redirect authenticated users to dashboard
-    if (pathname === "/") {
-      const token = request.cookies.get("__session")?.value;
-      if (token) {
-        try {
-          const verified = await clerkClient.verifyToken(token);
-          if (verified) {
-            return NextResponse.redirect(new URL("/dashboard", request.url));
-          }
-        } catch {
-          // Token invalid, continue to root
-        }
-      }
-    }
     return NextResponse.next();
   }
 
-  // Check authentication for protected routes
-  const token = request.cookies.get("__session")?.value;
+  // NextAuth session cookie (works in both dev and prod)
+  const sessionToken =
+    request.cookies.get("next-auth.session-token")?.value ||
+    request.cookies.get("__Secure-next-auth.session-token")?.value;
 
-  if (!token) {
-    // No session cookie, redirect to sign-in
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+  if (!sessionToken) {
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
-  try {
-    const verified = await clerkClient.verifyToken(token);
-    if (!verified) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
-    }
-  } catch {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
-  }
-
-  // Authenticated — allow request to proceed
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/((?!.+\\.[\\w]+$|_next).*)",
-    "/",
-    "/(api|trpc)(.*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.png|.*\\.svg|.*\\.jpg|.*\\.ico).*)",
   ],
 };
