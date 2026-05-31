@@ -35,7 +35,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       <div className="p-6 border-b border-[#334155]/30">
         <div className="flex items-center gap-3">
           <Image
-            src="/logo-icon.svg"
+            src="/logo-icon.png"
             alt="Unimatrix"
             width={36}
             height={36}

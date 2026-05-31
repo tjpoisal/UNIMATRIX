@@ -51,7 +51,7 @@ function CheckoutContent() {
           <div className="relative">
             <div className="absolute inset-0 rounded-full bg-[#00F5FF]/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <Image
-              src="/logo-icon.svg"
+              src="/logo-icon.png"
               alt="Unimatrix"
               width={34}
               height={34}
@@ -97,7 +97,7 @@ function CheckoutContent() {
                 <div className="absolute inset-0 rounded-2xl bg-[#00F5FF]/20 blur-xl" />
                 <div className="relative w-16 h-16 rounded-2xl bg-[#0A0F1C] border border-[#00F5FF]/30 flex items-center justify-center shadow-lg shadow-[#00F5FF]/10">
                   <Image
-                    src="/logo-icon.svg"
+                    src="/logo-icon.png"
                     alt="Unimatrix"
                     width={36}
                     height={36}
@@ -194,7 +194,7 @@ export default function CheckoutPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <Image src="/logo-icon.svg" alt="Unimatrix" width={48} height={48} className="animate-pulse drop-shadow-[0_0_16px_rgba(0,245,255,0.5)]" />
+          <Image src="/logo-icon.png" alt="Unimatrix" width={48} height={48} className="animate-pulse drop-shadow-[0_0_16px_rgba(0,245,255,0.5)]" />
           <p className="text-sm text-[#64748B]">Loading checkout…</p>
         </div>
       </div>
