@@ -51,7 +51,7 @@ export default async function Home() {
           </Link>
           <div className="hidden md:flex items-center gap-6 text-sm text-[#64748B]">
             <a href="#how-it-works" className="hover:text-[#94A3B8] transition-colors">How It Works</a>
-            <a href="#platforms" className="hover:text-[#94A3B8] transition-colors">Downloads</a>
+            <Link href="/downloads" className="hover:text-[#94A3B8] transition-colors">Downloads</Link>
             <a href="#features" className="hover:text-[#94A3B8] transition-colors">Features</a>
             <a href="#pricing" className="hover:text-[#94A3B8] transition-colors">Pricing</a>
           </div>
