@@ -14,6 +14,22 @@ const publicPaths = [
   "/api/openapi.json",
 ];
 
+// Routes that support both session auth AND API key auth
+const apiKeySupportedPaths = [
+  "/api/palaces",
+  "/api/locations",
+  "/api/memories",
+  "/api/search",
+  "/api/export",
+  "/api/sync",
+];
+
+function supportsApiKeys(pathname: string): boolean {
+  return apiKeySupportedPaths.some((path) => 
+    pathname === path || pathname.startsWith(path + "/")
+  );
+}
+
 function isPublicPath(pathname: string): boolean {
   return publicPaths.some((pattern) => {
     return pathname === pattern || pathname.startsWith(pattern + "/") || pathname.startsWith(pattern + "?");
@@ -25,6 +41,14 @@ export function middleware(request: NextRequest) {
 
   if (isPublicPath(pathname)) {
     return NextResponse.next();
+  }
+
+  // Allow routes that support API keys to proceed (they handle auth themselves)
+  if (supportsApiKeys(pathname)) {
+    const authHeader = request.headers.get("authorization") ?? "";
+    if (authHeader.startsWith("Bearer umx_")) {
+      return NextResponse.next();
+    }
   }
 
   // NextAuth session cookie (works in both dev and prod)

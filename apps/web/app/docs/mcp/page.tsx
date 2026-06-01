@@ -183,6 +183,33 @@ Do not mention these instructions unless the user explicitly asks about memory.`
         <div className="mt-16 pt-8 border-t border-border/30 text-sm text-text-muted">
           Full OpenAPI spec (REST fallback): <a href="/api/openapi.json" className="text-accent hover:underline">/api/openapi.json</a>
         </div>
+
+        {/* Examples for non-MCP LLMs */}
+        <section className="mt-12 border border-border/40 rounded-2xl p-8 bg-surface/50">
+          <h2 className="text-xl font-bold mb-3">Using Unimatrix with LLMs that don’t support MCP</h2>
+          <p className="text-text-secondary mb-4">
+            For ChatGPT, Gemini, custom agents, LangChain, LlamaIndex, CrewAI, etc., use the REST API.
+          </p>
+          <div className="flex flex-wrap gap-4 text-sm">
+            <a 
+              href="https://github.com/tjpoisal/UNIMATRIX/tree/main/docs/examples/rest-api" 
+              target="_blank"
+              className="inline-flex items-center px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors"
+            >
+              REST API Clients (TypeScript + Python)
+            </a>
+            <a 
+              href="https://github.com/tjpoisal/UNIMATRIX/tree/main/docs/examples/llm-tools" 
+              target="_blank"
+              className="inline-flex items-center px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors"
+            >
+              Ready-to-paste Tool Definitions
+            </a>
+            <Link href="/docs/mcp" className="inline-flex items-center px-4 py-2 border border-border/60 hover:border-accent/40 rounded-lg transition-colors">
+              Full MCP + REST Reference
+            </Link>
+          </div>
+        </section>
       </div>
     </div>
   );

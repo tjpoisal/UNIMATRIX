@@ -265,4 +265,6 @@ For LLMs that do not support MCP (e.g., ChatGPT Actions, Gemini function calling
 
 ---
 
-*Questions? Email hello@deployunimatrix.com or open an issue at github.com/tjpoisal/UNIMATRIX*
+* Full MCP tool reference & schemas: [docs/mcp-reference.md](https://github.com/tjpoisal/UNIMATRIX/blob/main/docs/mcp-reference.md) or https://deployunimatrix.com/docs/mcp
+
+Questions? Email hello@deployunimatrix.com or open an issue at github.com/tjpoisal/UNIMATRIX*
