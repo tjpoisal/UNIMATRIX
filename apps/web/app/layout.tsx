@@ -55,7 +55,7 @@ export default function RootLayout({
           attributes into <body> before React hydrates — this suppresses the
           resulting false-positive hydration mismatch warning. */}
       <body
-        className="min-h-full flex flex-col bg-[#0A0F1C]"
+        className="min-h-full flex flex-col bg-bg"
         suppressHydrationWarning
       >
         <Providers>{children}</Providers>

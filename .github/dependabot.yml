@@ -38,6 +38,10 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # Transitive uuid<11 via old xcode in Expo config chain (moderate buffer vuln).
+      # Override at root + not present in prod web/runtime. Dismiss GitHub alerts for this.
+      - dependency-name: "uuid"
     groups:
       non-breaking:
         update-types:

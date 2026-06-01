@@ -59,7 +59,7 @@ function CheckoutContent() {
             />
           </div>
           <span className="font-black text-xl tracking-tight">
-            <span className="text-[#00F5FF]">UNI</span>
+            <span className="text-accent">UNI</span>
             <span className="text-[#8892A4]">MATRIX</span>
           </span>
         </Link>
@@ -108,7 +108,7 @@ function CheckoutContent() {
               <div>
                 <p className="text-xs font-semibold text-[#64748B] uppercase tracking-widest mb-0.5">Upgrading to</p>
                 <p className="text-2xl font-black tracking-tight">
-                  <span className="text-[#00F5FF]">UNI</span>
+                  <span className="text-accent">UNI</span>
                   <span className="text-[#8892A4]">MATRIX</span>
                   <span className="ml-2 text-[#00F5FF]">Pro</span>
                 </p>

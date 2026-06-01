@@ -102,7 +102,7 @@ export default function NewPalacePage() {
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="flex-1 py-3 px-6 bg-[#00F5FF] hover:bg-[#00D9FF] disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
+              className="flex-1 py-3 px-6 bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-bg font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
             >
               {loading ? 'Creating…' : 'Create Palace'}
             </button>

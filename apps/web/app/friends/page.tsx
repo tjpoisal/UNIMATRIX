@@ -123,7 +123,7 @@ export default function FriendsPage() {
             <button
               onClick={sendRequest}
               disabled={sending || !email.trim()}
-              className="px-5 py-2.5 bg-[#00F5FF] hover:bg-[#00D9FF] disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0F1C] font-semibold rounded-lg text-sm transition-all"
+              className="px-5 py-2.5 bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-bg font-semibold rounded-lg text-sm transition-all"
             >
               {sending ? 'Sending…' : 'Send Request'}
             </button>

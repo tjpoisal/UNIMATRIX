@@ -113,7 +113,7 @@ function AddLocationModal({ palaceId, parentId, parentName, onClose, onAdd }: Ad
           {error && <p className="text-[#EF4444] text-sm">{error}</p>}
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={onClose} className="flex-1 py-2.5 border border-[#334155]/50 text-[#94A3B8] hover:text-[#F1F5F9] rounded-xl font-medium text-sm transition-colors">Cancel</button>
-            <button type="submit" disabled={saving} className="flex-1 py-2.5 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-xl text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="submit" disabled={saving} className="flex-1 py-2.5 bg-accent hover:bg-accent/90 text-bg font-semibold rounded-xl text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {saving ? 'Adding…' : 'Add Location'}
             </button>
           </div>
@@ -188,7 +188,7 @@ function AIPanel({ palaceId, selectedLocation, onInsertSuggestion }: AIPanelProp
           <button
             onClick={handleAskAI}
             disabled={loading}
-            className="w-full py-3 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-xl text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full py-3 bg-accent hover:bg-accent/90 text-bg font-semibold rounded-xl text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -491,7 +491,7 @@ export default function PalaceEditorPage() {
                   <button
                     onClick={isCreatingMemory ? handleCreateMemory : handleSaveMemory}
                     disabled={saving || !editContent.trim()}
-                    className="px-4 py-2 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-4 py-2 bg-accent hover:bg-accent/90 text-bg font-semibold rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     {saving ? (
                       <>

@@ -1,49 +1,179 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Unimatrix / Mempalace Global Design System
+   Authoritative source: design.md (updated palette)
+   Dark mode is the primary experience. Light mode is secondary.
+   ========================================================================== */
+
+@theme {
+  /* =====================================================================
+     Unimatrix Design Tokens (Tailwind v4)
+     Branding: Navy blue + Orange + White (as requested)
+     ===================================================================== */
+  --color-bg: #0e1030;                  /* Navy blue - main background */
+  --color-surface: #111827;
+  --color-surface-elevated: #1F2937;
+  --color-border: #334155;
+
+  --color-text: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+
+  --color-accent: #ff7a00;              /* Orange - primary brand accent, CTAs, highlights */
+  --color-accent-secondary: #A855F7;    /* Keep purple as secondary for now */
+
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+
+  /* Explicit brand tokens */
+  --color-brand-navy: #0e1030;
+  --color-brand-orange: #ff7a00;
+  --color-brand-white: #ffffff;
+}
+
 :root {
-  --background: #0e1030;
-  --foreground: #193b5e;
-  /* Brand colors: primary blue and accent orange */
-  --brand-blue: #0e1030; /* new logo blue */
-  --brand-orange: #ff7a00; /* new logo orange */
-  --brand-white:#ffffff;
-  --brand-color: var(--brand-blue);
-  --brand-accent: var(--brand-orange);
-  /* Copied from @theme inline - moved here to avoid unsupported at-rule */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* CSS Custom Properties — Navy + Orange + White branding */
+  --bg: #0e1030;                    /* Navy blue */
+  --surface: #111827;
+  --surface-elevated: #1F2937;
+  --border: #334155;
+
+  --text: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  --accent: #ff7a00;                /* Orange - primary branding color */
+  --accent-secondary: #A855F7;
+
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #EF4444;
+
+  /* Brand tokens (orange + navy + white) */
+  --brand-navy: #0e1030;
+  --brand-orange: #ff7a00;
+  --brand-white: #ffffff;
+
+  /* Legacy aliases for compatibility */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --brand-color: var(--accent);     /* Now points to orange */
+  --brand-accent: var(--accent-secondary);
+  --brand-white: #ffffff;
+
+  /* Font tokens */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* Light mode (secondary) */
+@media (prefers-color-scheme: light) {
   :root {
-    --background: #0e1030;
-    --foreground: #ededed;
-    --brand-blue: #193b5e;
-    --brand-orange: #ff9a33;
-    --brand-color: var(--brand-blue);
-    --brand-accent: var(--brand-orange);
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-elevated: #f1f5f9;
+    --text: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --border: #e2e8f0;
+
+    --accent: #e65c00; /* Slightly deeper orange for light mode contrast */
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-geist-sans), var(--font-geist-mono), system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Utility helpers for brand styling */
+/* ==========================================================================
+   Design System Utilities (matches design.md: glassmorphism, depth, spacing)
+   ========================================================================== */
+
+/* Glassmorphic surfaces */
+.glass {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid color-mix(in srgb, var(--border) 35%, transparent);
+}
+
+.glass-elevated {
+  background: color-mix(in srgb, var(--surface-elevated) 85%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid color-mix(in srgb, var(--border) 30%, transparent);
+}
+
+/* Standard cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+.card-elevated {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+}
+
+/* Buttons using new tokens */
 .btn-primary {
-  background-color: var(--brand-color);
-  color: white;
+  background-color: var(--accent);
+  color: var(--bg);
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(0.92);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
 .btn-accent {
-  background: linear-gradient(90deg, var(--brand-accent), color-mix(in srgb, var(--brand-color) 30%, white));
-  color: white;
+  background: linear-gradient(
+    90deg,
+    var(--accent-secondary),
+    color-mix(in srgb, var(--accent) 15%, var(--accent-secondary))
+  );
+  color: #fff;
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: 0.625rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Semantic text & borders */
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-error   { color: var(--error); }
+.text-muted   { color: var(--text-muted); }
+
+.border-subtle { border-color: var(--border); }
+
+/* Focus rings using accent (a11y) */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
