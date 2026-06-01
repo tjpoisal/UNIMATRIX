@@ -78,7 +78,7 @@ GITHUB_CLIENT_ID=
 GITHUB_CLIENT_SECRET=
 
 # Encryption (generate a real one for production)
-MASTER_ENCRYPTION_KEY=00000000000000000000000000000000
+MASTER_ENCRYPTION_KEY=0000000000000000000000000000000000000000000000000000000000000000  # dev only; generate real with openssl rand -hex 32 for any real use
 
 # Voyage AI (optional — needed for semantic search/embedding generation)
 VOYAGE_API_KEY=

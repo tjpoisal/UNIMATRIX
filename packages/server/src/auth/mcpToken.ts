@@ -52,11 +52,13 @@ export async function generateMcpToken(
   }
 
   // Store in database
+  // SECURITY: Do NOT store raw token in 'token' column (plaintext leak).
+  // Only store the bcrypt hash. 'token' column should be NULL or dropped via migration.
   const result = await pool.query<{ id: string }>(
     `INSERT INTO mcp_tokens (user_id, token, hashed_token, scope, expires_at, created_at)
-     VALUES ($1, $2, $3, $4, $5, NOW())
+     VALUES ($1, NULL, $2, $3, $4, NOW())
      RETURNING id`,
-    [userId, rawToken, hashedToken, scope, expiresAt],
+    [userId, hashedToken, scope, expiresAt],
   );
 
   const tokenId = result.rows[0].id;
@@ -88,8 +90,8 @@ export async function validateMcpToken(
 ): Promise<ValidateMcpTokenResult | null> {
   if (!rawToken) return null;
 
-  // Fetch all tokens for this user (we'll check bcrypt hashes)
-  // Note: we can't index by hash, so we fetch and compare
+  // SECURITY: Scan active tokens + bcrypt compare (no reliance on plaintext 'token' column).
+  // For production scale, add token prefix (first 8 chars) + hash, or embed token_id in a signed token.
   const result = await pool.query<{
     id: string;
     user_id: string;
@@ -100,15 +102,25 @@ export async function validateMcpToken(
   }>(
     `SELECT id, user_id, hashed_token, scope, expires_at, revoked_at
      FROM mcp_tokens
-     WHERE token = $1`,
-    [rawToken],
+     WHERE revoked_at IS NULL
+       AND (expires_at IS NULL OR expires_at > NOW())`,
   );
 
-  if (result.rows.length === 0) return null;
+  let matchedRow: any = null;
+  for (const row of result.rows) {
+    try {
+      if (await bcrypt.compare(rawToken, row.hashed_token)) {
+        matchedRow = row;
+        break;
+      }
+    } catch {}
+  }
 
-  const row = result.rows[0];
+  if (!matchedRow) return null;
 
-  // Check if revoked
+  const row = matchedRow;
+
+  // Check if revoked (redundant but safe)
   if (row.revoked_at) return null;
 
   // Check if expired
@@ -116,10 +128,6 @@ export async function validateMcpToken(
     const expiresAt = new Date(row.expires_at);
     if (expiresAt < new Date()) return null;
   }
-
-  // Verify bcrypt hash
-  const isValid = await bcrypt.compare(rawToken, row.hashed_token);
-  if (!isValid) return null;
 
   // Update last_used_at
   await pool.query(

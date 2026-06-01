@@ -16,7 +16,7 @@
 
 import { verifyToken } from '@clerk/backend';
 import { pool } from '../db/client.js';
-import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 
 // ---------------------------------------------------------------------------
 // Clerk config
@@ -47,13 +47,6 @@ async function findOrCreateUser(clerkId: string): Promise<string> {
   return insert.rows[0].id;
 }
 
-/**
- * Hash a token using SHA-256 for comparison against stored hashed_token.
- */
-function hashToken(token: string): string {
-  return crypto.createHash('sha256').update(token).digest('hex');
-}
-
 // ---------------------------------------------------------------------------
 // MCP Token verification
 // ---------------------------------------------------------------------------
@@ -67,53 +60,56 @@ export interface VerifyMcpTokenResult {
 /**
  * Verify an MCP token and return the associated user ID and token metadata.
  * Returns null if token is invalid, expired, or revoked.
+ *
+ * SECURITY FIX: Uses bcrypt compare against stored hashes only.
+ * Scans active tokens (small N per deployment) + constant-time compare.
+ * Never relies on plaintext 'token' column (which is no longer populated).
  */
 export async function verifyMcpToken(
   token: string,
 ): Promise<VerifyMcpTokenResult | null> {
   if (!token) return null;
 
-  const hashedToken = hashToken(token);
-
+  // Query only active (non-revoked, non-expired) tokens.
+  // Small table scan is acceptable; add (user_id) index or token_id prefix for scale.
   const result = await pool.query<{
     id: string;
     user_id: string;
+    hashed_token: string;
     scope: string;
     expires_at: string | null;
     revoked_at: string | null;
   }>(
-    `SELECT id, user_id, scope, expires_at, revoked_at
+    `SELECT id, user_id, hashed_token, scope, expires_at, revoked_at
      FROM mcp_tokens
-     WHERE hashed_token = $1`,
-    [hashedToken],
+     WHERE revoked_at IS NULL
+       AND (expires_at IS NULL OR expires_at > NOW())`,
   );
 
-  if (result.rows.length === 0) return null;
+  for (const row of result.rows) {
+    try {
+      const isValid = await bcrypt.compare(token, row.hashed_token);
+      if (isValid) {
+        // Update last_used_at
+        await pool.query(
+          `UPDATE mcp_tokens SET last_used_at = NOW() WHERE id = $1`,
+          [row.id],
+        ).catch((err) => {
+          console.error('[auth] Failed to update last_used_at:', err);
+        });
 
-  const row = result.rows[0];
-
-  // Check if revoked
-  if (row.revoked_at) return null;
-
-  // Check if expired
-  if (row.expires_at) {
-    const expiresAt = new Date(row.expires_at);
-    if (expiresAt < new Date()) return null;
+        return {
+          userId: row.user_id,
+          tokenId: row.id,
+          scope: row.scope,
+        };
+      }
+    } catch (e) {
+      // bcrypt errors on bad hash etc - skip
+    }
   }
 
-  // Update last_used_at
-  await pool.query(
-    `UPDATE mcp_tokens SET last_used_at = NOW() WHERE id = $1`,
-    [row.id],
-  ).catch((err) => {
-    console.error('[auth] Failed to update last_used_at:', err);
-  });
-
-  return {
-    userId: row.user_id,
-    tokenId: row.id,
-    scope: row.scope,
-  };
+  return null;
 }
 
 // ---------------------------------------------------------------------------
