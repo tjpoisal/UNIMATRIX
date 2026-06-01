@@ -136,4 +136,16 @@ When the user shares important information they may want to remember later:
 
 ---
 
-**Note**: For the actual REST implementation, see the helper clients in `docs/examples/rest-api/`.
+**Note (Recommended)**: Instead of hard-coding the tool definitions above, most agents should now dynamically discover the current tool surface at runtime:
+
+```
+GET https://deployunimatrix.com/api/tools
+```
+
+This returns the exact OpenAI function-calling shape (or `?format=mcp` for the raw definitions). The schemas will always stay in sync with the live MCP server.
+
+See the ready-to-use clients:
+- `docs/examples/rest-api/typescript.ts` → `UnimatrixToolsClient`
+- `docs/examples/rest-api/python.py` → `UnimatrixToolsClient`
+
+These clients handle both discovery (`listTools()`) and execution (`callTool()` / `searchMemories()` etc.).

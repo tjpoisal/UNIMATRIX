@@ -87,8 +87,80 @@ class UnimatrixClient:
         return self._request("GET", "/export")
 
 
-# Example usage
-if __name__ == "__main__":
-    client = UnimatrixClient(os.environ["UNIMATRIX_API_KEY"])
-    results = client.search_memories("authentication architecture")
-    print(results)
+# ─────────────────────────────────────────────────────────────────────────────
+# Universal Tools Client (for LLMs with OpenAI-style / Gemini / Claude function calling)
+# Use this when your model supports function calling but not the full MCP protocol.
+# It dynamically discovers tools and executes them via the REST fallback.
+# ─────────────────────────────────────────────────────────────────────────────
+
+class UnimatrixToolsClient:
+    """
+    Lightweight client for the /api/tools (discovery) + /api/tools/call (execution) endpoints.
+
+    Recommended for ChatGPT Actions, custom agents, LangChain/LlamaIndex tools,
+    Gemini function calling, etc.
+    """
+
+    def __init__(self, api_key: str, base_url: str = "https://deployunimatrix.com/api"):
+        self.api_key = api_key
+        self.base_url = base_url.rstrip("/")
+        self.headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+
+    def _request(self, method: str, path: str, **kwargs) -> Any:
+        url = f"{self.base_url}{path}"
+        resp = requests.request(method, url, headers=self.headers, **kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def list_tools(self, format: str = "openai") -> list[Dict]:
+        """
+        Discover available tools.
+        format="openai" (default) → ready for OpenAI/Groq/Anthropic tool use
+        format="mcp"              → raw MCP tool definitions
+        """
+        qs = f"?format={format}" if format != "openai" else ""
+        return self._request("GET", f"/tools{qs}")
+
+    def call_tool(self, tool_name: str, args: Optional[Dict] = None) -> Dict:
+        """
+        Execute any tool returned by list_tools().
+        This is the method your agent loop should call when the LLM requests a tool.
+        """
+        payload = {"toolName": tool_name, "args": args or {}}
+        return self._request("POST", "/tools/call", json=payload)
+
+    # Convenience wrappers for the most common operations
+
+    def search_memories(self, query: str, palace_id: Optional[str] = None, limit: int = 10) -> Dict:
+        return self.call_tool("unimatrix_search_memories", {
+            "query": query,
+            "palace_id": palace_id,
+            "limit": limit,
+        })
+
+    def store_memory(self, content: str, tags: Optional[List[str]] = None, location_id: Optional[str] = None) -> Dict:
+        args: Dict[str, Any] = {"content": content, "tags": tags or []}
+        if location_id:
+            args["location_id"] = location_id
+        return self.call_tool("unimatrix_store_memory", args)
+
+    def get_recent(self, limit: int = 10) -> Dict:
+        return self.call_tool("unimatrix_get_recent", {"limit": limit})
+
+
+# Example usage with an LLM that supports function calling
+#
+# tools_client = UnimatrixToolsClient(os.environ["UNIMATRIX_API_KEY"])
+#
+# # 1. Discovery (do this once per session or cache it)
+# tools = tools_client.list_tools()           # OpenAI format by default
+# # tools = tools_client.list_tools("mcp")    # Raw MCP
+#
+# # 2. Give the `tools` list to your LLM
+#
+# # 3. When the model wants to call a tool:
+# # result = tools_client.call_tool("unimatrix_search_memories", {"query": "Q3 roadmap"})
+# # result = tools_client.search_memories("architecture decisions")

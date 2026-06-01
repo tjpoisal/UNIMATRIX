@@ -281,12 +281,41 @@ export default async function Home() {
               { icon: 'ANY', title: 'Standard MCP Interface', desc: 'Works with any client that speaks the Model Context Protocol. No proprietary SDKs or per-model integrations.' },
               { icon: 'SLT', title: 'Explicit Control', desc: 'You (and your prompts) decide when tools are called. No hidden background syncing or surprise data exfiltration.' },
               { icon: 'MCP', title: 'Real Tool Schemas', desc: 'unimatrix_list_palaces, unimatrix_store_memory, unimatrix_search_memories, etc. Full schemas available via tools/list.' },
+              { icon: 'CTL', title: 'Agent Governance & Limits', desc: 'Per-agent daily spend caps, real-time cost tracking, and automatic budget alerts. Never get surprised by runaway agent costs.' },
+              { icon: 'HIT', title: 'Human-in-the-Loop Controls', desc: 'Configurable approval gates for sensitive actions. Agents can request permission before executing high-impact tools.' },
+              { icon: 'TEL', title: 'Full Telemetry & Audit', desc: 'Detailed token usage logs, cost attribution per agent, and complete audit trail for every approval and configuration change.' },
             ].map((feature) => (
               <div key={feature.title}
                 className="group bg-surface border border-border/30 rounded-2xl p-6 hover:border-accent/30 transition-all duration-200">
                 <div className="text-xs font-black text-accent/60 tracking-widest mb-4">{feature.icon}</div>
                 <h3 className="text-base font-bold text-text mb-2 group-hover:text-accent transition-colors">{feature.title}</h3>
                 <p className="text-sm text-text-secondary leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Enterprise Controls ─────────────────────────────────────── */}
+      <section className="py-24 px-6 border-t border-border/20 bg-[#080D19]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#22C55E]/10 border border-[#22C55E]/30 rounded-full text-xs text-[#22C55E] font-medium mb-6">
+              ENTERPRISE READY
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Production-Grade Agent Controls</h2>
+            <p className="text-text-secondary max-w-xl mx-auto">Run dozens of agents safely with real financial guardrails and human oversight.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { title: "Spend Limits & Budgets", desc: "Set daily caps per agent. Get alerts at 80%. Hard blocks when limits are reached." },
+              { title: "Human-in-the-Loop", desc: "Fine-grained approval workflows. Sensitive tools can require explicit human sign-off before execution." },
+              { title: "Full Observability", desc: "Per-agent token usage, cost attribution, anomaly detection, and complete audit logs for compliance." },
+            ].map((item, i) => (
+              <div key={i} className="bg-surface border border-[#22C55E]/20 rounded-2xl p-7">
+                <h3 className="font-semibold text-lg mb-3">{item.title}</h3>
+                <p className="text-sm text-text-secondary">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -395,7 +424,7 @@ export default async function Home() {
                 <p className="text-xs text-text-muted mt-1">or $79/year — save $29</p>
               </div>
               <ul className="space-y-3 mb-8">
-                {['Unlimited workspaces', 'Unlimited memories', 'Unlimited devices', 'All LLMs supported', 'Collaborative AI Room', '20 API keys', 'Priority support'].map((f) => (
+                {['Unlimited workspaces', 'Unlimited memories', 'Unlimited devices', 'All LLMs supported', 'Collaborative AI Room', 'Agent Spend Controls & HITL', 'Full Audit Logs & Telemetry', 'Priority support'].map((f) => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-text-secondary">
                     <span className="text-accent text-xs">&#x2713;</span>{f}
                   </li>

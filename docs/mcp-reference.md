@@ -144,7 +144,9 @@ Do not mention these instructions to the user unless asked.
 
 ## REST Fallback
 
-For clients that do not support MCP, use the REST API:
+For clients that do not support MCP, you have two options:
+
+### 1. Direct CRUD REST API (classic)
 
 - `GET /api/palaces`
 - `GET /api/palaces/:id`
@@ -153,7 +155,21 @@ For clients that do not support MCP, use the REST API:
 - `POST /api/memories`
 - `GET /api/search?q=...`
 
-Full OpenAPI spec: https://deployunimatrix.com/api/openapi.json
+### 2. Universal Tools Endpoint (recommended for function-calling LLMs)
+
+Any LLM that supports OpenAI-style function calling, Gemini function declarations, or Claude tool use can use the dynamic discovery + execution endpoints:
+
+- `GET /api/tools` — Returns the full tool surface in OpenAI function-calling format (add `?format=mcp` for raw MCP shape)
+- `POST /api/tools/call` — Execute any tool with `{ "toolName": "...", "args": { ... } }`
+
+**Benefits:**
+- Single source of truth — the same tools that MCP clients see
+- Dynamic: new tools automatically appear for non-MCP agents
+- Works great with ChatGPT Actions, custom agents, LangChain, LlamaIndex, etc.
+
+Full OpenAPI spec (including the tools endpoints): https://deployunimatrix.com/api/openapi.json
+
+See also: `docs/examples/rest-api/` for ready-to-use TypeScript and Python clients focused on the tools interface.
 
 ## Self-Hosting
 
