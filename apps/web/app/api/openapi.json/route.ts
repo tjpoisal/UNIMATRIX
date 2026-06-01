@@ -70,6 +70,66 @@ export async function GET() {
             error: { type: "string" },
           },
         },
+        // ── Tools / Function Calling (MCP REST Fallback) ─────────────────────
+        OpenAITool: {
+          type: "object",
+          properties: {
+            type: { type: "string", enum: ["function"] },
+            function: {
+              type: "object",
+              properties: {
+                name: { type: "string" },
+                description: { type: "string" },
+                parameters: {
+                  type: "object",
+                  description: "JSON Schema for the tool parameters (OpenAI function calling format)",
+                },
+              },
+              required: ["name", "parameters"],
+            },
+          },
+          required: ["type", "function"],
+        },
+        ToolCallRequest: {
+          type: "object",
+          required: ["toolName"],
+          properties: {
+            toolName: {
+              type: "string",
+              description: "Exact name of the tool from /api/tools (e.g. unimatrix_search_memories)",
+            },
+            args: {
+              type: "object",
+              description: "Arguments matching the tool's parameters schema",
+              additionalProperties: true,
+            },
+          },
+        },
+        ToolCallSuccessResponse: {
+          type: "object",
+          properties: {
+            status: { type: "string", enum: ["success"] },
+            result: {
+              type: "string",
+              description: "Textual result returned by the tool (same shape as MCP text content)",
+            },
+            toolName: { type: "string" },
+          },
+          required: ["status", "result", "toolName"],
+        },
+        ToolCallErrorResponse: {
+          type: "object",
+          properties: {
+            status: { type: "string", enum: ["error"] },
+            error: { type: "string" },
+            code: {
+              type: "string",
+              enum: ["UNAUTHORIZED", "NOT_FOUND", "VALIDATION_ERROR", "INTERNAL_ERROR"],
+            },
+            toolName: { type: "string" },
+          },
+          required: ["status", "error", "code"],
+        },
       },
     },
     paths: {
@@ -303,6 +363,94 @@ export async function GET() {
               content: {
                 "application/json": {
                   schema: { $ref: "#/components/schemas/Location" },
+                },
+              },
+            },
+          },
+        },
+      },
+      // ── Universal MCP REST Fallback (for non-MCP LLMs with function calling) ─
+      "/tools": {
+        get: {
+          operationId: "listTools",
+          summary: "Discover available Unimatrix tools",
+          description: "Returns all memory/context tools in OpenAI function calling format by default. Add ?format=mcp to receive the raw MCP tool definitions instead. This endpoint is public (no auth required) because tool schemas are not sensitive.",
+          parameters: [
+            {
+              name: "format",
+              in: "query",
+              schema: { type: "string", enum: ["openai", "mcp"], default: "openai" },
+              description: "Response shape: 'openai' (default, for function calling) or 'mcp' (raw tool definitions)",
+            },
+          ],
+          responses: {
+            "200": {
+              description: "List of tools",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "array",
+                    items: { $ref: "#/components/schemas/OpenAITool" },
+                  },
+                },
+              },
+            },
+            "500": { description: "Failed to load tools from MCP backend" },
+          },
+        },
+      },
+      "/tools/call": {
+        post: {
+          operationId: "callTool",
+          summary: "Execute a Unimatrix tool (MCP REST fallback)",
+          description: "Translates a simple {toolName, args} payload into an internal MCP tools/call invocation. Use the exact tool names returned by GET /api/tools. Requires a valid Unimatrix API key.",
+          security: [{ bearerAuth: [] }],
+          requestBody: {
+            required: true,
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ToolCallRequest" },
+              },
+            },
+          },
+          responses: {
+            "200": {
+              description: "Tool executed successfully",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/ToolCallSuccessResponse" },
+                },
+              },
+            },
+            "400": {
+              description: "Bad request (missing toolName or malformed args)",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/ToolCallErrorResponse" },
+                },
+              },
+            },
+            "401": {
+              description: "Unauthorized (invalid or missing API key)",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/ToolCallErrorResponse" },
+                },
+              },
+            },
+            "404": {
+              description: "Unknown tool",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/ToolCallErrorResponse" },
+                },
+              },
+            },
+            "500": {
+              description: "Internal tool execution error",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/ToolCallErrorResponse" },
                 },
               },
             },
