@@ -60,7 +60,7 @@ function textContent(text: string) {
 
 // ─── Tool definitions ─────────────────────────────────────────────────────────
 
-const TOOLS = [
+export const TOOLS = [
   {
     name: "unimatrix_list_palaces",
     description: "List all memory palaces owned by the authenticated user.",
@@ -170,7 +170,7 @@ const TOOLS = [
 
 // ─── Tool handlers ────────────────────────────────────────────────────────────
 
-async function handleTool(
+export async function handleTool(
   name: string,
   args: Record<string, unknown>,
   userId: string
@@ -417,7 +417,10 @@ export async function POST(req: NextRequest) {
 
   // ── tools/list ──────────────────────────────────────────────────────────────
   if (method === "tools/list") {
-    return ok(id, { tools: TOOLS });
+    // Use central registry so collab tools appear automatically
+    const { getAllTools } = await import("@/lib/tools/registry");
+    const tools = getAllTools();
+    return ok(id, { tools });
   }
 
   // ── tools/call ──────────────────────────────────────────────────────────────
@@ -427,9 +430,95 @@ export async function POST(req: NextRequest) {
 
     if (!toolName) return err(id, -32602, "Missing tool name");
 
+    // Extract agent context (used for telemetry + HITL)
+    const agentName = (args.agent_name || args.sender_name || 'unknown-agent') as string;
+    const organizationId = null; // TODO: resolve from auth context when available
+
     try {
-      const result = await handleTool(toolName, args, userId);
-      return ok(id, textContent(result));
+      // === NEW: Spend Limit Check + Pre-execution Cost Estimation ===
+      const { 
+        checkSpendLimit, 
+        requiresHumanApproval, 
+        createPendingAction,
+        estimateCostBeforeExecution 
+      } = await import('@/lib/telemetry/agent-usage');
+
+      // Rough pre-estimation (agents should pass better estimates in future)
+      const estimatedCost = estimateCostBeforeExecution(
+        (args.provider as string) || 'openai',
+        (args.model as string) || 'gpt-4o',
+        1200, // assumed prompt tokens
+        600
+      );
+
+      const projectedSpend = (await checkSpendLimit(agentName, organizationId || undefined)).currentSpend + estimatedCost;
+
+      const spendCheck = await checkSpendLimit(agentName, organizationId || undefined);
+      if (projectedSpend > spendCheck.limit) {
+        return ok(id, {
+          status: 'blocked',
+          reason: 'would_exceed_daily_spend_limit',
+          estimated_cost: estimatedCost,
+          current_spend: spendCheck.currentSpend,
+          limit: spendCheck.limit,
+          message: 'This call would exceed the daily spend limit.',
+        });
+      }
+
+      if (!spendCheck.allowed) {
+        return ok(id, {
+          status: 'blocked',
+          reason: 'daily_spend_limit_exceeded',
+          current_spend: spendCheck.currentSpend,
+          limit: spendCheck.limit,
+        });
+      }
+
+      // === NEW: HITL (Human-in-the-Loop) Check ===
+      const hitlRequired =
+        (args.hitl_required as boolean) ||
+        (await requiresHumanApproval(agentName, toolName, organizationId || undefined));
+
+      if (hitlRequired) {
+        const pending = await createPendingAction({
+          roomId: (args.room_id as string) || 'global',
+          agentName,
+          toolName,
+          args,
+          requestedBy: agentName,
+          expiresInMinutes: 60,
+        });
+
+        // Fire notification (non-blocking)
+        import('@/lib/notifications/pending-action')
+          .then(({ notifyPendingActionCreated }) =>
+            notifyPendingActionCreated({
+              id: pending.id,
+              roomId: pending.roomId,
+              agentName,
+              toolName,
+              requestedBy: agentName,
+            })
+          )
+          .catch(() => {});
+
+        return ok(id, {
+          status: 'pending_approval',
+          pending_action_id: pending.id,
+          message: 'This action requires human approval before execution.',
+          tool_name: toolName,
+        });
+      }
+
+      // Normal execution path
+      const { executeTool } = await import('@/lib/tools/registry');
+      const result = await executeTool(toolName, args, { userId, organizationId });
+
+      // Best-effort telemetry logging (non-blocking)
+      const { logToolExecutionTelemetry } = await import('@/lib/telemetry/agent-usage');
+      logToolExecutionTelemetry(toolName, agentName, result, args).catch(() => {});
+
+      return ok(id, result);
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       console.error(`[MCP] Tool error (${toolName}):`, msg);
