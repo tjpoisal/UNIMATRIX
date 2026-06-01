@@ -28,7 +28,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { toOpenAITools } from "@/lib/tools/registry";
-import { listMcpTools, type McpTool } from "@/lib/mcp-client";
+import { listMcpTools, type McpTool, type OpenAITool } from "@/lib/mcp-client";
 
 export const dynamic = "force-dynamic";
 

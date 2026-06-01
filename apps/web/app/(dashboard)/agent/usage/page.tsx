@@ -57,7 +57,7 @@ export default function AgentUsagePage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis tickFormatter={(v) => `$${(v / 100).toFixed(0)}`} />
-                <Tooltip formatter={(value: number) => [`$${(value / 100).toFixed(2)}`, 'Spend']} />
+                <Tooltip formatter={(value) => [`$${(Number(value) / 100).toFixed(2)}`, 'Spend']} />
                 <Line type="monotone" dataKey="spend" stroke="#00F5FF" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>

@@ -120,7 +120,7 @@ async function executeCollabTool(
   name: string,
   args: Record<string, unknown>,
   context: ToolExecutionContext
-) {
+): Promise<{ content: Array<{ type: 'text'; text: string }> }> {
   try {
     if (name === 'collab.send_message') {
       const result = await sendMessage(args as any, context.organizationId ?? ''); // TODO: tighten during migration
