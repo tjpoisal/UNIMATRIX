@@ -31,6 +31,30 @@ interface GraphData {
   edges: GraphEdge[];
 }
 
+interface ApiMemory {
+  id: string;
+  content_preview?: string | null;
+  content?: string | null;
+  importance_score?: number | null;
+  space_id?: string | null;
+  space_name?: string | null;
+  space?: { name?: string | null } | null;
+  memory_class?: string | null;
+  digest_level?: string | null;
+  created_at: string;
+}
+
+interface ApiEmbeddingNeighbor {
+  memory_id: string;
+  neighbor_id?: string | null;
+  similarity?: number | null;
+}
+
+interface GraphApiResponse {
+  data?: ApiMemory[];
+  embedding_neighbors?: ApiEmbeddingNeighbor[];
+}
+
 interface UserTier {
   tier: 'free' | 'pro' | 'team';
 }
@@ -59,7 +83,7 @@ export default function GraphPage() {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; node: GraphNode } | null>(null);
   const simulationRef = useRef<d3.Simulation<GraphNode, GraphEdge> | null>(null);
-  const zoomRef = useRef<d3.ZoomBehavior<Element, unknown> | null>(null);
+  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
   // Fetch user tier
   useEffect(() => {
@@ -67,8 +91,11 @@ export default function GraphPage() {
       try {
         const res = await fetch('/api/user');
         if (!res.ok) throw new Error('Failed to load user');
-        const data = await res.json();
+        const data = await res.json() as UserTier;
         setUserTier(data);
+        if (data.tier !== 'pro' && data.tier !== 'team') {
+          setLoading(false);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load user');
         setLoading(false);
@@ -80,18 +107,15 @@ export default function GraphPage() {
   // Fetch graph data
   useEffect(() => {
     if (!userTier) return;
-    if (userTier.tier !== 'pro' && userTier.tier !== 'team') {
-      setLoading(false);
-      return;
-    }
+    if (userTier.tier !== 'pro' && userTier.tier !== 'team') return;
 
     async function loadGraph() {
       try {
         const res = await fetch('/api/explorer/memories?limit=100&embedding_neighbors=true');
         if (!res.ok) throw new Error('Failed to load graph data');
-        const data = await res.json();
+        const data = await res.json() as GraphApiResponse;
 
-        const nodes: GraphNode[] = (data.data ?? []).map((m: any) => ({
+        const nodes: GraphNode[] = (data.data ?? []).map((m) => ({
           id: m.id,
           content: m.content_preview ?? m.content ?? 'Untitled memory',
           importance_score: m.importance_score ?? 0.5,
@@ -125,12 +149,12 @@ export default function GraphPage() {
 
         // Also connect by semantic similarity if embedding_neighbors provided
         if (data.embedding_neighbors) {
-          (data.embedding_neighbors as any[]).forEach((n: any) => {
-            if (n.neighbor_id && n.similarity > 0.6) {
+          data.embedding_neighbors.forEach((n) => {
+            if (n.neighbor_id && (n.similarity ?? 0) > 0.6) {
               edges.push({
                 source: n.memory_id,
                 target: n.neighbor_id,
-                weight: n.similarity,
+                weight: n.similarity ?? 0,
               });
             }
           });
@@ -161,7 +185,6 @@ export default function GraphPage() {
     if (!graphData || !svgRef.current || !containerRef.current) return;
 
     const svg = d3.select(svgRef.current);
-    const container = d3.select(containerRef.current);
     const width = containerRef.current.clientWidth;
     const height = containerRef.current.clientHeight;
 
@@ -175,23 +198,23 @@ export default function GraphPage() {
     // Zoom
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.1, 4])
-      .on('zoom', (event) => {
-        g.attr('transform', event.transform);
+      .on('zoom', (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
+        g.attr('transform', event.transform.toString());
       });
 
     zoomRef.current = zoom;
-    svg.call(zoom as any);
+    svg.call(zoom);
 
     // Simulation
     const simulation = d3.forceSimulation<GraphNode>(graphData.nodes)
       .force('link', d3.forceLink<GraphNode, GraphEdge>(graphData.edges)
-        .id((d: any) => d.id)
-        .distance((d: any) => 80 + (1 - d.weight) * 120)
-        .strength((d: any) => d.weight * 0.5)
+        .id((d) => d.id)
+        .distance((d) => 80 + (1 - d.weight) * 120)
+        .strength((d) => d.weight * 0.5)
       )
       .force('charge', d3.forceManyBody().strength(-300))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide<GraphNode>().radius((d: any) => 8 + d.importance_score * 24));
+      .force('collision', d3.forceCollide<GraphNode>().radius((d) => 8 + d.importance_score * 24));
 
     simulationRef.current = simulation;
 
@@ -199,18 +222,18 @@ export default function GraphPage() {
     const link = g.append('g')
       .attr('stroke', '#1a2535')
       .attr('stroke-opacity', 0.6)
-      .selectAll('line')
+      .selectAll<SVGLineElement, GraphEdge>('line')
       .data(graphData.edges)
       .join('line')
-      .attr('stroke-width', (d: any) => Math.max(0.5, d.weight * 2));
+      .attr('stroke-width', (d) => Math.max(0.5, d.weight * 2));
 
     // Nodes
     const node = g.append('g')
-      .selectAll('circle')
+      .selectAll<SVGCircleElement, GraphNode>('circle')
       .data(graphData.nodes)
       .join('circle')
-      .attr('r', (d: any) => 4 + d.importance_score * 16)
-      .attr('fill', (d: any) => {
+      .attr('r', (d) => 4 + d.importance_score * 16)
+      .attr('fill', (d) => {
         if (d.memory_class && CLASS_COLORS[d.memory_class]) {
           return CLASS_COLORS[d.memory_class];
         }
@@ -233,7 +256,7 @@ export default function GraphPage() {
           if (!event.active) simulation.alphaTarget(0);
           d.fx = null;
           d.fy = null;
-        }) as any
+        })
       )
       .on('mouseover', (event: MouseEvent, d: GraphNode) => {
         setTooltip({ x: event.clientX, y: event.clientY, node: d });
@@ -248,14 +271,14 @@ export default function GraphPage() {
     // Tick
     simulation.on('tick', () => {
       link
-        .attr('x1', (d: any) => (d.source as GraphNode).x ?? 0)
-        .attr('y1', (d: any) => (d.source as GraphNode).y ?? 0)
-        .attr('x2', (d: any) => (d.target as GraphNode).x ?? 0)
-        .attr('y2', (d: any) => (d.target as GraphNode).y ?? 0);
+        .attr('x1', (d) => (d.source as GraphNode).x ?? 0)
+        .attr('y1', (d) => (d.source as GraphNode).y ?? 0)
+        .attr('x2', (d) => (d.target as GraphNode).x ?? 0)
+        .attr('y2', (d) => (d.target as GraphNode).y ?? 0);
 
       node
-        .attr('cx', (d: any) => d.x ?? 0)
-        .attr('cy', (d: any) => d.y ?? 0);
+        .attr('cx', (d) => d.x ?? 0)
+        .attr('cy', (d) => d.y ?? 0);
     });
 
     // Cleanup
@@ -373,7 +396,7 @@ export default function GraphPage() {
                 d3.select(svgRef.current)
                   .transition()
                   .duration(750)
-                  .call(zoomRef.current.transform as any, d3.zoomIdentity);
+                  .call(zoomRef.current.transform, d3.zoomIdentity);
               }
             }}
             className="px-3 py-1.5 bg-[#111827] border border-[#1a2535] rounded-lg text-xs text-[#94A3B8] hover:text-white transition-colors"
