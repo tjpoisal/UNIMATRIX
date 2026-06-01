@@ -2,8 +2,8 @@
  * Custom Next.js + WebSocket server for Unimatrix on Render (and other PaaS).
  *
  * Why this exists:
- * - Long-lived WebSocket connections for the multi-LLM Collab Room
- * - Cannot use Vercel serverless
+ * - Long-lived WebSocket connections for the multi-LLM Collab Room on Render / self-hosted
+ * - Alternative managed path: Ably (see apps/web/lib/realtime/ably.ts + lib/collab/)
  * - Same HTTP server handles both Next.js pages/API routes + raw WS upgrades
  *
  * Usage:

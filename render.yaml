@@ -9,6 +9,11 @@
 # After first deploy, manually run migrations via the Shell tab if needed:
 #   pnpm --filter server db:migrate:deploy
 #   pnpm --filter web db:migrate:deploy
+#
+# DOCKER OPTION (recommended for full control):
+#   - Change runtime to "docker" and add dockerfilePath
+#   - See Dockerfile.server and Dockerfile.web in repo root
+#   - Much better for native WebSocket + consistent builds
 
 databases:
   - name: unimatrix-db
@@ -110,7 +115,44 @@ services:
       - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
         sync: false
 
-  # Optional: Future background worker for librarian jobs (embeddings, summarization)
+  # ──────────────────────────────────────────────────────────────
+  # DOCKER-BASED ALTERNATIVES (uncomment to use instead of native Node)
+  # Better for consistent builds, native WebSockets, and self-hosting parity
+  # ──────────────────────────────────────────────────────────────
+  # - type: web
+  #   name: unimatrix-mcp
+  #   runtime: docker
+  #   plan: standard
+  #   dockerfilePath: ./Dockerfile.server
+  #   healthCheckPath: /health
+  #   envVars: [ ... same as above ... ]
+
+  # - type: web
+  #   name: unimatrix-web
+  #   runtime: docker
+  #   plan: standard
+  #   dockerfilePath: ./Dockerfile.web
+  #   healthCheckPath: /api/health
+  #   envVars: [ ... same as above ... ]
+
+  # ──────────────────────────────────────────────────────────────
+  # Background Worker for Librarian / Embedding Jobs
+  # Runs the async semantic processing from packages/server/src/librarian
+  # ──────────────────────────────────────────────────────────────
   # - type: worker
+  #   name: unimatrix-worker
+  #   runtime: docker
+  #   plan: standard
+  #   dockerfilePath: ./Dockerfile.server
+  #   dockerCommand: node dist/worker.js
+  #   envVars:
+  #     - key: DATABASE_URL
+  #       fromDatabase:
+  #         name: unimatrix-db
+  #         property: connectionString
+  #     - key: VOYAGE_API_KEY
+  #       sync: false
+  #     # ... other keys
+
   #   name: unimatrix-worker
   #   ...

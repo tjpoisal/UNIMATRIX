@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # Core MCP Server (Fastify) — what LLMs connect to
+  mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://unimatrix:unimatrix@db:5432/unimatrix
+      DIRECT_URL: postgresql://unimatrix:unimatrix@db:5432/unimatrix
+      # Add your local secrets here or via .env
+      # CLERK_SECRET_KEY: ...
+      # VOYAGE_API_KEY: ...
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Web Portal + Collab WS Server
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://unimatrix:unimatrix@db:5432/unimatrix
+      DIRECT_URL: postgresql://unimatrix:unimatrix@db:5432/unimatrix
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: dev-secret-change-in-production
+      # Add other keys as needed
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL (mimics Render Postgres)
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: unimatrix
+      POSTGRES_PASSWORD: unimatrix
+      POSTGRES_DB: unimatrix
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U unimatrix -d unimatrix"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

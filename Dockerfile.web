@@ -1,0 +1,55 @@
+# Multi-stage Dockerfile for the Unimatrix Web Portal + Collab WS Server
+# Uses custom server.ts for persistent WebSocket support (Collab Room)
+
+FROM node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
+
+# Root workspace manifests
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY apps/web/package.json ./apps/web/
+
+# Install dependencies for web workspace
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter web --frozen-lockfile
+
+# Copy source
+COPY apps/web ./apps/web
+COPY packages ./packages
+
+WORKDIR /app/apps/web
+
+# Generate Prisma + build Next.js + custom server
+RUN pnpm prisma generate
+RUN pnpm build
+
+# --- Production runner ---
+FROM node:20-slim AS production
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Copy only what is needed at runtime
+COPY --from=base /app/apps/web/.next ./.next
+COPY --from=base /app/apps/web/dist ./dist
+COPY --from=base /app/apps/web/public ./public
+COPY --from=base /app/apps/web/package.json ./
+COPY --from=base /app/apps/web/prisma ./prisma
+COPY --from=base /app/apps/web/node_modules ./node_modules
+
+# Copy server.ts compiled output (dist/server.js)
+# Also bring in any runtime config
+COPY --from=base /app/apps/web/next.config.ts ./
+
+EXPOSE 3000
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+
+# Run the custom server (Next.js + WebSocket)
+CMD ["node", "dist/server.js"]

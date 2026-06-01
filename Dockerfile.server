@@ -1,0 +1,51 @@
+# Multi-stage Dockerfile for the Core MCP Server (packages/server)
+# This is the primary backend that LLMs (Claude, Cursor, etc.) connect to via MCP.
+
+FROM node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+
+WORKDIR /app
+
+# Copy root workspace files for pnpm
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY packages/server/package.json ./packages/server/
+
+# Install dependencies (only server + shared)
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter server --frozen-lockfile
+
+# Copy source
+COPY packages/server ./packages/server
+COPY packages/types ./packages/types
+
+# Generate Prisma Client + build
+WORKDIR /app/packages/server
+RUN pnpm prisma generate
+RUN pnpm build
+
+# --- Production image ---
+FROM node:20-slim AS production
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Copy built artifacts + node_modules from builder
+COPY --from=base /app/packages/server/dist ./dist
+COPY --from=base /app/packages/server/node_modules ./node_modules
+COPY --from=base /app/packages/server/package.json ./
+COPY --from=base /app/packages/server/prisma ./prisma
+COPY --from=base /app/packages/server/migrations ./migrations
+
+# Copy root pnpm files if needed for runtime
+COPY --from=base /app/node_modules/.pnpm ./.pnpm 2>/dev/null || true
+
+EXPOSE 3000
+
+# Healthcheck (Render uses this)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+
+CMD ["node", "dist/index.js"]
