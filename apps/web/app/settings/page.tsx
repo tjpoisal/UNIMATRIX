@@ -96,11 +96,11 @@ function SettingsContent() {
     <div className="p-8 max-w-2xl mx-auto space-y-8">
       {/* Upgrade success banner */}
       {upgraded && (
-        <div className="flex items-center gap-3 px-5 py-4 bg-[#00F5FF]/10 border border-[#00F5FF]/30 rounded-2xl">
-          <span className="text-[#00F5FF] text-lg">✓</span>
+        <div className="flex items-center gap-3 px-5 py-4 bg-accent/10 border border-[#00F5FF]/30 rounded-2xl">
+          <span className="text-accent text-lg">✓</span>
           <div>
-            <p className="text-[#00F5FF] font-semibold">You&apos;re now on Pro!</p>
-            <p className="text-sm text-[#64748B] mt-0.5">
+            <p className="text-accent font-semibold">You&apos;re now on Pro!</p>
+            <p className="text-sm text-text-muted mt-0.5">
               All limits have been lifted. Enjoy unlimited palaces, memories, and sharing.
             </p>
           </div>
@@ -109,28 +109,28 @@ function SettingsContent() {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[#F1F5F9]">Settings</h1>
-        <p className="text-[#94A3B8] mt-1">Manage your account and preferences</p>
+        <h1 className="text-3xl font-bold text-text">Settings</h1>
+        <p className="text-text-secondary mt-1">Manage your account and preferences</p>
       </div>
 
       {/* Profile Section */}
-      <section className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-[#F1F5F9] mb-5">Profile</h2>
+      <section className="backdrop-blur-xl bg-surface/60 border border-border/30 rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-text mb-5">Profile</h2>
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#A855F7] flex items-center justify-center text-[#F1F5F9] text-xl font-bold flex-shrink-0">
+          <div className="w-14 h-14 rounded-2xl bg-accent-secondary flex items-center justify-center text-text text-xl font-bold flex-shrink-0">
             {session?.user?.name?.[0]?.toUpperCase() || 'U'}
           </div>
           <div>
-            <p className="text-[#F1F5F9] font-medium">{session?.user?.name || '—'}</p>
-            <p className="text-sm text-[#64748B]">{session?.user?.email || '—'}</p>
+            <p className="text-text font-medium">{session?.user?.name || '—'}</p>
+            <p className="text-sm text-text-muted">{session?.user?.email || '—'}</p>
           </div>
         </div>
       </section>
 
       {/* Billing Section */}
-      <section className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-[#F1F5F9] mb-1">Plan &amp; Billing</h2>
-        <p className="text-sm text-[#94A3B8] mb-5">
+      <section className="backdrop-blur-xl bg-surface/60 border border-border/30 rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-text mb-1">Plan &amp; Billing</h2>
+        <p className="text-sm text-text-secondary mb-5">
           {isPro
             ? "You're on the Pro plan. Manage or cancel your subscription any time."
             : "You're on the Free plan. Upgrade to unlock unlimited palaces, memories, and sharing."}
@@ -140,35 +140,35 @@ function SettingsContent() {
           <span
             className={`px-3 py-1 rounded-full text-xs font-semibold ${
               isPro
-                ? 'bg-[#00F5FF]/10 text-[#00F5FF] border border-[#00F5FF]/30'
-                : 'bg-[#334155]/40 text-[#94A3B8] border border-[#334155]/40'
+                ? 'bg-accent/10 text-accent border border-[#00F5FF]/30'
+                : 'bg-[#334155]/40 text-text-secondary border border-border/40'
             }`}
           >
             {isPro ? 'Pro' : 'Free'}
           </span>
           {isPro && (
-            <span className="text-xs text-[#64748B]">
+            <span className="text-xs text-text-muted">
               Unlimited palaces · Unlimited memories · 20 API keys
             </span>
           )}
         </div>
 
         {billingError && (
-          <p className="text-sm text-[#EF4444] mb-3">{billingError}</p>
+          <p className="text-sm text-error mb-3">{billingError}</p>
         )}
 
         {isPro ? (
           <button
             onClick={handleManageBilling}
             disabled={billingLoading}
-            className="px-5 py-2.5 bg-[#1F2937] hover:bg-[#2D3748] disabled:opacity-50 disabled:cursor-not-allowed text-[#F1F5F9] text-sm font-medium rounded-lg transition-colors"
+            className="px-5 py-2.5 bg-surface-elevated hover:bg-[#2D3748] disabled:opacity-50 disabled:cursor-not-allowed text-text text-sm font-medium rounded-lg transition-colors"
           >
             {billingLoading ? 'Opening portal…' : 'Manage Subscription'}
           </button>
         ) : (
           <Link
             href="/pricing"
-            className="inline-block px-5 py-2.5 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] text-sm font-bold rounded-lg transition-colors shadow-lg shadow-[#00F5FF]/20"
+            className="inline-block px-5 py-2.5 bg-accent hover:bg-accent/90 text-[#0A0F1C] text-sm font-bold rounded-lg transition-colors shadow-lg shadow-[#00F5FF]/20"
           >
             Upgrade to Pro →
           </Link>
@@ -176,23 +176,23 @@ function SettingsContent() {
       </section>
 
       {/* Export Section */}
-      <section className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-[#F1F5F9] mb-1">Export Data</h2>
-        <p className="text-sm text-[#94A3B8] mb-5">Download a palace as JSON or Markdown</p>
+      <section className="backdrop-blur-xl bg-surface/60 border border-border/30 rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-text mb-1">Export Data</h2>
+        <p className="text-sm text-text-secondary mb-5">Download a palace as JSON or Markdown</p>
 
         {palaces.length === 0 ? (
-          <p className="text-sm text-[#64748B]">No palaces to export yet.</p>
+          <p className="text-sm text-text-muted">No palaces to export yet.</p>
         ) : (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#94A3B8] mb-2">Palace</label>
+              <label className="block text-sm font-medium text-text-secondary mb-2">Palace</label>
               <select
                 value={selectedPalaceId}
                 onChange={(e) => setSelectedPalaceId(e.target.value)}
-                className="w-full px-4 py-3 bg-[#0A0F1C]/60 border border-[#334155]/50 rounded-lg text-[#F1F5F9] focus:outline-none focus:border-[#00F5FF]/50 focus:ring-1 focus:ring-[#00F5FF]/20 transition-colors"
+                className="w-full px-4 py-3 bg-bg/60 border border-border/50 rounded-lg text-text focus:outline-none focus:border-[#00F5FF]/50 focus:ring-1 focus:ring-[#00F5FF]/20 transition-colors"
               >
                 {palaces.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-[#111827]">
+                  <option key={p.id} value={p.id} className="bg-surface">
                     {p.name}
                   </option>
                 ))}
@@ -200,7 +200,7 @@ function SettingsContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#94A3B8] mb-2">Format</label>
+              <label className="block text-sm font-medium text-text-secondary mb-2">Format</label>
               <div className="flex gap-3">
                 {(['json', 'markdown'] as const).map((fmt) => (
                   <button
@@ -209,8 +209,8 @@ function SettingsContent() {
                     onClick={() => setExportFormat(fmt)}
                     className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 border ${
                       exportFormat === fmt
-                        ? 'bg-[#00F5FF]/10 border-[#00F5FF]/40 text-[#00F5FF]'
-                        : 'bg-[#0A0F1C]/40 border-[#334155]/40 text-[#94A3B8] hover:border-[#334155]/60 hover:text-[#F1F5F9]'
+                        ? 'bg-accent/10 border-[#00F5FF]/40 text-accent'
+                        : 'bg-bg/40 border-border/40 text-text-secondary hover:border-border/60 hover:text-text'
                     }`}
                   >
                     {fmt === 'json' ? 'JSON' : 'Markdown'}
@@ -220,13 +220,13 @@ function SettingsContent() {
             </div>
 
             {exportError && (
-              <p className="text-sm text-[#EF4444]">{exportError}</p>
+              <p className="text-sm text-error">{exportError}</p>
             )}
 
             <button
               onClick={handleExport}
               disabled={exporting || !selectedPalaceId}
-              className="w-full py-3 px-6 bg-[#00F5FF] hover:bg-[#00D9FF] disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
+              className="w-full py-3 px-6 bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
             >
               {exporting ? 'Exporting…' : 'Download Export'}
             </button>
@@ -235,12 +235,12 @@ function SettingsContent() {
       </section>
 
       {/* Account */}
-      <section className="backdrop-blur-xl bg-[#111827]/60 border border-[#334155]/30 rounded-2xl p-6">
-        <h2 className="text-lg font-semibold text-[#F1F5F9] mb-1">Account</h2>
-        <p className="text-sm text-[#94A3B8] mb-5">Sign out of Unimatrix</p>
+      <section className="backdrop-blur-xl bg-surface/60 border border-border/30 rounded-2xl p-6">
+        <h2 className="text-lg font-semibold text-text mb-1">Account</h2>
+        <p className="text-sm text-text-secondary mb-5">Sign out of Unimatrix</p>
         <button
           onClick={() => signOut({ redirect: true, callbackUrl: '/auth/login' })}
-          className="px-5 py-2.5 bg-[#1F2937] hover:bg-[#2D3748] text-[#F1F5F9] text-sm font-medium rounded-lg transition-colors"
+          className="px-5 py-2.5 bg-surface-elevated hover:bg-[#2D3748] text-text text-sm font-medium rounded-lg transition-colors"
         >
           Sign Out
         </button>
@@ -253,7 +253,7 @@ function SettingsContent() {
 export default function SettingsPage() {
   return (
     <AppShell>
-      <Suspense fallback={<div className="p-8 text-[#64748B]">Loading…</div>}>
+      <Suspense fallback={<div className="p-8 text-text-muted">Loading…</div>}>
         <SettingsContent />
       </Suspense>
     </AppShell>

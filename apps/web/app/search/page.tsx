@@ -105,7 +105,7 @@ function SearchContent() {
             <button
               type="submit"
               disabled={loading || !query.trim()}
-              className="px-6 py-3.5 bg-[#00F5FF] hover:bg-[#00D9FF] disabled:opacity-50 disabled:cursor-not-allowed text-[#0A0F1C] font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
+              className="px-6 py-3.5 bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-bg font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
             >
               {loading ? '…' : 'Search'}
             </button>

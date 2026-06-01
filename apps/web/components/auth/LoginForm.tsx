@@ -29,7 +29,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="backdrop-blur-xl bg-[#111827]/80 border border-[#334155]/30 rounded-2xl p-8 space-y-6">
           {/* Header */}
@@ -49,27 +49,27 @@ export default function LoginForm() {
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium text-[#F1F5F9] mb-2">Email</label>
+              <label className="block text-sm font-medium text-text mb-2">Email</label>
               <input
                 type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 bg-[#0A0F1C] border border-[#334155] rounded-lg text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#00F5FF]/50 transition-all"
+                className="w-full px-4 py-2 bg-bg border border-[#334155] rounded-lg text-text placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[accent]/50 transition-all"
                 placeholder="you@example.com" required
               />
             </div>
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-[#F1F5F9]">Password</label>
-                <a href="/auth/forgot-password" className="text-xs text-[#00F5FF] hover:text-[#00D9FF] transition-colors">Forgot password?</a>
+                <label className="block text-sm font-medium text-text">Password</label>
+                <a href="/auth/forgot-password" className="text-xs text-accent hover:text-[#00D9FF] transition-colors">Forgot password?</a>
               </div>
               <input
                 type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-[#0A0F1C] border border-[#334155] rounded-lg text-[#F1F5F9] placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[#00F5FF]/50 transition-all"
+                className="w-full px-4 py-2 bg-bg border border-[#334155] rounded-lg text-text placeholder-[#64748B] focus:outline-none focus:ring-2 focus:ring-[accent]/50 transition-all"
                 placeholder="••••••••" required
               />
             </div>
             <button
               type="submit" disabled={loading}
-              className="w-full py-2 px-4 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-[#00F5FF]/20 transform hover:scale-105"
+              className="w-full py-2 px-4 bg-[accent] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg hover:shadow-[accent]/20 transform hover:scale-105"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -78,7 +78,7 @@ export default function LoginForm() {
           <div className="text-center pt-4 border-t border-[#334155]/30">
             <p className="text-[#94A3B8]">
               Don&apos;t have an account?{' '}
-              <a href="/auth/register" className="text-[#00F5FF] hover:text-[#00D9FF] font-medium transition-colors">Sign up</a>
+              <a href="/auth/register" className="text-accent hover:text-[#00D9FF] font-medium transition-colors">Sign up</a>
             </p>
           </div>
         </div>

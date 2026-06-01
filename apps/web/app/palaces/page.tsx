@@ -54,7 +54,7 @@ export default function PalacesPage() {
           </div>
           <Link
             href="/palaces/new"
-            className="px-5 py-2.5 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20 flex items-center gap-2"
+            className="px-5 py-2.5 bg-accent hover:bg-accent/90 text-bg font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20 flex items-center gap-2"
           >
             <span>+</span> New Workspace
           </Link>
@@ -84,7 +84,7 @@ export default function PalacesPage() {
             <p className="text-[#94A3B8] mb-6">Connect an AI via MCP and it will start storing context here automatically.</p>
             <Link
               href="/palaces/new"
-              className="inline-block px-6 py-3 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
+              className="inline-block px-6 py-3 bg-accent hover:bg-accent/90 text-bg font-semibold rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#00F5FF]/20"
             >
               Create Your First Workspace
             </Link>

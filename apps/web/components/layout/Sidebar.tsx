@@ -27,12 +27,12 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   return (
     <div
-      className={`bg-[#111827] border-r border-[#334155]/30 backdrop-blur-xl transition-all duration-300 flex flex-col ${
+      className={`bg-surface border-r border-border/30 backdrop-blur-xl transition-all duration-300 flex flex-col ${
         isOpen ? 'w-64' : 'w-20'
       }`}
     >
       {/* Logo */}
-      <div className="p-6 border-b border-[#334155]/30">
+      <div className="p-6 border-b border-border/30">
         <div className="flex items-center gap-3">
           <Image
             src="/LOGO_DARK_BACKGROUND.png"
@@ -43,7 +43,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           />
           {isOpen && (
             <span className="font-black text-lg tracking-tight leading-none">
-              <span className="text-[#00F5FF]">UNI</span>
+              <span className="text-accent">UNI</span>
               <span className="text-[#8892A4]">MATRIX</span>
             </span>
           )}
@@ -58,8 +58,8 @@ export default function Sidebar({ isOpen }: SidebarProps) {
             href={item.href}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
               isActive(item.href)
-                ? 'bg-[#00F5FF]/10 border border-[#00F5FF]/30 text-[#00F5FF]'
-                : 'text-[#94A3B8] hover:bg-[#1F2937] hover:text-[#F1F5F9]'
+                ? 'bg-accent/10 border border-accent/30 text-accent'
+                : 'text-text-secondary hover:bg-surface-elevated hover:text-text'
             }`}
           >
             <span className="text-sm font-bold font-mono w-5 text-center flex-shrink-0">{item.icon}</span>
@@ -73,14 +73,14 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         <div className="px-4 pb-3">
           <Link
             href="/pricing"
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-[#A855F7]/20 to-[#00F5FF]/10 border border-[#A855F7]/30 hover:border-[#A855F7]/60 transition-all duration-200 ${
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-[accent-secondary]/20 to-[accent]/10 border border-accent-secondary/30 hover:border-accent-secondary/60 transition-all duration-200 ${
               isOpen ? '' : 'justify-center'
             }`}
           >
-            <span className="text-xs font-bold text-[#A855F7] flex-shrink-0">PRO</span>
+            <span className="text-xs font-bold text-accent-secondary flex-shrink-0">PRO</span>
             {isOpen && (
               <div className="min-w-0">
-                <p className="text-xs font-bold text-[#A855F7]">Upgrade to Pro</p>
+                <p className="text-xs font-bold text-accent-secondary">Upgrade to Pro</p>
                 <p className="text-[10px] text-[#64748B] truncate">Unlimited workspaces &amp; memory</p>
               </div>
             )}
@@ -89,15 +89,15 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       )}
 
       {/* User Section */}
-      <div className="p-4 border-t border-[#334155]/30 space-y-3">
+      <div className="p-4 border-t border-border/30 space-y-3">
         {session && (
           <div className={`flex items-center gap-3 ${isOpen ? 'flex-row' : 'flex-col'}`}>
-            <div className="w-8 h-8 rounded-lg bg-[#A855F7] flex items-center justify-center text-[#F1F5F9] text-sm font-bold">
+            <div className="w-8 h-8 rounded-lg bg-[accent-secondary] flex items-center justify-center text-text text-sm font-bold">
               {session.user?.name?.[0] || 'U'}
             </div>
             {isOpen && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[#F1F5F9] truncate">
+                <p className="text-sm font-medium text-text truncate">
                   {session.user?.name}
                 </p>
                 <p className="text-xs text-[#64748B] truncate">
@@ -110,7 +110,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
         <button
           onClick={() => signOut({ redirect: true, callbackUrl: '/auth/login' })}
-          className="w-full px-4 py-2 text-sm bg-[#1F2937] hover:bg-[#2D3748] text-[#F1F5F9] rounded-lg transition-all duration-200"
+          className="w-full px-4 py-2 text-sm bg-[#1F2937] hover:bg-[#2D3748] text-text rounded-lg transition-all duration-200"
         >
           {isOpen ? 'Sign Out' : '→'}
         </button>

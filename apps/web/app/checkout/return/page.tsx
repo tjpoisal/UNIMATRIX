@@ -117,7 +117,7 @@ function ReturnContent() {
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
           href="/dashboard"
-          className="px-7 py-3 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-bold rounded-xl transition-colors shadow-lg shadow-[#00F5FF]/20 text-sm"
+          className="px-7 py-3 bg-accent hover:bg-accent/90 text-bg font-bold rounded-xl transition-colors shadow-lg shadow-[#00F5FF]/20 text-sm"
         >
           Go to dashboard →
         </Link>
@@ -140,7 +140,7 @@ export default function CheckoutReturnPage() {
         <Link href="/" className="flex items-center gap-3">
           <Image src="/logo-icon.png" alt="Unimatrix" width={32} height={32} className="drop-shadow-[0_0_8px_rgba(0,245,255,0.4)]" />
           <span className="font-black text-lg tracking-tight">
-            <span className="text-[#00F5FF]">UNI</span>
+            <span className="text-accent">UNI</span>
             <span className="text-[#8892A4]">MATRIX</span>
           </span>
         </Link>
