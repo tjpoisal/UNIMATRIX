@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserIdFromRequest } from "@/lib/api-auth";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const userId = await getUserIdFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       include: { palace: { select: { userId: true } } },
     });
 
-    if (!location || location.palace.userId !== session.user.id) {
+    if (!location || location.palace.userId !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth();
+    const userId = await getUserIdFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -74,7 +74,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    if (!memory || memory.location.palace.userId !== session.user.id) {
+    if (!memory || memory.location.palace.userId !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -99,9 +99,9 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await auth();
+    const userId = await getUserIdFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -124,7 +124,7 @@ export async function DELETE(request: NextRequest) {
       },
     });
 
-    if (!memory || memory.location.palace.userId !== session.user.id) {
+    if (!memory || memory.location.palace.userId !== userId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

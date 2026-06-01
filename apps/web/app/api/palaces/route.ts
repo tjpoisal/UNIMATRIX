@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserIdFromRequest } from "@/lib/api-auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const userId = await getUserIdFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const palaces = await prisma.palace.findMany({
-      where: { userId: session.user.id, deletedAt: null },
+      where: { userId, deletedAt: null },
       include: {
         locations: {
           where: { deletedAt: null },
@@ -33,9 +33,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
+    const userId = await getUserIdFromRequest(request);
 
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -50,13 +50,13 @@ export async function POST(request: NextRequest) {
 
     // Check tier limit (free tier = 3 palaces)
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: userId },
       select: { tier: true },
     });
 
     if (user?.tier === "free") {
       const palaceCount = await prisma.palace.count({
-        where: { userId: session.user.id, deletedAt: null },
+        where: { userId, deletedAt: null },
       });
 
       if (palaceCount >= 3) {
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     const palace = await prisma.palace.create({
       data: {
-        userId: session.user.id,
+        userId,
         name,
         description,
       },

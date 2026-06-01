@@ -1,119 +1,115 @@
 # Unimatrix MCP Setup Guide
 
-Connect your AI tools to Unimatrix so they can read and write persistent memory across all your conversations, devices, and LLMs.
+Unimatrix is a cloud-hosted MCP server that gives your AI tools (Claude Desktop, Cursor, Windsurf, etc.) access to persistent, structured memory across sessions and models.
+
+**Important:** MCP is a developer protocol. It works with desktop clients and IDEs that support it. It does **not** work with consumer apps like ChatGPT or Gemini on mobile.
 
 ## What You Need
 
-1. A Unimatrix account — [register free at unimatrix-flax.vercel.app/auth/register](https://unimatrix-flax.vercel.app/auth/register)
-2. An API key — generate one at **Settings → API Keys** after signing in
-3. An MCP-compatible LLM client (Claude Desktop, Cursor, Continue.dev, etc.)
+1. A Unimatrix account — [sign up at deployunimatrix.com](https://deployunimatrix.com/auth/register)
+2. An API key — generate one in **Settings → API Keys** after logging in
+3. An MCP-compatible client (Claude Desktop, Cursor, Windsurf, Zed, Continue, etc.)
 
 ---
 
 ## Claude Desktop
 
+Claude Desktop requires a **local stdio process**. You cannot point it directly at a remote URL.
+
 **Config file location:**
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
-**Add this to your config:**
+**Correct configuration:**
 
 ```json
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix-flax.vercel.app/api/mcp",
-      "apiKey": "YOUR_UNIMATRIX_API_KEY"
+      "command": "npx",
+      "args": ["-y", "@unimatrix/mcp-server@latest"],
+      "env": {
+        "UNIMATRIX_API_KEY": "umx_your_key_here",
+        "UNIMATRIX_API_URL": "https://deployunimatrix.com/api"
+      }
     }
   }
 }
 ```
 
-**Verify it works:**
+**How it actually works:**
+- The `@unimatrix/mcp-server` package runs locally as a bridge.
+- It securely forwards requests to your Unimatrix account using your API key.
+- No data is stored on your machine.
 
-1. Restart Claude Desktop
-2. Start a new conversation
-3. Ask Claude: `"What do you remember from my previous conversations?"`
-4. Claude will call `get_recent()` and show your stored memories
+**Important: LLMs do not automatically load memory.**  
+After connecting, add this to your Claude custom instructions / system prompt:
 
-**Available MCP tools after connecting:**
+> At the start of every new conversation, call `unimatrix_list_palaces`, then use `unimatrix_search_memories` or `unimatrix_get_palace` to load relevant context before responding.
 
-| Tool | What It Does |
-|------|-------------|
-| `remember(content, context?)` | Store something from this conversation |
-| `recall(query)` | Search all memories across all LLMs |
-| `get_recent(limit?)` | Get last N memories (cross-LLM, chronological) |
-| `continue_from(session_id?)` | Resume a specific prior session |
-| `list_contexts()` | List all your memory workspaces |
+**Available tools (actual names):**
+
+| Tool                        | Purpose                                      |
+|----------------------------|----------------------------------------------|
+| `unimatrix_list_palaces`   | List your memory workspaces                  |
+| `unimatrix_get_palace`     | Load a full palace with locations + memories |
+| `unimatrix_search_memories`| Semantic + full-text search                  |
+| `unimatrix_store_memory`   | Save new context (requires location_id)      |
+| `unimatrix_create_palace`  | Create a new top-level workspace             |
+| `unimatrix_create_location`| Create a "room" inside a palace              |
+
+See the tool descriptions inside Claude for full schemas and examples.
 
 ---
 
-## Cursor
+## Cursor, Windsurf, and Other IDEs
 
-Open your Cursor settings and add Unimatrix as an MCP server:
+Many modern IDEs support the streamable HTTP transport directly.
 
-**Via `~/.cursor/mcp.json`:**
+**Recommended config** (e.g. `~/.cursor/mcp.json`):
 
 ```json
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix-flax.vercel.app/api/mcp",
-      "apiKey": "YOUR_UNIMATRIX_API_KEY"
+      "type": "streamable-http",
+      "url": "https://deployunimatrix.com/api/mcp",
+      "headers": {
+        "Authorization": "Bearer umx_your_key_here"
+      }
     }
   }
 }
 ```
 
-**Via the Cursor Settings UI:**
+Some clients also accept this simpler form:
 
-1. Open Cursor → Settings → MCP
-2. Click "Add MCP Server"
-3. Name: `unimatrix`
-4. URL: `https://unimatrix-flax.vercel.app/api/mcp`
-5. API Key: your Unimatrix API key
+```json
+{
+  "mcpServers": {
+    "unimatrix": {
+      "url": "https://deployunimatrix.com/api/mcp",
+      "headers": { "Authorization": "Bearer umx_..." }
+    }
+  }
+}
+```
 
-**Verify:** Open any file and ask Cursor's AI: `"What were we working on last session?"` — Cursor will call `get_recent()` to pull context.
+**Again:** You must add explicit instructions in the IDE's AI settings telling it to load context at the start of sessions using the tools above. There is no automatic background polling.
 
 ---
 
-## Any MCP-Compatible Client (Generic)
+## Any MCP-Compatible Client (Generic HTTP)
 
-Any client that supports the [Model Context Protocol](https://modelcontextprotocol.io) can connect to Unimatrix.
+Clients that support the streamable HTTP transport can connect directly:
 
-**MCP Server URL:** `https://unimatrix-flax.vercel.app/api/mcp`
+**Endpoint:** `https://deployunimatrix.com/api/mcp`
 
-**Authentication:** Pass your API key in the `Authorization` header:
-```
-Authorization: Bearer YOUR_UNIMATRIX_API_KEY
-```
+**Authentication:** `Authorization: Bearer umx_your_key`
 
-**Protocol:** Unimatrix uses the Streamable HTTP transport (stateless, per-request MCP sessions). No persistent WebSocket connection required.
+Unimatrix implements the MCP protocol over HTTP (JSON-RPC 2.0). Use the standard `tools/list` and `tools/call` methods.
 
-**Example JSON-RPC call to list tools:**
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "tools/list"
-}
-```
-
-**Example `remember` call:**
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 2,
-  "method": "tools/call",
-  "params": {
-    "name": "remember",
-    "arguments": {
-      "content": "User is building a Rust web server with Axum. Prefers async/await patterns.",
-      "context": "rust-web-project"
-    }
-  }
-}
-```
+**Current tool names all start with the `unimatrix_` prefix** (e.g. `unimatrix_store_memory`, `unimatrix_search_memories`). Check the descriptions returned by `tools/list` for exact schemas.
 
 ---
 
@@ -168,7 +164,7 @@ docker compose up -d
 
 ### Point Your LLM Client at Your Server
 
-Replace `https://unimatrix-flax.vercel.app/api/mcp` with your server's URL:
+Replace `https://deployunimatrix.com/api/mcp` with your server's URL:
 
 ```json
 {
@@ -220,7 +216,7 @@ Your API key is not being passed correctly. Ensure:
 
 1. Check that `claude_desktop_config.json` is valid JSON (no trailing commas)
 2. Fully quit and relaunch Claude Desktop (not just close the window)
-3. Confirm the MCP server URL is reachable: `curl https://unimatrix-flax.vercel.app/health`
+3. Confirm the MCP server URL is reachable: `curl https://deployunimatrix.com/health`
 
 ### Memories not persisting across sessions
 
@@ -235,18 +231,18 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 ---
 
-## Cross-LLM Continuity: How It Works
+## How Cross-Model Continuity Actually Works
 
-When Claude connects to Unimatrix and calls `get_recent()`, it receives the last N memories written by **any** LLM — including ChatGPT, Gemini, Groq, and your local Ollama instance. There is no LLM filter. All queries are scoped by user ID only.
+Unimatrix stores memories in a user-scoped, hierarchical structure (Palaces → Locations → Memories). Any connected MCP client can read and write to the same data.
 
-This is the core mechanism for the cross-LLM handoff:
+**There is no automatic magic.** Each client only sees what it explicitly asks for via tool calls.
 
-1. You finish a session with ChatGPT on your iPhone. ChatGPT calls `remember()` to store key context.
-2. You open Claude on your iPad. Claude calls `get_recent()` at session start.
-3. Claude sees the ChatGPT-written memories and picks up the conversation seamlessly.
-4. The user never re-explains anything.
+To get the "continue where I left off" experience:
 
-The `source` field on each memory records which LLM wrote it (e.g., `"mcp"`) but this field is informational only — it never affects what any AI can read.
+1. When using one client, explicitly ask it (or instruct it via system prompt) to call `unimatrix_store_memory` for important context.
+2. When starting in a different client, your custom instructions must tell it to call `unimatrix_list_palaces` + search/get tools at the beginning of the session.
+
+The memories themselves are not filtered by which LLM wrote them. This is by design.
 
 ---
 
@@ -265,8 +261,10 @@ For LLMs that do not support MCP (e.g., ChatGPT Actions, Gemini function calling
 
 **Authentication:** `Authorization: Bearer YOUR_API_KEY`
 
-**OpenAPI spec:** `https://unimatrix-flax.vercel.app/api/openapi.json`
+**OpenAPI spec:** `https://deployunimatrix.com/api/openapi.json`
 
 ---
 
-*Questions? Email hello@deployunimatrix.com or open an issue at github.com/tjpoisal/UNIMATRIX*
+* Full MCP tool reference & schemas: [docs/mcp-reference.md](https://github.com/tjpoisal/UNIMATRIX/blob/main/docs/mcp-reference.md) or https://deployunimatrix.com/docs/mcp
+
+Questions? Email hello@deployunimatrix.com or open an issue at github.com/tjpoisal/UNIMATRIX*

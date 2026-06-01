@@ -4,6 +4,7 @@ import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
+import { getOrCreatePersonalOrganization } from "./organizations";
 
 declare module "next-auth" {
   interface Session {
@@ -50,14 +51,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account }) {
-      // Auto-create DB user on first OAuth login
-      if (account?.provider !== "credentials" && user.email) {
-        await prisma.user.upsert({
-          where:  { email: user.email },
-          create: { email: user.email, name: user.name, image: user.image },
-          update: { name: user.name,   image: user.image },
-        });
+      if (!user.email) return true;
+
+      // Auto-create user record for OAuth
+      const dbUser = await prisma.user.upsert({
+        where:  { email: user.email },
+        create: { email: user.email, name: user.name, image: user.image },
+        update: { name: user.name,   image: user.image },
+      });
+
+      // === NEW: Auto-create Personal Organization for every new login ===
+      // This ensures every user (OAuth or credentials) has at least one organization
+      // for the new multi-tenant collaboration features.
+      if (dbUser.id) {
+        await getOrCreatePersonalOrganization(dbUser.id, dbUser.email, dbUser.name);
       }
+
       return true;
     },
     async jwt({ token, user, trigger }) {

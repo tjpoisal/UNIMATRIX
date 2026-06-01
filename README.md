@@ -57,7 +57,7 @@ Stdio MCP server that any Claude Desktop / Claude Code / Ollama user installs. C
 
 - **Tools**: `list_palaces`, `get_palace`, `search_memories`, `store_memory`, `list_memories`, `create_palace`, `create_location`, `update_memory`
 - **Publishable** as an npm package (`unimatrix-mcp-server` binary)
-- **Live API**: `https://unimatrix-flax.vercel.app/api`
+- **Live API**: `https://deployunimatrix.com/api`
 
 ### `packages/llm` — Multi-LLM Abstraction
 Unified interface for 5 LLM providers with intelligent routing.
@@ -140,7 +140,7 @@ Add to `claude_desktop_config.json`:
       "args": ["unimatrix-mcp-server"],
       "env": {
         "UNIMATRIX_API_KEY": "your-api-key",
-        "UNIMATRIX_API_URL": "https://unimatrix-flax.vercel.app/api"
+        "UNIMATRIX_API_URL": "https://deployunimatrix.com/api"
       }
     }
   }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { getOrCreatePersonalOrganization } from "@/lib/organizations";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,6 +38,9 @@ export async function POST(request: NextRequest) {
         name: name || email.split("@")[0],
       },
     });
+
+    // Create Personal Organization for the new user (consistent with OAuth flow)
+    await getOrCreatePersonalOrganization(user.id, user.email, user.name);
 
     return NextResponse.json(
       {

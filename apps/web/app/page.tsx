@@ -2,33 +2,33 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ProofOfReality } from '@/components/marketing/ProofSections';
 
 export const metadata = {
-  title: 'Unimatrix — Your AI Remembers Everything. Everywhere.',
+  title: 'Unimatrix — MCP Memory Server for AI Tools',
   description:
-    'Universal AI memory persistence via MCP. Start with ChatGPT on iPhone, continue with Claude on iPad. Cross-LLM, cross-device context continuity — automatically.',
+    'Cloud-hosted memory backend for the Model Context Protocol. Connect Claude Desktop, Cursor, Windsurf and other MCP clients to persistent, structured memory across sessions and models.',
   keywords: [
-    'cross-LLM AI memory',
-    'AI context continuity',
-    'MCP memory server',
-    'persistent AI memory',
-    'cross-device AI',
-    'ChatGPT Claude memory sync',
-    'AI memory persistence',
     'MCP server',
+    'Model Context Protocol',
+    'Claude Desktop memory',
+    'Cursor MCP',
+    'persistent AI memory',
+    'cross-LLM context',
+    'AI infrastructure',
   ],
   openGraph: {
-    title: 'Unimatrix — Your AI Remembers Everything. Everywhere.',
+    title: 'Unimatrix — MCP Memory Server',
     description:
-      'Universal AI memory persistence via MCP. Start with ChatGPT on iPhone, continue with Claude on iPad. Full context, every time.',
+      'A managed MCP server that gives your AI tools structured, persistent memory. Works with Claude Desktop, Cursor, Windsurf, and any MCP-compatible client.',
     url: 'https://deployunimatrix.com',
     siteName: 'Unimatrix',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Unimatrix — Your AI Remembers Everything. Everywhere.',
-    description: 'Cross-LLM, cross-device AI memory persistence via MCP.',
+    title: 'Unimatrix — MCP Memory Server for AI Tools',
+    description: 'Persistent memory for Claude Desktop, Cursor, and other MCP clients.',
   },
 };
 
@@ -52,6 +52,7 @@ export default async function Home() {
           <div className="hidden md:flex items-center gap-6 text-sm text-text-muted">
             <a href="#how-it-works" className="hover:text-text-secondary transition-colors">How It Works</a>
             <Link href="/downloads" className="hover:text-text-secondary transition-colors">Downloads</Link>
+            <Link href="/docs/mcp" className="hover:text-text-secondary transition-colors">MCP Docs</Link>
             <a href="#features" className="hover:text-text-secondary transition-colors">Features</a>
             <a href="#pricing" className="hover:text-text-secondary transition-colors">Pricing</a>
           </div>
@@ -73,19 +74,18 @@ export default async function Home() {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/30 rounded-full text-xs text-accent font-medium mb-8 tracking-wide">
             <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            Universal AI Memory &middot; MCP Protocol &middot; Cross-LLM &middot; All Platforms
+            MCP Server for AI Tools
           </div>
           <div className="flex justify-center mb-8">
             <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={88} height={97}
               className="opacity-80 drop-shadow-[0_0_24px_rgba(0,245,255,0.4)]" />
           </div>
           <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight mb-6">
-            Your AI Remembers&nbsp;<span className="text-accent">Everything.</span>
-            <br />Everywhere.
+            Persistent memory for your<br />AI tools via MCP.
           </h1>
           <p className="text-xl text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
-            Start a conversation with ChatGPT on your phone. Pick up with Claude on your iPad.
-            Get home and let multiple AIs collaborate together — all with full context, automatically.
+            A managed Model Context Protocol server. Connect Claude Desktop, Cursor, Windsurf,
+            and other MCP clients to structured, long-term memory that works across models and machines.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
             <Link href="/auth/register"
@@ -100,31 +100,19 @@ export default async function Home() {
           <p className="text-xs text-text-muted">Available on macOS &middot; Windows &middot; Linux &middot; iOS &middot; Android &middot; Web</p>
         </div>
 
-        {/* Terminal MCP config demo */}
-        <div className="max-w-3xl mx-auto mt-20">
-          <div className="bg-surface border border-border/50 rounded-2xl overflow-hidden shadow-2xl shadow-black/50">
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-border/40 bg-[#0D1117]">
-              <div className="w-3 h-3 rounded-full bg-error/80" />
-              <div className="w-3 h-3 rounded-full bg-warning/80" />
-              <div className="w-3 h-3 rounded-full bg-success/80" />
-              <span className="ml-2 text-xs text-text-muted font-mono">claude_desktop_config.json</span>
-            </div>
-            <pre className="p-6 text-sm font-mono text-text-secondary leading-relaxed overflow-x-auto">
-{`{
-  "mcpServers": {
-    `}<span className="text-accent">&quot;unimatrix&quot;</span>{`: {
-      "url": `}<span className="text-[#86EFAC]">&quot;https://deployunimatrix.com/api/mcp&quot;</span>{`,
-      "apiKey": `}<span className="text-[#FCD34D]">&quot;YOUR_API_KEY&quot;</span>{`
-    }
-  }
-}`}
-            </pre>
-            <div className="px-6 pb-5 pt-2 border-t border-border/30">
-              <p className="text-xs text-text-muted font-mono">
-                <span className="text-[#22C55E]">✓</span> Claude will now pick up where ChatGPT left off — automatically
-              </p>
-            </div>
-          </div>
+        {/* Honest setup callout */}
+        <div className="max-w-2xl mx-auto mt-16 text-center">
+          <p className="text-sm text-text-muted mb-3">Works with Claude Desktop, Cursor, Windsurf, and any MCP client.</p>
+          <Link 
+            href="/onboarding" 
+            className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent/80 transition-colors"
+          >
+            View correct setup instructions for your tools →
+          </Link>
+          <p className="mt-4 text-xs text-text-muted">
+            Note: You must add explicit instructions in your LLM settings so it loads memory at the start of sessions.
+            There is no automatic background behavior.
+          </p>
         </div>
       </section>
 
@@ -133,13 +121,13 @@ export default async function Home() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
-            <p className="text-text-secondary text-lg">One config. Every AI. Every device. Forever.</p>
+            <p className="text-text-secondary text-lg">One MCP server. Your context, available to every tool you use.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { step: '01', title: 'Connect to Your AI', desc: 'Add a single MCP config to Claude Desktop, Cursor, or any MCP-compatible LLM client. Takes 60 seconds.' },
-              { step: '02', title: 'Have Conversations Normally', desc: 'Every AI automatically saves context to Unimatrix in the background. You do nothing differently.' },
-              { step: '03', title: 'Continue Anywhere, Any AI', desc: 'Open any AI on any device and it calls get_recent() at session start — picking up exactly where you left off.' },
+              { step: '01', title: 'Connect a Client', desc: 'Add Unimatrix to Claude Desktop (via local bridge), Cursor/Windsurf (direct HTTP), or any MCP-compatible tool using your API key.' },
+              { step: '02', title: 'Store What Matters', desc: 'During conversations, the AI (or you) explicitly calls tools like unimatrix_store_memory to save important context into structured Palaces and Locations.' },
+              { step: '03', title: 'Load Context Deliberately', desc: 'In your system prompt or custom instructions, tell each client to call unimatrix_list_palaces + search/get tools at the start of new sessions. No automatic magic — you control when context is loaded.' },
             ].map((item) => (
               <div key={item.step}
                 className="relative bg-surface border border-border/30 rounded-2xl p-8 hover:border-accent/30 transition-all duration-200">
@@ -150,17 +138,23 @@ export default async function Home() {
               </div>
             ))}
           </div>
+          <p className="text-center text-xs text-text-muted mt-8 max-w-md mx-auto">
+            This is how real MCP memory works today. Explicit tool calls, not background telepathy.
+          </p>
         </div>
       </section>
+
+      {/* ── Proof of Reality (New Trust Sections) ─────────────────────── */}
+      <ProofOfReality />
 
       {/* ── Platform Downloads ─────────────────────────────────────────── */}
       <section id="platforms" className="py-24 px-6 bg-[#080D19] border-t border-border/20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Every Platform. One Memory.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Clients for the Platforms You Actually Use</h2>
             <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Download Unimatrix for your device. Every platform connects to the same MCP memory
-              layer — your context follows you everywhere.
+              Native desktop apps for macOS, Windows, and Linux (plus mobile companions) that connect to the same
+              cloud MCP memory backend as your IDEs and agents.
             </p>
           </div>
 
@@ -252,8 +246,8 @@ export default async function Home() {
               The Collaborative <span className="text-accent-secondary">AI Room</span>
             </h2>
             <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Multiple AIs participate in your conversation simultaneously — each one with full context
-              from Unimatrix. Claude, GPT-4, Gemini, and others in the same room.
+              Multiple AI clients can read from and write to the same Unimatrix memory layer at the same time.
+              Useful for complex workflows where different models contribute.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -281,12 +275,15 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: 'XLM', title: 'Cross-LLM Memory', desc: 'Start with ChatGPT. Continue with Claude. Switch to Gemini. Same context, always.' },
-              { icon: 'SYN', title: 'Cross-Device Sync', desc: 'iPhone → iPad → desktop → home server. The conversation thread never breaks.' },
-              { icon: 'PVT', title: 'Private Cloud', desc: 'Run Unimatrix on your own hardware for complete data sovereignty. Or use our secure cloud.' },
-              { icon: 'ANY', title: 'Works with Any AI', desc: 'Claude, ChatGPT, Gemini, Groq, Ollama. If it supports MCP, it works.' },
-              { icon: 'SLT', title: 'Invisible by Design', desc: 'No new app to open. No copy-paste. Unimatrix runs silently in the background.' },
-              { icon: 'MCP', title: 'MCP Native', desc: 'remember, recall, continue_from, get_recent — standard MCP tools any LLM can call.' },
+              { icon: 'XLM', title: 'Cross-Client Memory', desc: 'The same memories are readable and writable from Claude Desktop, Cursor, Windsurf, custom agents, or your own scripts via the MCP protocol.' },
+              { icon: 'SYN', title: 'Structured Organization', desc: 'Memories live in hierarchical Palaces and Locations (method of loci model), not a flat key-value bag. Better navigation and context for agents.' },
+              { icon: 'PVT', title: 'Self-Host or Cloud', desc: 'Use our managed cloud or run the full stack yourself with Docker + PostgreSQL + pgvector for complete data sovereignty.' },
+              { icon: 'ANY', title: 'Standard MCP Interface', desc: 'Works with any client that speaks the Model Context Protocol. No proprietary SDKs or per-model integrations.' },
+              { icon: 'SLT', title: 'Explicit Control', desc: 'You (and your prompts) decide when tools are called. No hidden background syncing or surprise data exfiltration.' },
+              { icon: 'MCP', title: 'Real Tool Schemas', desc: 'unimatrix_list_palaces, unimatrix_store_memory, unimatrix_search_memories, etc. Full schemas available via tools/list.' },
+              { icon: 'CTL', title: 'Agent Governance & Limits', desc: 'Per-agent daily spend caps, real-time cost tracking, and automatic budget alerts. Never get surprised by runaway agent costs.' },
+              { icon: 'HIT', title: 'Human-in-the-Loop Controls', desc: 'Configurable approval gates for sensitive actions. Agents can request permission before executing high-impact tools.' },
+              { icon: 'TEL', title: 'Full Telemetry & Audit', desc: 'Detailed token usage logs, cost attribution per agent, and complete audit trail for every approval and configuration change.' },
             ].map((feature) => (
               <div key={feature.title}
                 className="group bg-surface border border-border/30 rounded-2xl p-6 hover:border-accent/30 transition-all duration-200">
@@ -299,31 +296,86 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── Competitive moat ──────────────────────────────────────────── */}
-      <section className="py-20 px-6 border-t border-border/20">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-text mb-10">Why Not Just Use Mem0 or MemGPT?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* ── Enterprise Controls ─────────────────────────────────────── */}
+      <section className="py-24 px-6 border-t border-border/20 bg-[#080D19]">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#22C55E]/10 border border-[#22C55E]/30 rounded-full text-xs text-[#22C55E] font-medium mb-6">
+              ENTERPRISE READY
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Production-Grade Agent Controls</h2>
+            <p className="text-text-secondary max-w-xl mx-auto">Run dozens of agents safely with real financial guardrails and human oversight.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
             {[
-              { label: 'Per-LLM memory only', competitor: true },
-              { label: 'ChatGPT → Claude continuity', competitor: false },
-              { label: 'Cross-device context sync', competitor: false },
-              { label: 'Self-hosted + cloud hybrid', competitor: false },
-              { label: 'Multi-LLM collaborative room', competitor: false },
-              { label: 'Agentic device control', competitor: false },
-              { label: 'MCP-native (any LLM, zero integration)', competitor: false },
-              { label: 'Mobile + desktop + web', competitor: false },
-            ].map((item) => (
-              <div key={item.label}
-                className="flex items-center gap-3 bg-surface rounded-xl px-4 py-3 border border-border/20">
-                {item.competitor
-                  ? <span className="text-[#EF4444] text-sm">&#x2717; Others</span>
-                  : <span className="text-accent text-sm font-bold">&#x2713; Unimatrix</span>
-                }
-                <span className="text-sm text-text-secondary">{item.label}</span>
+              { title: "Spend Limits & Budgets", desc: "Set daily caps per agent. Get alerts at 80%. Hard blocks when limits are reached." },
+              { title: "Human-in-the-Loop", desc: "Fine-grained approval workflows. Sensitive tools can require explicit human sign-off before execution." },
+              { title: "Full Observability", desc: "Per-agent token usage, cost attribution, anomaly detection, and complete audit logs for compliance." },
+            ].map((item, i) => (
+              <div key={i} className="bg-surface border border-[#22C55E]/20 rounded-2xl p-7">
+                <h3 className="font-semibold text-lg mb-3">{item.title}</h3>
+                <p className="text-sm text-text-secondary">{item.desc}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Competitive Positioning ──────────────────────────────────── */}
+      <section className="py-20 px-6 border-t border-border/20">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-text mb-6">Unimatrix vs. Mem0 / MemGPT</h2>
+          <div className="text-left text-text-secondary text-sm leading-relaxed bg-surface border border-border/30 rounded-2xl p-8">
+            <p className="mb-4">
+              Unimatrix and Mem0 solve different problems.
+            </p>
+            <p className="mb-4">
+              Mem0 is a lightweight, embeddable memory layer designed primarily for single-agent applications. You typically run it yourself as a key-value store inside your own agent loop.
+            </p>
+            <p>
+              Unimatrix is a managed, multi-tenant <strong>MCP server</strong> built for developers who use many different AI clients (Claude Desktop, Cursor, Windsurf, Continue, custom agents). It provides a standardized protocol interface, hierarchical "Memory Palace" organization, semantic search, and first-class support for cross-client federation without writing per-tool glue code.
+            </p>
+            <p className="mt-4 text-xs text-text-muted">
+              Choose Mem0 if you want a simple store inside one agent you fully control.<br />
+              Choose Unimatrix if you want your context available to every MCP client you already use.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Security & Architecture (new trust section) ───────────────── */}
+      <section className="py-20 px-6 border-t border-border/20 bg-[#080D19]">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Security &amp; Architecture</h2>
+            <p className="text-text-secondary">Built as infrastructure. Not magic.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div className="bg-surface border border-border/30 rounded-2xl p-8">
+              <h3 className="font-bold mb-3 text-accent">Encryption &amp; Access</h3>
+              <ul className="space-y-2 text-text-secondary">
+                <li>• Memories encrypted at rest with AES-256-GCM (scrypt KDF per user)</li>
+                <li>• TLS 1.3 in transit</li>
+                <li>• Clerk JWT authentication + PostgreSQL Row Level Security</li>
+                <li>• Raw API keys are never stored (only bcrypt-hashed prefixes)</li>
+              </ul>
+            </div>
+            <div className="bg-surface border border-border/30 rounded-2xl p-8">
+              <h3 className="font-bold mb-3 text-accent">Data Control &amp; Transparency</h3>
+              <ul className="space-y-2 text-text-secondary">
+                <li>• Full delete and export via API at any time</li>
+                <li>• No training on your data, ever</li>
+                <li>• All MCP tool calls are auditable per account</li>
+                <li>• Self-host the entire stack (Docker + Postgres + pgvector) if you prefer</li>
+              </ul>
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-text-muted mt-8">
+            Full details in <a href="https://github.com/tjpoisal/UNIMATRIX/blob/main/SECURITY.md" target="_blank" className="underline hover:text-text">SECURITY.md</a> and the self-host guide.
+          </p>
         </div>
       </section>
 
@@ -372,7 +424,7 @@ export default async function Home() {
                 <p className="text-xs text-text-muted mt-1">or $79/year — save $29</p>
               </div>
               <ul className="space-y-3 mb-8">
-                {['Unlimited workspaces', 'Unlimited memories', 'Unlimited devices', 'All LLMs supported', 'Collaborative AI Room', '20 API keys', 'Priority support'].map((f) => (
+                {['Unlimited workspaces', 'Unlimited memories', 'Unlimited devices', 'All LLMs supported', 'Collaborative AI Room', 'Agent Spend Controls & HITL', 'Full Audit Logs & Telemetry', 'Priority support'].map((f) => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-text-secondary">
                     <span className="text-accent text-xs">&#x2713;</span>{f}
                   </li>
@@ -455,6 +507,7 @@ export default async function Home() {
           <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-text-muted">
             <a href="#how-it-works" className="hover:text-text-secondary transition-colors">How It Works</a>
             <a href="#platforms" className="hover:text-text-secondary transition-colors">Downloads</a>
+            <Link href="/docs/mcp" className="hover:text-text-secondary transition-colors">MCP Reference</Link>
             <a href="#features" className="hover:text-text-secondary transition-colors">Features</a>
             <a href="#pricing" className="hover:text-text-secondary transition-colors">Pricing</a>
             <Link href="/auth/login" className="hover:text-text-secondary transition-colors">Sign In</Link>

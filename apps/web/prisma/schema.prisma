@@ -9,28 +9,31 @@ datasource db {
 
 // User accounts
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  password  String?   // nullable for OAuth users
-  name      String?
-  image     String?   // profile image from OAuth
-  tier                 String    @default("free") // free | pro
-  stripeCustomerId     String?   @unique
+  id                   String  @id @default(cuid())
+  email                String  @unique
+  password             String? // nullable for OAuth users
+  name                 String?
+  image                String? // profile image from OAuth
+  tier                 String  @default("free") // free | pro
+  stripeCustomerId     String? @unique
   stripeSubscriptionId String?
 
   // Relations
-  accounts      Account[]
-  palaces       Palace[]
-  sessions      Session[]
-  apiKeys       ApiKey[]
-  llmProviders  LLMProvider[]
-  agentRuns     AgentRun[]
+  accounts     Account[]
+  palaces      Palace[]
+  sessions     Session[]
+  apiKeys      ApiKey[]
+  llmProviders LLMProvider[]
+  agentRuns    AgentRun[]
 
   // Social
   friendRequestsSent     Friendship[]  @relation("FriendRequests")
   friendRequestsReceived Friendship[]  @relation("FriendAddressees")
   palacesSharedByMe      PalaceShare[] @relation("SharedByUser")
   palacesSharedWithMe    PalaceShare[] @relation("SharedWithUser")
+
+  // Multi-tenant collaboration
+  organizationMemberships OrganizationMember[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -42,9 +45,9 @@ model User {
 
 // OAuth accounts linked to users
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   type              String
   provider          String
@@ -63,20 +66,20 @@ model Account {
 
 // Memory Palaces
 model Palace {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   name        String
   description String?
-  isPublic    Boolean   @default(false)
+  isPublic    Boolean @default(false)
 
-  locations   Location[]
-  shares      PalaceShare[]
+  locations Location[]
+  shares    PalaceShare[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime? // soft delete
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete
 
   @@unique([userId, name])
   @@index([userId])
@@ -85,19 +88,19 @@ model Palace {
 
 // Locations (hierarchical folders within palaces)
 model Location {
-  id        String    @id @default(cuid())
-  palaceId  String
-  palace    Palace    @relation(fields: [palaceId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  palaceId String
+  palace   Palace @relation(fields: [palaceId], references: [id], onDelete: Cascade)
 
-  parentId  String?
-  parent    Location? @relation("NestedLocations", fields: [parentId], references: [id], onDelete: Cascade)
-  children  Location[] @relation("NestedLocations")
+  parentId String?
+  parent   Location?  @relation("NestedLocations", fields: [parentId], references: [id], onDelete: Cascade)
+  children Location[] @relation("NestedLocations")
 
   name        String
   description String?
   position    Int     @default(0)
 
-  memories  Memory[]
+  memories Memory[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -111,16 +114,16 @@ model Location {
 
 // Memories stored in locations
 model Memory {
-  id          String    @id @default(cuid())
-  locationId  String
-  location    Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
-  content     String
-  tags        String[]
+  content String
+  tags    String[]
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  lastAccessed DateTime @default(now())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastAccessed DateTime  @default(now())
   deletedAt    DateTime? // soft delete
 
   @@index([locationId])
@@ -129,10 +132,10 @@ model Memory {
 
 // Sync state for offline-first mobile app
 model SyncState {
-  id          String    @id @default(cuid())
-  userId      String
-  deviceId    String
-  deviceName  String?
+  id         String  @id @default(cuid())
+  userId     String
+  deviceId   String
+  deviceName String?
 
   lastSync       DateTime @default(now())
   pendingChanges Int      @default(0)
@@ -169,13 +172,17 @@ model VerificationToken {
 
 // API keys for LLM/MCP integrations
 model ApiKey {
-  id        String    @id @default(cuid())
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  name      String    // e.g. "Claude Desktop", "My ChatGPT Key"
-  keyHash   String    @unique  // bcrypt hash of the actual key
-  keyPrefix String    // first 8 chars shown in UI e.g. "umx_a1b2"
+  // Multi-tenant support (nullable for migration from user-scoped keys)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+
+  name      String // e.g. "Claude Desktop", "My ChatGPT Key"
+  keyHash   String    @unique // bcrypt hash of the actual key
+  keyPrefix String // first 8 chars shown in UI e.g. "umx_a1b2"
   lastUsed  DateTime?
 
   createdAt DateTime  @default(now())
@@ -183,28 +190,29 @@ model ApiKey {
 
   @@index([userId])
   @@index([keyHash])
+  @@index([organizationId])
 }
 
 // User-connected LLM providers (encrypted API keys)
 model LLMProvider {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  provider     String   // claude | openai | gemini | groq | ollama
-  model        String   // e.g. "claude-opus-4-6", "gpt-4o", "gemini-pro"
-  label        String?  // user-friendly name e.g. "My Claude Key"
-  keyEncrypted String   // AES-256-GCM encrypted API key
-  keyIv        String   // initialization vector for decryption
-  keyPrefix    String   // first 8 chars for display
-  isActive     Boolean  @default(true)
+  provider     String // claude | openai | gemini | groq | ollama
+  model        String // e.g. "claude-opus-4-6", "gpt-4o", "gemini-pro"
+  label        String? // user-friendly name e.g. "My Claude Key"
+  keyEncrypted String // AES-256-GCM encrypted API key
+  keyIv        String // initialization vector for decryption
+  keyPrefix    String // first 8 chars for display
+  isActive     Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([userId, provider, model])
   @@index([userId])
   @@index([provider])
-  @@unique([userId, provider, model])
 }
 
 // Collaborative agent run sessions
@@ -213,16 +221,16 @@ model AgentRun {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  task      String   // the question or task submitted
+  task      String // the question or task submitted
   mode      String   @default("parallel") // parallel | sequential | debate
   providers String[] // provider names that participated
 
-  result      Json?    // final synthesized result { synthesis, responses[] }
-  memoryIds   String[] // IDs of Memory records created from this run
-  palaceId    String?  // palace where memories were saved
+  result    Json? // final synthesized result { synthesis, responses[] }
+  memoryIds String[] // IDs of Memory records created from this run
+  palaceId  String? // palace where memories were saved
 
-  status    String   @default("pending") // pending | running | complete | error
-  errorMsg  String?
+  status   String  @default("pending") // pending | running | complete | error
+  errorMsg String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -234,18 +242,18 @@ model AgentRun {
 
 // Friend connections between users
 model Friendship {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
   requesterId String
-  requester   User     @relation("FriendRequests", fields: [requesterId], references: [id], onDelete: Cascade)
+  requester   User   @relation("FriendRequests", fields: [requesterId], references: [id], onDelete: Cascade)
 
   addresseeId String
-  addressee   User     @relation("FriendAddressees", fields: [addresseeId], references: [id], onDelete: Cascade)
+  addressee   User   @relation("FriendAddressees", fields: [addresseeId], references: [id], onDelete: Cascade)
 
-  status      String   @default("pending") // pending | accepted | blocked
+  status String @default("pending") // pending | accepted | blocked
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([requesterId, addresseeId])
   @@index([requesterId])
@@ -255,24 +263,202 @@ model Friendship {
 
 // Palace sharing with specific users and permission levels
 model PalaceShare {
-  id           String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  palaceId     String
-  palace       Palace   @relation(fields: [palaceId], references: [id], onDelete: Cascade)
+  palaceId String
+  palace   Palace @relation(fields: [palaceId], references: [id], onDelete: Cascade)
 
-  sharedById   String
-  sharedBy     User     @relation("SharedByUser", fields: [sharedById], references: [id], onDelete: Cascade)
+  sharedById String
+  sharedBy   User   @relation("SharedByUser", fields: [sharedById], references: [id], onDelete: Cascade)
 
   sharedWithId String
-  sharedWith   User     @relation("SharedWithUser", fields: [sharedWithId], references: [id], onDelete: Cascade)
+  sharedWith   User   @relation("SharedWithUser", fields: [sharedWithId], references: [id], onDelete: Cascade)
 
-  permission   String   @default("view") // view | edit
+  permission String @default("view") // view | edit
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([palaceId, sharedWithId])
   @@index([palaceId])
   @@index([sharedById])
   @@index([sharedWithId])
+}
+
+// ============================================================================
+// MULTI-TENANT COLLABORATION MODELS (Organization-scoped)
+// ============================================================================
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique // e.g. "acme-corp" for URLs / subdomains
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members      OrganizationMember[]
+  apiKeys      ApiKey[]
+  rooms        CollabRoom[]
+  agentConfigs AgentConfig[]
+  auditLogs    AuditLog[]
+
+  @@index([slug])
+  @@index([createdAt])
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role      String   @default("member") // owner | admin | member
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+}
+
+model CollabRoom {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  isPrivate   Boolean @default(true)
+
+  messages CollabMessage[]
+  webhooks WebhookSubscription[]
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  tokenLogs      TokenLog[]
+  pendingActions PendingAction[]
+
+  @@index([organizationId])
+  @@index([createdAt])
+  @@index([organizationId, createdAt])
+}
+
+model CollabMessage {
+  id     String     @id @default(cuid())
+  roomId String
+  room   CollabRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  senderId   String? // Can be user id or agent identifier
+  senderName String
+  senderType String // "human" | "agent" | "system"
+
+  message  String
+  metadata Json   @default("{}")
+
+  createdAt DateTime @default(now())
+
+  @@index([roomId, createdAt])
+  @@index([roomId, id]) // Efficient "since_id" pagination
+}
+
+model WebhookSubscription {
+  id     String     @id @default(cuid())
+  roomId String
+  room   CollabRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  targetUrl     String
+  webhookSecret String // Used only for HMAC-SHA256 signing. Never returned in API responses.
+  isActive      Boolean @default(true)
+
+  createdAt       DateTime  @default(now())
+  lastTriggeredAt DateTime?
+
+  @@index([roomId])
+  @@index([isActive])
+}
+
+// ============================================================================
+// TELEMETRY, SPEND LIMITS & HUMAN-IN-THE-LOOP (HITL)
+// ============================================================================
+
+model AgentConfig {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  agent_name         String
+  provider           String // e.g. "openai", "anthropic", "groq"
+  model              String // e.g. "gpt-4o", "claude-3-5-sonnet"
+  daily_spend_limit  Int      @default(5000) // in cents
+  current_spend      Int      @default(0) // in cents, reset daily
+  last_spend_reset   DateTime @default(now())
+  context_window_max Int      @default(128000)
+
+  // HITL configuration
+  requires_hitl   Boolean @default(false) // Global default
+  hitl_tool_rules Json?   @default("{}") // { "collab.send_message": true, "collab.subscribe_webhook": false }
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, agent_name])
+  @@index([organizationId])
+  @@index([agent_name])
+}
+
+model TokenLog {
+  id     String     @id @default(cuid())
+  roomId String
+  room   CollabRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  agent_name        String
+  prompt_tokens     Int
+  completion_tokens Int
+  cost_in_cents     Int
+  latency_ms        Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([roomId, createdAt])
+  @@index([agent_name, createdAt])
+}
+
+model PendingAction {
+  id     String     @id @default(cuid())
+  roomId String
+  room   CollabRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  agent_name String
+  tool_name  String
+  args       Json
+
+  status       String  @default("pending") // pending | approved | rejected | expired
+  requested_by String? // user or agent identifier
+  approved_by  String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expiresAt DateTime?
+
+  @@index([roomId, status])
+  @@index([status, createdAt])
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  actorId     String?  // user who performed the action
+  actorName   String?
+  action      String   // e.g. "pending_action.approved", "agent_config.updated", "spend_limit.exceeded"
+  targetType  String?  // "PendingAction", "AgentConfig", etc.
+  targetId    String?
+
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now())
+
+  @@index([organizationId, createdAt])
+  @@index([action, createdAt])
 }
