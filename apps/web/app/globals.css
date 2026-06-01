@@ -1,11 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0e1030;
+  --foreground: #193b5e;
   /* Brand colors: primary blue and accent orange */
-  --brand-blue: #0b74ff; /* new logo blue */
+  --brand-blue: #0e1030; /* new logo blue */
   --brand-orange: #ff7a00; /* new logo orange */
+  --brand-white:#ffffff;
   --brand-color: var(--brand-blue);
   --brand-accent: var(--brand-orange);
   /* Copied from @theme inline - moved here to avoid unsupported at-rule */
@@ -17,9 +18,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #0e1030;
     --foreground: #ededed;
-    --brand-blue: #539bff;
+    --brand-blue: #193b5e;
     --brand-orange: #ff9a33;
     --brand-color: var(--brand-blue);
     --brand-accent: var(--brand-orange);
