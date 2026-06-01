@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import AppShell from '@/components/layout/AppShell';
 
 interface ApiKey {
@@ -18,7 +19,9 @@ const AI_SYSTEMS = [
     icon: 'CD',
     description: 'Connect via MCP server',
     color: '#CC785C',
-    instructions: (key: string) => `Add this to your Claude Desktop config file:
+    instructions: (key: string) => `Claude Desktop requires a local stdio bridge (it cannot connect directly to remote URLs).
+
+Add this to your config file:
 
 macOS: ~/Library/Application Support/Claude/claude_desktop_config.json
 Windows: %APPDATA%\\Claude\\claude_desktop_config.json
@@ -27,14 +30,16 @@ Windows: %APPDATA%\\Claude\\claude_desktop_config.json
   "mcpServers": {
     "unimatrix": {
       "command": "npx",
-      "args": ["-y", "@unimatrix/mcp-server"],
+      "args": ["-y", "@unimatrix/mcp-server@latest"],
       "env": {
         "UNIMATRIX_API_KEY": "${key}",
         "UNIMATRIX_API_URL": "${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api"
       }
     }
   }
-}`,
+}
+
+Important: Add instructions in Claude's settings telling it to call unimatrix_list_palaces + search tools at the start of every new conversation. LLMs do not load memory automatically.`,
   },
   {
     id: 'claude-code',
@@ -57,19 +62,20 @@ Then restart Claude Code and your memories will be available.`,
     icon: 'GP',
     description: 'Connect via REST API',
     color: '#10A37F',
-    instructions: (key: string) => `Use the Unimatrix REST API directly in your ChatGPT actions or custom GPTs.
+    instructions: (key: string) => `ChatGPT and Gemini do not support MCP natively.
+
+Use the REST API instead:
 
 Base URL: ${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api
 Authorization: Bearer ${key}
 
-Endpoints:
-  GET  /palaces           — list your memory workspaces
-  GET  /memories          — search memories
-  POST /memories          — store a new memory
-  GET  /search?q=...      — full-text search
+Key endpoints:
+  GET  /palaces           — list workspaces
+  GET  /memories          — list/search memories
+  POST /memories          — store memory
+  GET  /search?q=...      — full-text + semantic search
 
-Add the OpenAPI spec to your GPT Actions:
-${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api/openapi.json`,
+OpenAPI spec: ${typeof window !== 'undefined' ? window.location.origin : 'https://deployunimatrix.com'}/api/openapi.json`,
   },
   {
     id: 'gemini',
@@ -214,6 +220,14 @@ export default function OnboardingPage() {
           <p className="text-[#94A3B8] mt-1">
             Generate an API key and follow the setup guide for your AI of choice.
           </p>
+          <div className="mt-3">
+            <Link 
+              href="/docs/mcp" 
+              className="text-sm font-medium text-accent hover:text-accent/80 inline-flex items-center gap-1"
+            >
+              Full MCP tool reference &amp; schemas →
+            </Link>
+          </div>
         </div>
 
         {/* Step 1: API Keys */}

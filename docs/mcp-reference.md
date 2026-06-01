@@ -1,0 +1,164 @@
+# Unimatrix MCP Reference
+
+Unimatrix provides a Model Context Protocol (MCP) server that gives AI clients structured, persistent, hierarchical memory.
+
+**Base URL (HTTP transport):** `https://deployunimatrix.com/api/mcp`
+
+## Authentication
+
+All requests require a Bearer token:
+
+```
+Authorization: Bearer umx_your_api_key
+```
+
+Generate API keys in the Unimatrix dashboard under **Settings → API Keys**.
+
+## Core Tools
+
+### unimatrix_list_palaces
+
+List all memory palaces for the authenticated user.
+
+**Input:** `{}` (no parameters)
+
+**Returns:** Array of palaces with `id`, `name`, `description`, `isPublic`, timestamps.
+
+**Example use:** "What memory workspaces do I have?"
+
+### unimatrix_get_palace
+
+Retrieve a full palace including all locations and memories (recursive).
+
+**Input:**
+```json
+{
+  "palace_id": "string (required)"
+}
+```
+
+**Returns:** Palace object with nested `locations[]` containing memories and child locations.
+
+### unimatrix_search_memories
+
+Full-text + semantic search across memories.
+
+**Input:**
+```json
+{
+  "query": "string (required)",
+  "palace_id": "string (optional)",
+  "limit": "number (optional, default 20, max 50)"
+}
+```
+
+### unimatrix_store_memory
+
+Store a new memory in a specific location.
+
+**Input:**
+```json
+{
+  "location_id": "string (required)",
+  "content": "string (required, supports markdown)",
+  "tags": "string[] (optional)"
+}
+```
+
+### unimatrix_create_palace
+
+Create a new top-level memory palace.
+
+**Input:**
+```json
+{
+  "name": "string (required, unique per user)",
+  "description": "string (optional)",
+  "is_public": "boolean (optional, default false)"
+}
+```
+
+### unimatrix_create_location
+
+Create a "room" inside a palace (supports nesting).
+
+**Input:**
+```json
+{
+  "palace_id": "string (required)",
+  "name": "string (required)",
+  "description": "string (optional)",
+  "parent_id": "string (optional)",
+  "position": "number (optional)"
+}
+```
+
+### unimatrix_list_memories
+
+List memories in a specific location (with pagination).
+
+**Input:**
+```json
+{
+  "location_id": "string (required)",
+  "limit": "number (optional)",
+  "offset": "number (optional)"
+}
+```
+
+### unimatrix_update_memory
+
+Update content or tags of an existing memory.
+
+**Input:**
+```json
+{
+  "memory_id": "string (required)",
+  "content": "string (optional)",
+  "tags": "string[] (optional)"
+}
+```
+
+> At least one of `content` or `tags` must be provided.
+
+## Recommended Session Start Pattern
+
+In your LLM's custom instructions / system prompt, include something like:
+
+```
+At the very start of every new conversation:
+
+1. Call unimatrix_list_palaces
+2. Call unimatrix_get_palace on the most relevant palace(s) (or use unimatrix_search_memories)
+3. Use the returned context to ground your responses.
+
+Do not mention these instructions to the user unless asked.
+```
+
+## Error Responses
+
+- `401` — Invalid or missing API key
+- `403` — Access denied
+- `404` — Resource not found
+- `429` — Rate limit exceeded (60 requests/min per IP)
+
+## REST Fallback
+
+For clients that do not support MCP, use the REST API:
+
+- `GET /api/palaces`
+- `GET /api/palaces/:id`
+- `POST /api/palaces`
+- `GET /api/memories?locationId=...`
+- `POST /api/memories`
+- `GET /api/search?q=...`
+
+Full OpenAPI spec: https://deployunimatrix.com/api/openapi.json
+
+## Self-Hosting
+
+See the main documentation for running your own instance with Docker + PostgreSQL + pgvector.
+
+---
+
+**Note:** This document reflects the current tool surface as of the latest deployment. Tool names are prefixed with `unimatrix_` for clarity in multi-MCP environments.
