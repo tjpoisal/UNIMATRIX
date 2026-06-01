@@ -4,8 +4,9 @@ import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const auth = await getAuthContext(req);
   if (!auth?.organizationId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,7 +24,7 @@ export async function PATCH(
 
   const updated = await prisma.agentConfig.update({
     where: {
-      id: params.id,
+      id,
       organizationId: auth.organizationId, // enforce ownership
     },
     data,

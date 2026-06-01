@@ -9,8 +9,9 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const auth = await getAuthContext(req);
   if (!auth?.userId || !auth.organizationId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -30,7 +31,7 @@ export async function POST(
   }
 
   try {
-    const updated = await rejectPendingAction(params.id, auth.userId);
+    const updated = await rejectPendingAction(id, auth.userId);
 
     await prisma.auditLog.create({
       data: {
@@ -38,7 +39,7 @@ export async function POST(
         actorId: auth.userId,
         action: 'pending_action.rejected',
         targetType: 'PendingAction',
-        targetId: params.id,
+        targetId: id,
       },
     });
 

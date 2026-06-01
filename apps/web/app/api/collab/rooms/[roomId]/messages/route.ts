@@ -18,8 +18,9 @@ const PostMessageSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { roomId: string } }
+  { params }: { params: Promise<{ roomId: string }> }
 ) {
+  const { roomId } = await params;
   const auth = await getAuthContext(req);
   if (!auth?.userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -31,7 +32,7 @@ export async function GET(
 
   try {
     const messages = await getMessages(
-      { room_id: params.roomId, since_id, limit },
+      { room_id: roomId, since_id, limit },
       auth.organizationId || ''
     );
     return NextResponse.json({ messages });
@@ -42,8 +43,9 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { roomId: string } }
+  { params }: { params: Promise<{ roomId: string }> }
 ) {
+  const { roomId } = await params;
   const auth = await getAuthContext(req);
   if (!auth?.userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -55,7 +57,7 @@ export async function POST(
 
     const result = await sendMessage(
       {
-        room_id: params.roomId,
+        room_id: roomId,
         sender_id: auth.userId,
         sender_name: input.sender_name,
         sender_type: input.sender_type,

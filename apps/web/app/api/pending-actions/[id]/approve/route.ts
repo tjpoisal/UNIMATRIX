@@ -10,8 +10,9 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const auth = await getAuthContext(req);
   if (!auth?.userId || !auth.organizationId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -32,7 +33,7 @@ export async function POST(
   }
 
   try {
-    const updated = await approvePendingAction(params.id, auth.userId);
+    const updated = await approvePendingAction(id, auth.userId);
 
     // Log to audit
     await prisma.auditLog.create({
@@ -41,7 +42,7 @@ export async function POST(
         actorId: auth.userId,
         action: 'pending_action.approved',
         targetType: 'PendingAction',
-        targetId: params.id,
+        targetId: id,
         metadata: { previousStatus: 'pending' },
       },
     });
