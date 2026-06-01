@@ -5,12 +5,16 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && next build && pnpm run build:server",
+    "build:server": "tsc -p tsconfig.server.json",
     "start": "next start",
-    "lint": "eslint",
+    "start:prod": "node dist/server.js",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "lint": "eslint"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -35,10 +39,13 @@
     "recharts": "^3.8.1",
     "stripe": "^22.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/ws": "^8.5.12",
     "eslint": "^9",
-    "eslint-config-next": "16.2.6"
+    "eslint-config-next": "16.2.6",
+    "tsx": "^4.19.0"
   }
 }
