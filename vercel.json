@@ -8,7 +8,5 @@
       "path": "/api/cron/reset-spend",
       "schedule": "0 0 * * *"
     }
-    // Note: "expire-pending" cron removed because Hobby accounts only allow 1 cron run per day.
-    // Expiry now happens automatically on read in the pending-actions endpoint.
   ]
 }
