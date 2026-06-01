@@ -18,6 +18,7 @@ import { createServer } from 'http';
 import next from 'next';
 import { WebSocketServer, WebSocket } from 'ws';
 import { parse } from 'url';
+import { publishToRoom, subscribeToRoom, notifyLocalSubscribers } from './lib/realtime/redis-pubsub';
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0'; // Bind to all interfaces (required on Render)
@@ -65,6 +66,16 @@ app.prepare().then(() => {
     const room = rooms.get(roomId)!;
     room.add(ws);
 
+    // Subscribe this instance to cross-instance messages for the room
+    const unsubscribe = subscribeToRoom(roomId, (_channel, message) => {
+      // Deliver to local clients (except if we want to filter sender)
+      room.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(message));
+        }
+      });
+    });
+
     // Welcome message
     ws.send(
       JSON.stringify({
@@ -77,19 +88,24 @@ app.prepare().then(() => {
     ws.on('message', (data) => {
       try {
         const message = JSON.parse(data.toString());
+        const outgoing = {
+          ...message,
+          roomId,
+          timestamp: new Date().toISOString(),
+        };
 
-        // Broadcast to all other clients in the same room
+        // 1. Publish to Redis so other instances can deliver
+        publishToRoom(roomId, outgoing).catch(() => {});
+
+        // 2. Deliver locally immediately (low latency for same instance)
         room.forEach((client) => {
           if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                ...message,
-                roomId,
-                timestamp: new Date().toISOString(),
-              })
-            );
+            client.send(JSON.stringify(outgoing));
           }
         });
+
+        // Also notify any local subscribers from redis-pubsub (for consistency)
+        notifyLocalSubscribers(roomId, outgoing);
       } catch (err) {
         console.error('[WS] Failed to parse message:', err);
         ws.send(JSON.stringify({ type: 'error', message: 'Invalid JSON' }));
@@ -97,6 +113,7 @@ app.prepare().then(() => {
     });
 
     ws.on('close', () => {
+      unsubscribe();
       room.delete(ws);
       if (room.size === 0) {
         rooms.delete(roomId);

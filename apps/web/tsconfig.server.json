@@ -12,6 +12,6 @@
     "sourceMap": true,
     "target": "ES2022"
   },
-  "include": ["server.ts", "next-env.d.ts"],
+  "include": ["server.ts", "lib/realtime/redis-pubsub.ts", "next-env.d.ts"],
   "exclude": ["node_modules", ".next", "dist"]
 }

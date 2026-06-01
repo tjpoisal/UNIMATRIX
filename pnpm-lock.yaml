@@ -187,6 +187,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.3(@types/react@19.1.17)
+      '@unimatrix/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@upstash/ratelimit':
         specifier: ^2.0.3
         version: 2.0.8(@upstash/redis@1.38.0)
@@ -308,6 +311,19 @@ importers:
         specifier: ^5.9.2
         version: 5.9.3
 
+  packages/db:
+    dependencies:
+      '@prisma/client':
+        specifier: ^6.19.3
+        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+    devDependencies:
+      prisma:
+        specifier: ^6.19.3
+        version: 6.19.3(typescript@5.9.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+
   packages/llm:
     dependencies:
       '@anthropic-ai/sdk':
@@ -372,6 +388,9 @@ importers:
       '@types/pg':
         specifier: ^8.11.0
         version: 8.20.0
+      '@unimatrix/db':
+        specifier: workspace:*
+        version: link:../db
       fastify:
         specifier: ^5.0.0
         version: 5.8.5
