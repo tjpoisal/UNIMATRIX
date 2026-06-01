@@ -172,7 +172,7 @@ FROM pg_tables;
 const API_URL = 'https://api.appsync.amazonaws.com/graphql';
 
 // NEW
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://unimatrix.vercel.app/api';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://unimatrix-flax.vercel.app/api';
 ```
 
 2. **Sync payload format**:

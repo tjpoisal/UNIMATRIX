@@ -83,7 +83,7 @@ git push
 3. Select `apps/web` as the root directory
 4. Add environment variables:
    - `DATABASE_URL` (from Neon)
-   - `NEXTAUTH_URL` (your Vercel domain, e.g., `https://unimatrix.vercel.app`)
+   - `NEXTAUTH_URL` (your Vercel domain, e.g., `https://unimatrix-flax.vercel.app`)
    - `NEXTAUTH_SECRET` (same as local)
 
 ### Step 3: Deploy

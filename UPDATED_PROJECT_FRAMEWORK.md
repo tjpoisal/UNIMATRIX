@@ -85,7 +85,7 @@ pnpm install
     CREATE TABLE IF NOT EXISTS mcp_tokens (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-      token TEXT,  -- legacy; set NULL for new rows (post-fix)
+      token TEXT,  -- legacy column (bcrypt hashes live in hashed_token; leave NULL for new rows)
       hashed_token TEXT NOT NULL,
       scope TEXT NOT NULL,
       expires_at TIMESTAMPTZ,
