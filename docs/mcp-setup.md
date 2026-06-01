@@ -4,7 +4,7 @@ Connect your AI tools to Unimatrix so they can read and write persistent memory 
 
 ## What You Need
 
-1. A Unimatrix account — [register free at unimatrix.vercel.app/auth/register](https://unimatrix.vercel.app/auth/register)
+1. A Unimatrix account — [register free at unimatrix-flax.vercel.app/auth/register](https://unimatrix-flax.vercel.app/auth/register)
 2. An API key — generate one at **Settings → API Keys** after signing in
 3. An MCP-compatible LLM client (Claude Desktop, Cursor, Continue.dev, etc.)
 
@@ -22,7 +22,7 @@ Connect your AI tools to Unimatrix so they can read and write persistent memory 
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix.vercel.app/api/mcp",
+      "url": "https://unimatrix-flax.vercel.app/api/mcp",
       "apiKey": "YOUR_UNIMATRIX_API_KEY"
     }
   }
@@ -58,7 +58,7 @@ Open your Cursor settings and add Unimatrix as an MCP server:
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix.vercel.app/api/mcp",
+      "url": "https://unimatrix-flax.vercel.app/api/mcp",
       "apiKey": "YOUR_UNIMATRIX_API_KEY"
     }
   }
@@ -70,7 +70,7 @@ Open your Cursor settings and add Unimatrix as an MCP server:
 1. Open Cursor → Settings → MCP
 2. Click "Add MCP Server"
 3. Name: `unimatrix`
-4. URL: `https://unimatrix.vercel.app/api/mcp`
+4. URL: `https://unimatrix-flax.vercel.app/api/mcp`
 5. API Key: your Unimatrix API key
 
 **Verify:** Open any file and ask Cursor's AI: `"What were we working on last session?"` — Cursor will call `get_recent()` to pull context.
@@ -81,7 +81,7 @@ Open your Cursor settings and add Unimatrix as an MCP server:
 
 Any client that supports the [Model Context Protocol](https://modelcontextprotocol.io) can connect to Unimatrix.
 
-**MCP Server URL:** `https://unimatrix.vercel.app/api/mcp`
+**MCP Server URL:** `https://unimatrix-flax.vercel.app/api/mcp`
 
 **Authentication:** Pass your API key in the `Authorization` header:
 ```
@@ -168,7 +168,7 @@ docker compose up -d
 
 ### Point Your LLM Client at Your Server
 
-Replace `https://unimatrix.vercel.app/api/mcp` with your server's URL:
+Replace `https://unimatrix-flax.vercel.app/api/mcp` with your server's URL:
 
 ```json
 {
@@ -220,7 +220,7 @@ Your API key is not being passed correctly. Ensure:
 
 1. Check that `claude_desktop_config.json` is valid JSON (no trailing commas)
 2. Fully quit and relaunch Claude Desktop (not just close the window)
-3. Confirm the MCP server URL is reachable: `curl https://unimatrix.vercel.app/health`
+3. Confirm the MCP server URL is reachable: `curl https://unimatrix-flax.vercel.app/health`
 
 ### Memories not persisting across sessions
 
@@ -265,7 +265,7 @@ For LLMs that do not support MCP (e.g., ChatGPT Actions, Gemini function calling
 
 **Authentication:** `Authorization: Bearer YOUR_API_KEY`
 
-**OpenAPI spec:** `https://unimatrix.vercel.app/api/openapi.json`
+**OpenAPI spec:** `https://unimatrix-flax.vercel.app/api/openapi.json`
 
 ---
 

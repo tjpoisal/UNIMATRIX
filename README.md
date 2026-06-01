@@ -106,7 +106,7 @@ Next.js 16 dashboard for managing memory palaces.
 ### Install
 
 ```bash
-git clone https://github.com/tjpoisal/unimatrix.git
+git clone https://github.com/tjpoisal/UNIMATRIX.git
 cd unimatrix
 pnpm install
 ```

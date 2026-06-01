@@ -24,7 +24,7 @@ a serverless function via `api/index.ts`; all routes are rewritten to it via
 1. `vercel login` then `vercel link` in repo root
 2. Set env vars in Vercel Dashboard → Settings → Environment Variables (see below)
 3. `vercel --prod` from repo root
-4. Copy the deployment URL (e.g. `https://unimatrix.vercel.app`)
+4. Copy the deployment URL (e.g. `https://unimatrix-flax.vercel.app`)
 5. Add it to the portal's `NEXT_PUBLIC_MCP_URL` and Clerk webhook endpoint
 
 ### Required environment variables

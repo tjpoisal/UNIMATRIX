@@ -31,7 +31,7 @@ unimatrix/
 - **Auth:** NextAuth v5 — credentials + Google + GitHub, JWT sessions, bcryptjs
 - **Payments:** Stripe — Free / Pro $9.99/mo / Enterprise $29.99/mo
 - **Email:** Resend API
-- **MCP endpoint (cloud):** `https://unimatrix.vercel.app/api/mcp`
+- **MCP endpoint (cloud):** `https://unimatrix-flax.vercel.app/api/mcp`
 
 **Data model:**
 - `Palace` = workspace / project (e.g. "Work Research", "Personal")
@@ -84,7 +84,7 @@ Generate a ready-to-paste JSON block of OpenAI function/tool definitions that an
   "parameters": { "content": "string", "context": "string?" }
 }
 ```
-Host these definitions at a static URL: `https://unimatrix.vercel.app/api/tools.json`
+Host these definitions at a static URL: `https://unimatrix-flax.vercel.app/api/tools.json`
 
 **D. SDK / npm package (`@unimatrix/sdk`)**
 - `npm install @unimatrix/sdk`
@@ -102,7 +102,7 @@ Cursor natively supports MCP servers. Document and test the config:
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix.vercel.app/api/mcp",
+      "url": "https://unimatrix-flax.vercel.app/api/mcp",
       "apiKey": "USER_API_KEY"
     }
   }
@@ -124,7 +124,7 @@ Warp AI supports MCP servers natively. Provide config and setup guide at `/docs/
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix.vercel.app/api/mcp",
+      "url": "https://unimatrix-flax.vercel.app/api/mcp",
       "apiKey": "USER_API_KEY"
     }
   }
@@ -271,7 +271,7 @@ When any LLM writes a memory to Unimatrix, all other connected clients (web dash
 https://github.com/tjpoisal/UNIMATRIX
 
 ## Live Cloud
-https://unimatrix.vercel.app
+https://unimatrix-flax.vercel.app
 
 ## Marketing Site
 https://deployunimatrix.com

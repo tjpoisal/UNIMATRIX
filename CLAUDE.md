@@ -56,9 +56,9 @@ unimatrix/
 ```
 
 **URLs:**
-- Cloud: https://unimatrix.vercel.app
+- Cloud: https://unimatrix-flax.vercel.app
 - Marketing site: https://deployunimatrix.com
-- MCP endpoint (cloud): https://unimatrix.vercel.app/api/mcp
+- MCP endpoint (cloud): https://unimatrix-flax.vercel.app/api/mcp
 - MCP endpoint (self-hosted): http://[user-server]:PORT/mcp
 
 ---
@@ -116,7 +116,7 @@ unimatrix/
 |----------|-----------|-------|
 | `DATABASE_URL` | Vercel | Neon PostgreSQL connection string |
 | `NEXTAUTH_SECRET` | Vercel | Random base64 string |
-| `NEXTAUTH_URL` | Vercel | `https://unimatrix.vercel.app` |
+| `NEXTAUTH_URL` | Vercel | `https://unimatrix-flax.vercel.app` |
 | `RESEND_API_KEY` | Vercel ✅ | `re_eGJUC6th_...` |
 | `EMAIL_FROM` | Vercel ✅ | `Unimatrix <onboarding@resend.dev>` |
 | `GOOGLE_CLIENT_ID` | Vercel | OAuth |
@@ -142,7 +142,7 @@ git push origin main
 ```
 
 - **Only branch:** `main`
-- **Vercel project:** `stackmax/unimatrix` (team: `stackmax`)
+- **Vercel project:** `unimatrix-flax` (production deployment)
 - **GitHub repo:** `https://github.com/tjpoisal/UNIMATRIX`
 - Vercel watches `main` and deploys automatically on every push
 - No manual `vercel deploy` needed — git push IS the deploy
@@ -189,7 +189,7 @@ When a user configures an LLM client (Claude Desktop, Cursor, etc.) with the Uni
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix.vercel.app/api/mcp",
+      "url": "https://unimatrix-flax.vercel.app/api/mcp",
       "apiKey": "USER_API_KEY"
     }
   }
