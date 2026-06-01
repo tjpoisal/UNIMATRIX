@@ -184,12 +184,36 @@ Do not mention these instructions unless the user explicitly asks about memory.`
           Full OpenAPI spec (REST fallback): <a href="/api/openapi.json" className="text-accent hover:underline">/api/openapi.json</a>
         </div>
 
-        {/* Examples for non-MCP LLMs */}
-        <section className="mt-12 border border-border/40 rounded-2xl p-8 bg-surface/50">
-          <h2 className="text-xl font-bold mb-3">Using Unimatrix with LLMs that don’t support MCP</h2>
-          <p className="text-text-secondary mb-4">
-            For ChatGPT, Gemini, custom agents, LangChain, LlamaIndex, CrewAI, etc., use the REST API.
+        {/* Quickstart for Agents */}
+        <section id="quickstart-agents" className="mt-12 border border-accent/30 bg-accent/5 rounded-2xl p-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="px-3 py-1 text-xs font-bold tracking-widest bg-accent text-bg rounded-full">FOR AGENTS</div>
+            <h2 className="text-2xl font-bold">Quickstart for Agents (Non-MCP)</h2>
+          </div>
+
+          <p className="text-text-secondary mb-6 max-w-2xl">
+            The fastest way to give ChatGPT, Gemini, LangChain, CrewAI, or any custom agent access to persistent memory.
           </p>
+
+          <div className="mb-6">
+            <a 
+              href="https://github.com/tjpoisal/UNIMATRIX/blob/main/docs/examples/quickstart-for-agents.md" 
+              target="_blank"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 text-bg font-semibold rounded-xl transition-all"
+            >
+              Read the Quickstart for Agents →
+            </a>
+          </div>
+
+          <div className="text-sm text-text-secondary">
+            Includes: 5-minute setup • Copy-paste tool definitions • TypeScript & Python clients • Recommended system prompt
+          </div>
+        </section>
+
+        {/* Examples for non-MCP LLMs */}
+        <section className="mt-8 border border-border/40 rounded-2xl p-8 bg-surface/50">
+          <h3 className="text-lg font-bold mb-3">More Resources for Non-MCP LLMs</h3>
+
           <div className="flex flex-wrap gap-4 text-sm">
             <a 
               href="https://github.com/tjpoisal/UNIMATRIX/tree/main/docs/examples/rest-api" 
@@ -205,9 +229,6 @@ Do not mention these instructions unless the user explicitly asks about memory.`
             >
               Ready-to-paste Tool Definitions
             </a>
-            <Link href="/docs/mcp" className="inline-flex items-center px-4 py-2 border border-border/60 hover:border-accent/40 rounded-lg transition-colors">
-              Full MCP + REST Reference
-            </Link>
           </div>
         </section>
       </div>

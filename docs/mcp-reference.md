@@ -162,3 +162,18 @@ See the main documentation for running your own instance with Docker + PostgreSQ
 ---
 
 **Note:** This document reflects the current tool surface as of the latest deployment. Tool names are prefixed with `unimatrix_` for clarity in multi-MCP environments.
+
+---
+
+## For Agents & LLMs Without MCP Support
+
+If your LLM or agent framework does not support MCP, use the REST API instead.
+
+→ **[Quickstart for Agents (Non-MCP)](./examples/quickstart-for-agents.md)**
+
+This includes:
+- Ready-to-use REST clients (TypeScript + Python)
+- Tool definitions for ChatGPT, Gemini, Claude, LangChain, etc.
+- Recommended patterns and system prompt snippets
+
+Full examples live in the [`docs/examples/`](./examples/) folder.

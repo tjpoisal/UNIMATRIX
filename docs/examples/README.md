@@ -2,27 +2,28 @@
 
 This folder contains practical examples for using Unimatrix with LLMs and agents that do **not** support the Model Context Protocol (MCP).
 
+## Recommended Starting Point
+
+→ **[Quickstart for Agents (Non-MCP)](./quickstart-for-agents.md)**
+
+This is the fastest way to get started with ChatGPT, Gemini, LangChain, custom agents, etc.
+
 ## Folder Structure
 
-- `rest-api/` — Simple client libraries for direct REST access
+- `quickstart-for-agents.md` — **Start here** — concise guide with copy-paste examples
+- `rest-api/` — Simple client libraries
   - `typescript.ts`
   - `python.py`
-- `llm-tools/` — Ready-to-paste tool definitions for popular LLMs
+- `llm-tools/` — Ready-to-paste tool definitions
   - `non-mcp-tool-definitions.md`
-
-## Quick Start
-
-1. Get an API key from the Unimatrix dashboard.
-2. Use one of the clients in `rest-api/`, or copy tool definitions from `llm-tools/`.
-3. For full documentation, see the [MCP Reference](../mcp-reference.md) and the live docs at https://deployunimatrix.com/docs/mcp.
 
 ## When to Use This
 
-Use the REST API when your LLM or framework does not support MCP natively:
+Use these resources when your LLM or framework does not support MCP natively:
 
 - ChatGPT (Custom GPTs / Actions)
 - Gemini
-- Most custom agents and scripts
-- LangChain, LlamaIndex, CrewAI, AutoGen, etc. (unless using an MCP adapter)
+- Grok, Claude via API
+- LangChain, LlamaIndex, CrewAI, AutoGen, etc.
 
-For Claude Desktop, Cursor, Windsurf, etc., use the MCP connection instead (much better experience).
+For Claude Desktop, Cursor, Windsurf, Zed, and other native MCP clients, use the [MCP connection](../mcp-setup.md) instead.
