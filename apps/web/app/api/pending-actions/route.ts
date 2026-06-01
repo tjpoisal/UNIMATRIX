@@ -9,7 +9,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthContext } from '@/lib/api-auth';
-import { getPendingActions } from '@/lib/telemetry/agent-usage';
+import { getPendingActions, expireOldPendingActions } from '@/lib/telemetry/agent-usage';
 
 export async function GET(req: NextRequest) {
   const auth = await getAuthContext(req);
@@ -26,6 +26,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // Auto-expire old pending actions on every read (no frequent cron needed)
+    await expireOldPendingActions();
+
     const actions = await getPendingActions(roomId, status);
     return NextResponse.json({ actions });
   } catch (error) {
