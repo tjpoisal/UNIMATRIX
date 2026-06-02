@@ -59,6 +59,7 @@ app.prepare().then(() => {
     }
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   wss.on('connection', (ws: WebSocket, _request: any, roomId: string) => {
     console.log(`[WS] Client connected → room: ${roomId}`);
     // SECURITY NOTE (self-hosted / Railway / Fly):

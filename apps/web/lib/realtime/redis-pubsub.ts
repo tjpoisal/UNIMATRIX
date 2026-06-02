@@ -99,6 +99,7 @@ export function subscribeToRoom(roomId: string, handler: MessageHandler): () => 
 /**
  * Notify local subscribers (used internally when receiving from Redis).
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function notifyLocalSubscribers(roomId: string, message: any) {
   const channel = `collab:${roomId}`;
   const handlers = subscribers.get(channel);

@@ -177,6 +177,7 @@ export async function createPendingAction(params: {
       roomId: params.roomId,
       agent_name: params.agentName,
       tool_name: params.toolName,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       args: params.args as any,
       requested_by: params.requestedBy,
       status: 'pending',
@@ -236,6 +237,7 @@ export async function expireOldPendingActions() {
 export async function logToolExecutionTelemetry(
   toolName: string,
   agentName: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result: any,
   args: Record<string, unknown>,
   provider?: string,

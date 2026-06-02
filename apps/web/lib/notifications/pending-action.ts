@@ -7,7 +7,8 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
 let Resend: any;
 try {
-  // @ts-ignore - optional dependency not present in all envs/CI
+  // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
+  // @ts-ignore - optional dependency not present in all envs/CI; expect-error would be unused in tsc
   Resend = require('resend').Resend;
 } catch {}
 
