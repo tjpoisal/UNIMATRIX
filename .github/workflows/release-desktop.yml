@@ -15,9 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
         working-directory: apps/desktop
@@ -64,9 +68,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
         working-directory: apps/desktop
@@ -97,9 +105,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
         working-directory: apps/desktop
