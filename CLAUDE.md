@@ -145,6 +145,7 @@ git push origin main
   - Best stack: Fly.io (persistent) + Neon (pgvector DB) + Ably (realtime collab - prefer over raw WS) + Upstash (Redis/QStash) + Voyage (embeddings).
 - Render alternative: `render.yaml` + `RENDER.md` (when billing resolved). Uses @unimatrix/db + @unimatrix/server, robust migrate, Docker or native.
 - Dockerfiles + docker-compose.yml for local parity / self-host / any platform.
+- **Accounts + Secrets**: See `ACCOUNTS_AND_SECRETS.md` (complete list of what to sign up for + every secret from your .env list, mapped to best services).
 - vercel.json is legacy only. No more Vercel analytics or hard-coded vercel.app URLs in prod paths.
 - Custom server binds to 0.0.0.0:PORT; start:prod = node dist/server.js after build:server.
 - Monorepo: always `pnpm --filter @unimatrix/db build` before web/server in CI/deploys. Use path or @scope filters.

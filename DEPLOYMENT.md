@@ -18,6 +18,8 @@ The autonomous migration agent + our work has prepared everything portable for t
 
 Render files kept as alt if billing fixed. Railway/VPS also viable but Fly is best balance for perf/cost/simplicity here.
 
+**Complete list of accounts to create + every secret you need** (mapped to your provided .env list + best services): See the new `ACCOUNTS_AND_SECRETS.md`. This is the single source of truth — create these accounts, get the keys, then `fly secrets set` them.
+
 ## Why We Moved Away From Vercel (and why it's hard to go back)
 
 Vercel was the original home, and parts of the app still work there:
