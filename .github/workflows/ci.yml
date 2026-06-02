@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    name: Typecheck, Lint & Build
+  typecheck-build:
+    name: Typecheck & Build
     runs-on: ubuntu-latest
 
     steps:
@@ -44,10 +44,6 @@ jobs:
           NEXTAUTH_SECRET: ci-secret-32-chars-minimum-length-x
           NEXTAUTH_URL: http://localhost:3000
 
-      - name: Lint
-        run: cd apps/web && pnpm lint
-        continue-on-error: true
-
       - name: Build
         working-directory: apps/web
         run: pnpm build
@@ -60,3 +56,27 @@ jobs:
           STRIPE_SECRET_KEY: sk_test_placeholder
           STRIPE_WEBHOOK_SECRET: whsec_placeholder
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+
+  lint:
+    name: Lint (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: cd apps/web && pnpm lint
