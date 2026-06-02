@@ -8,7 +8,9 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://localhost:3000/api"
+        "EXPO_PUBLIC_API_URL": "http://localhost:3000/api",
+        "EXPO_NO_TELEMETRY": "1",
+        "EAS_BUILD_NO_EXPO_GO_WARNING": "true"
       }
     },
     "preview": {
@@ -17,7 +19,9 @@
         "simulator": true
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://unimatrix-web.fly.dev/api"
+        "EXPO_PUBLIC_API_URL": "https://unimatrix-web.fly.dev/api",
+        "EXPO_NO_TELEMETRY": "1",
+        "EAS_BUILD_NO_EXPO_GO_WARNING": "true"
       }
     },
     "production": {
@@ -31,7 +35,9 @@
         "credentialsSource": "remote"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://unimatrix-web.fly.dev/api"
+        "EXPO_PUBLIC_API_URL": "https://unimatrix-web.fly.dev/api",
+        "EXPO_NO_TELEMETRY": "1",
+        "EAS_BUILD_NO_EXPO_GO_WARNING": "true"
       }
     }
   },
