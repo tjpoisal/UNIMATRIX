@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch --env-file=.env src/index.ts",
+    "postinstall": "PRISMA_HIDE_UPDATE_MESSAGE=true prisma generate",
     "build": "prisma generate && tsc && echo 'Build complete (includes worker.ts)'",
     "db:generate": "prisma generate",
     "db:migrate:deploy": "prisma migrate deploy",

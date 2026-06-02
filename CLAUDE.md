@@ -248,7 +248,15 @@ Enterprise = self-hosted Docker option + priority support + team sharing.
 
 ## Notes & Gotchas
 
-1. **No CLAUDE.md existed before** — this is the first one. Check it every session.
+1. **Prisma usage**: We use the *free* open-source Prisma Client + CLI everywhere (web + packages/db as source of truth for the rich schema). 
+   - Server code is being migrated from raw `pg` queries to Prisma models (see `withUserContextPrisma` in packages/server/src/db/client.ts and usage in storeMemory.ts).
+   - **You do NOT need a Prisma account or to "sign up" for anything.** 
+     Any signup prompts/tips you saw were marketing for optional paid add-ons (Accelerate for serverless pooling, hosted DB, etc.). Ignore them. 
+     We use direct `postgresql://` from Neon. See .env.example for full explanation and suppression.
+   - Run `npx prisma telemetry --status off` once if you want to disable telemetry.
+   - postinstall scripts set `PRISMA_HIDE_UPDATE_MESSAGE=true` to reduce noise.
+
+2. **No CLAUDE.md existed before** — this is the first one. Check it every session.
 2. **Vercel `framework` shows "fastify"** in the API but builds as Next.js — this is a stale API field, ignore it.
 3. **`EMAIL_FROM` must use `onboarding@resend.dev`** until a custom domain is verified on Resend.
 4. **Mobile API URL** is set via `EXPO_PUBLIC_API_URL` env var (defaults to `http://localhost:3000/api`).
