@@ -22,8 +22,9 @@ export async function GET(req: NextRequest) {
   let ctx: Awaited<ReturnType<typeof requireAuthContext>>;
   try {
     ctx = await requireAuthContext(req);
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Unauthorized' }, { status: e?.status ?? 401 });
+  } catch (e: unknown) {
+    const err = e as { message?: string; status?: number };
+    return NextResponse.json({ error: err?.message || 'Unauthorized' }, { status: err?.status ?? 401 });
   }
 
   const { searchParams } = req.nextUrl;
@@ -32,8 +33,9 @@ export async function GET(req: NextRequest) {
   try {
     const rooms = await listRooms({ limit }, ctx.organizationId);
     return NextResponse.json({ rooms });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: e.status ?? 500 });
+  } catch (e: unknown) {
+    const err = e as { message?: string; status?: number };
+    return NextResponse.json({ error: err?.message || 'Error' }, { status: err?.status ?? 500 });
   }
 }
 
@@ -41,8 +43,9 @@ export async function POST(req: NextRequest) {
   let ctx: Awaited<ReturnType<typeof requireAuthContext>>;
   try {
     ctx = await requireAuthContext(req);
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Unauthorized' }, { status: e?.status ?? 401 });
+  } catch (e: unknown) {
+    const err = e as { message?: string; status?: number };
+    return NextResponse.json({ error: err?.message || 'Unauthorized' }, { status: err?.status ?? 401 });
   }
 
   // Light rate limit on room creation per org/key
@@ -66,10 +69,11 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(result, { status: 201 });
-  } catch (e: any) {
+  } catch (e: unknown) {
     if (e instanceof z.ZodError) {
       return NextResponse.json({ error: e.flatten() }, { status: 400 });
     }
-    return NextResponse.json({ error: e.message }, { status: e.status ?? 500 });
+    const err = e as { message?: string; status?: number };
+    return NextResponse.json({ error: err?.message || 'Error' }, { status: err?.status ?? 500 });
   }
 }

@@ -25,9 +25,10 @@ export async function GET(
   let ctx: Awaited<ReturnType<typeof requireAuthContext>>;
   try {
     ctx = await requireAuthContext(req);
-  } catch (e: any) {
-    const status = e?.status ?? 401;
-    return NextResponse.json({ error: e?.message || 'Unauthorized' }, { status });
+  } catch (e: unknown) {
+    const err = e as { message?: string; status?: number };
+    const status = err?.status ?? 401;
+    return NextResponse.json({ error: err?.message || 'Unauthorized' }, { status });
   }
 
   const { searchParams } = req.nextUrl;
@@ -40,8 +41,9 @@ export async function GET(
       ctx.organizationId
     );
     return NextResponse.json({ messages });
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: e.status ?? 500 });
+  } catch (e: unknown) {
+    const err = e as { message?: string; status?: number };
+    return NextResponse.json({ error: err?.message || 'Error' }, { status: err?.status ?? 500 });
   }
 }
 
@@ -53,9 +55,10 @@ export async function POST(
   let ctx: Awaited<ReturnType<typeof requireAuthContext>>;
   try {
     ctx = await requireAuthContext(req);
-  } catch (e: any) {
-    const status = e?.status ?? 401;
-    return NextResponse.json({ error: e?.message || 'Unauthorized' }, { status });
+  } catch (e: unknown) {
+    const err = e as { message?: string; status?: number };
+    const status = err?.status ?? 401;
+    return NextResponse.json({ error: err?.message || 'Unauthorized' }, { status });
   }
 
   // Per-room burst protection (in addition to per-key limits)
@@ -84,10 +87,11 @@ export async function POST(
     );
 
     return NextResponse.json(result, { status: 201 });
-  } catch (e: any) {
+  } catch (e: unknown) {
     if (e instanceof z.ZodError) {
       return NextResponse.json({ error: e.flatten() }, { status: 400 });
     }
-    return NextResponse.json({ error: e.message }, { status: e.status ?? 500 });
+    const err = e as { message?: string; status?: number };
+    return NextResponse.json({ error: err?.message || 'Error' }, { status: err?.status ?? 500 });
   }
 }

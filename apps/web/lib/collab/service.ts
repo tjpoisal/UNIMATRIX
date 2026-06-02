@@ -24,7 +24,6 @@ import {
 import { generateWebhookSecret, signWebhookPayload } from '@/lib/webhooks/signer';
 import { rateLimiters } from '@/lib/rate-limit';
 import { publishToRoom } from '@/lib/realtime/ably'; // Preferred managed realtime (see architecture review)
-import { z } from 'zod';
 
 // ============================================================================
 // ERRORS
