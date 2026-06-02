@@ -161,9 +161,8 @@ export async function POST(
 
     return NextResponse.json(successResponse, { status: 200 });
   } catch (error) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const toolNameForError =
-      (req as any)._parsedBody?.toolName ?? "unknown";
+      ((req as unknown) as { _parsedBody?: { toolName?: string } })._parsedBody?.toolName ?? "unknown";
 
     console.error(`[/api/tools/call] Tool execution failed (${toolNameForError}):`, error);
 
