@@ -3,18 +3,8 @@
  * Supports Resend (email) and Slack webhooks.
  */
 
-// Resend is optional — project already depends on it in some environments
-// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
-let Resend: any;
-try {
-  // eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
-  // @ts-ignore - optional dependency not present in all envs/CI; expect-error would be unused in tsc
-  Resend = require('resend').Resend;
-} catch {}
-
-const resend = (process.env.RESEND_API_KEY && Resend)
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+// Resend client loaded dynamically only if API key present (avoids require + optional dep issues in CI/lint/typecheck)
+let resend: any = null;
 
 interface PendingActionNotification {
   id: string;
@@ -47,10 +37,12 @@ export async function notifyPendingActionCreated(action: PendingActionNotificati
     </div>
   `;
 
-  // Email via Resend (if configured)
-  if (resend && process.env.EMAIL_FROM) {
+  // Email via Resend (if configured) - dynamic import to avoid static require/any in lint/typecheck
+  if (process.env.RESEND_API_KEY && process.env.EMAIL_FROM) {
     try {
-      await resend.emails.send({
+      const { Resend } = await import('resend');
+      const client = new Resend(process.env.RESEND_API_KEY);
+      await client.emails.send({
         from: process.env.EMAIL_FROM,
         to: process.env.HITL_NOTIFICATION_EMAIL || 'alerts@deployunimatrix.com',
         subject,
