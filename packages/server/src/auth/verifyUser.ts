@@ -16,7 +16,7 @@
 
 import { verifyToken } from '@clerk/backend';
 import { pool } from '../db/client.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 // ---------------------------------------------------------------------------
 // Clerk config

@@ -15,7 +15,7 @@
  * Verbatim is only decrypted by get_timeline when explicitly requested.
  */
 
-import { withUserContext }                        from '../db/client.js';
+import { withUserContext, pool }                        from '../db/client.js';
 import { withAudit }                              from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';
@@ -91,7 +91,8 @@ export const storeMemoryHandler = withAudit(
     });
 
     // ------------------------------------------------------------------
-    // 5. Queue Librarian — fire-and-forget, does not block the response
+    // 5. Enqueue Librarian via AgentRun (real background processing)
+    //    The worker (packages/server/src/worker.ts) will pick this up.
     // ------------------------------------------------------------------
     const librarianJob: LibrarianJob = {
       memoryId,
@@ -101,10 +102,19 @@ export const storeMemoryHandler = withAudit(
       createdAt: new Date(),
     };
 
-    // intentionally not awaited — Librarian runs async
-    processLibrarianJob(librarianJob).catch((err) => {
-      console.error(`[Librarian] Failed to process ${memoryId}:`, err);
-    });
+    try {
+      await pool.query(
+        `INSERT INTO agent_runs (id, user_id, task, status, result, memory_ids, created_at, updated_at)
+         VALUES (gen_random_uuid(), $1, 'librarian', 'pending', $2, $3, NOW(), NOW())`,
+        [userId, JSON.stringify({ job: librarianJob }), [memoryId]]
+      );
+    } catch (e) {
+      // Fallback to direct if table not ready or error
+      console.warn('[StoreMemory] Could not enqueue via AgentRun, falling back to direct', e);
+      processLibrarianJob(librarianJob).catch((err) => {
+        console.error(`[Librarian] Failed to process ${memoryId}:`, err);
+      });
+    }
 
     return {
       memoryId,

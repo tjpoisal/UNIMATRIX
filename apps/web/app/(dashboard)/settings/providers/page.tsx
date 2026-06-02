@@ -185,6 +185,9 @@ export default function ProvidersPage() {
           <p className="text-[#94A3B8] text-sm">
             Connect your AI accounts. Keys are encrypted and stored securely — never shared.
           </p>
+          <p className="mt-2 text-xs">
+            <a href="/settings/mcp-tokens" className="text-[#00F5FF] hover:underline font-medium">Manage MCP Tokens →</a> <span className="text-[#64748B]">(for Claude Desktop, Cursor and other MCP clients)</span>
+          </p>
         </div>
 
         {/* Success banner */}

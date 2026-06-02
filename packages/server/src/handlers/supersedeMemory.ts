@@ -27,7 +27,7 @@
  *   - Audit logging via withAudit wrapper
  */
 
-import { withUserContext }                        from '../db/client.js';
+import { withUserContext, pool }                        from '../db/client.js';
 import { withAudit }                              from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';
@@ -129,7 +129,7 @@ export const supersedeMemoryHandler = withAudit(
         return res.rows[0].id;
       });
 
-      // Queue Librarian — fire-and-forget
+      // Enqueue via AgentRun for the worker (preferred)
       const job: LibrarianJob = {
         memoryId:  replacementId,
         userId,
@@ -137,9 +137,19 @@ export const supersedeMemoryHandler = withAudit(
         hint:      input.hint ?? null,
         createdAt: new Date(),
       };
-      processLibrarianJob(job).catch((err) =>
-        console.error(`[Librarian] Failed to process replacement ${replacementId}:`, err),
-      );
+
+      try {
+        await pool.query(
+          `INSERT INTO agent_runs (id, user_id, task, status, result, memory_ids, created_at, updated_at)
+           VALUES (gen_random_uuid(), $1, 'librarian', 'pending', $2, $3, NOW(), NOW())`,
+          [userId, JSON.stringify({ job }), [replacementId]]
+        );
+      } catch (e) {
+        console.warn('[Supersede] AgentRun enqueue failed, fallback direct', e);
+        processLibrarianJob(job).catch((err) =>
+          console.error(`[Librarian] Failed to process replacement ${replacementId}:`, err),
+        );
+      }
     }
 
     // ------------------------------------------------------------------

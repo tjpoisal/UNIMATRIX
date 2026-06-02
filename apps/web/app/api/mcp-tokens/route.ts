@@ -59,3 +59,21 @@ export async function GET(req: NextRequest) {
   const tokens = await listMcpTokensForUser(userId);
   return NextResponse.json({ tokens });
 }
+
+// DELETE /api/mcp-tokens?id=xxx  or support body, simple revoke
+export async function DELETE(req: NextRequest) {
+  const userId = await getUserIdFromRequest(req);
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+  }
+
+  await revokeMcpToken(id, userId);
+  return new NextResponse(null, { status: 204 });
+}

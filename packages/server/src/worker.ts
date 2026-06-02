@@ -6,9 +6,10 @@
  * main MCP request path.
  *
  * Current implementation:
- * - Polls for unindexed memories (indexedAt IS NULL)
- * - For production writes, prefer enqueuing at write time (see updated handlers)
- * - Can be run as a dedicated Render Worker or as a sidecar.
+ * - Polls AgentRun rows with task='librarian' + status='pending' (enqueued by store_memory / supersede_memory)
+ * - Executes the real Librarian (embeddings + summarize + tag + classifySpace)
+ * - Updates the AgentRun to completed/failed and marks memory indexedAt
+ * - Designed to be run as dedicated Render Worker (see render.yaml) or sidecar.
  *
  * To run locally:
  *   pnpm --filter server build
@@ -24,67 +25,79 @@ import { pool } from './db/client.js';
 const POLL_INTERVAL_MS = 15_000; // 15 seconds
 const BATCH_SIZE = 10;
 
-async function getPendingLibrarianJobs(): Promise<LibrarianJob[]> {
-  // Find memories that have not been indexed yet.
-  // NOTE: In the current design, the plain `content` is only available at write time.
-  // For a robust queue, we recommend storing the sanitized content alongside the job
-  // (e.g. in a dedicated queue table or in AgentRun.input for task='librarian').
-  //
-  // This poller is useful for:
-  //  - Recovering failed fire-and-forget jobs
-  //  - Backfilling old data (you can pass a reconstruction if needed)
+async function getPendingLibrarianAgentRuns(): Promise<Array<{ id: string; userId: string; job: LibrarianJob }>> {
   const { rows } = await pool.query<{
     id: string;
     user_id: string;
-    content: string; // This will be null/encrypted in real table — see note above
+    result: any;
   }>(
-    `SELECT m.id, m.user_id, '' as content
-     FROM memories m
-     WHERE m.indexed_at IS NULL
-       AND m.deleted_at IS NULL
-       AND m.status = 'active'
-     ORDER BY m.created_at ASC
+    `SELECT id, user_id, result
+     FROM agent_runs
+     WHERE task = 'librarian'
+       AND status = 'pending'
+     ORDER BY created_at ASC
      LIMIT $1`,
     [BATCH_SIZE]
   );
 
-  // In a full implementation, content would come from a job queue that captured
-  // the plain text at enqueue time.
-  return rows.map((r) => ({
-    memoryId: r.id,
-    userId: r.user_id,
-    content: r.content || '', // Will need real content for embedding
-    hint: null,
-    createdAt: new Date(),
-  }));
+  const out: Array<{ id: string; userId: string; job: LibrarianJob }> = [];
+  for (const r of rows) {
+    try {
+      const payload = typeof r.result === 'string' ? JSON.parse(r.result) : r.result;
+      if (payload?.job) {
+        out.push({
+          id: r.id,
+          userId: r.user_id,
+          job: payload.job as LibrarianJob,
+        });
+      }
+    } catch (e) {
+      console.warn('[Worker] Bad AgentRun result payload for', r.id);
+    }
+  }
+  return out;
 }
 
-async function markAsIndexed(memoryId: string) {
+async function markAgentRunCompleted(runId: string, result: any, memoryId: string) {
   await pool.query(
-    `UPDATE memories SET indexed_at = NOW() WHERE id = $1`,
-    [memoryId]
+    `UPDATE agent_runs
+     SET status = 'completed', result = $1, memory_ids = $2, updated_at = NOW()
+     WHERE id = $3`,
+    [JSON.stringify(result), [memoryId], runId]
   );
 }
 
-async function processBatch() {
-  const jobs = await getPendingLibrarianJobs();
+async function markAgentRunFailed(runId: string, errMsg: string) {
+  await pool.query(
+    `UPDATE agent_runs SET status = 'failed', error_msg = $1, updated_at = NOW() WHERE id = $2`,
+    [errMsg, runId]
+  );
+}
 
-  for (const job of jobs) {
+async function markMemoryIndexed(memoryId: string) {
+  await pool.query(`UPDATE memories SET indexed_at = NOW() WHERE id = $1`, [memoryId]);
+}
+
+async function processBatch() {
+  const pendingRuns = await getPendingLibrarianAgentRuns();
+
+  for (const run of pendingRuns) {
+    const { id: runId, job } = run;
+
     if (!job.content) {
-      console.warn(`[Worker] Skipping ${job.memoryId} — no plain content available for embedding (see docs)`);
-      // In real use, you would have captured content at enqueue time.
-      await markAsIndexed(job.memoryId); // prevent infinite loop on bad data
+      await markAgentRunFailed(runId, 'No content in job payload');
       continue;
     }
 
     try {
-      console.log(`[Worker] Processing librarian job for memory ${job.memoryId}`);
-      const result = await processLibrarianJob(job);
-      console.log(`[Worker] Completed ${job.memoryId} → space ${result.spaceId}`);
-      await markAsIndexed(job.memoryId);
-    } catch (err) {
-      console.error(`[Worker] Failed job ${job.memoryId}:`, err);
-      // Leave indexedAt null so it can be retried, or add retry count
+      console.log(`[Worker] Processing AgentRun ${runId} for memory ${job.memoryId}`);
+      const libResult = await processLibrarianJob(job);
+      await markAgentRunCompleted(runId, libResult, job.memoryId);
+      await markMemoryIndexed(job.memoryId);
+      console.log(`[Worker] AgentRun ${runId} completed → space ${libResult.spaceId}`);
+    } catch (err: any) {
+      console.error(`[Worker] AgentRun ${runId} failed:`, err);
+      await markAgentRunFailed(runId, err?.message || String(err));
     }
   }
 }

@@ -10,8 +10,7 @@
 
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
-import { prisma as webPrisma } from './prisma'; // web's current Prisma for user lookup
-// In the future we can switch to: import { prisma } from '@unimatrix/db';
+import { prisma as webPrisma } from './prisma'; // web's Prisma (now includes McpToken model via schema unification step)
 
 const BCRYPT_ROUNDS = 10;
 const TOKEN_LENGTH = 32;
@@ -48,24 +47,21 @@ export async function generateMcpTokenForUser(
     expiresAt.setDate(expiresAt.getDate() + expiresInDays);
   }
 
-  // Insert directly into the mcp_tokens table (shared DB)
-  // This works because we share the Postgres instance.
-  // Note: uses raw query because web's Prisma schema may not yet include McpToken model.
-  const result = await webPrisma.$queryRawUnsafe<{ id: string }[]>(
-    `INSERT INTO mcp_tokens (user_id, token, hashed_token, scope, expires_at, created_at)
-     VALUES ($1, NULL, $2, $3, $4, NOW())
-     RETURNING id`,
-    userId,
-    hashedToken,
-    scope,
-    expiresAt
-  );
-
-  const tokenId = result[0].id;
+  // Use typed Prisma (McpToken model was added to web schema as part of migration to @unimatrix/db)
+  const created = await webPrisma.mcpToken.create({
+    data: {
+      userId,
+      token: null, // per security best practice (only store hash)
+      hashedToken,
+      scope,
+      expiresAt,
+    },
+    select: { id: true },
+  });
 
   return {
     token: rawToken,
-    tokenId,
+    tokenId: created.id,
     expiresAt,
   };
 }
@@ -74,22 +70,26 @@ export async function generateMcpTokenForUser(
  * List active MCP tokens for a user (for the settings page).
  */
 export async function listMcpTokensForUser(userId: string) {
-  return webPrisma.$queryRawUnsafe<any[]>(
-    `SELECT id, scope, expires_at, last_used_at, created_at, revoked_at
-     FROM mcp_tokens
-     WHERE user_id = $1
-     ORDER BY created_at DESC`,
-    userId
-  );
+  return webPrisma.mcpToken.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      scope: true,
+      expiresAt: true,
+      lastUsedAt: true,
+      createdAt: true,
+      revokedAt: true,
+    },
+  });
 }
 
 /**
  * Revoke a token.
  */
 export async function revokeMcpToken(tokenId: string, userId: string) {
-  await webPrisma.$queryRawUnsafe(
-    `UPDATE mcp_tokens SET revoked_at = NOW() WHERE id = $1 AND user_id = $2`,
-    tokenId,
-    userId
-  );
+  await webPrisma.mcpToken.updateMany({
+    where: { id: tokenId, userId },
+    data: { revokedAt: new Date() },
+  });
 }
