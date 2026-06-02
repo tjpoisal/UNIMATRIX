@@ -165,14 +165,23 @@ If any other obscure var from your paste isn't listed here (e.g. SVIX), it's opt
   2. Set Authorization callback URL to your NEXTAUTH_URL + /api/auth/callback/github.
 - **Set on Fly**: On web app.
 
-### 1.9 Expo (Mobile App Builds)
-- **Sign up**: https://expo.dev (free).
-- **What you get**: `EXPO_TOKEN` (for CI/EAS builds).
-- **How**:
-  1. Account → Access Tokens → Create (read-only or full for builds).
-  2. For mobile: Set `EXPO_PUBLIC_API_URL` in mobile .env.
-- **Set on Fly**: Only if you run mobile builds in CI on Fly (usually set in your Expo/EAS dashboard or CI secrets).
-- **Also needed**: `EXPO_PUBLIC_API_URL` (your Fly web URL).
+### 1.9 Expo (Mobile App Builds) — one of the few items that remained in the delta
+- **Sign up**: https://expo.dev (free) under the same account that owns the project (tjpoisal).
+- **Existing EAS project**: We are using ID `a93ce64a-bd02-4777-a432-35f72349253d` (the one in your command).
+- **What you get**: `EXPO_TOKEN` (long-lived token for non-interactive `eas build` in CI or local scripts).
+- **How to link + build (IMPORTANT: do NOT run create-expo-app again — the app already exists at apps/mobile)**:
+  1. From monorepo root: `cd apps/mobile`
+  2. `eas login` (log in with the Expo account that owns the project)
+  3. `eas init --id a93ce64a-bd02-4777-a432-35f72349253d`   ← this links the local `apps/mobile` to the EAS project and updates config.
+  4. (I already pre-cleaned `app.json` and `eas.json` in the repo: removed duplicate keys, set the projectId, and configured `EXPO_PUBLIC_API_URL` per profile pointing at the Fly target for preview/production.)
+  5. Create token: In Expo dashboard → your account → Access Tokens (or project settings) → Create new token. Copy it.
+  6. Use it: `EXPO_TOKEN=xxx eas build --platform ios --profile production` (or android, or --profile preview).
+- **API URL**: 
+  - Local dev: `EXPO_PUBLIC_API_URL=http://YOUR_LAN_IP:3000/api pnpm --filter mobile start` (or npx expo start from apps/mobile).
+  - EAS builds: already wired in `eas.json` under each profile (production/preview → Fly URL once deployed).
+- **Set EXPO_TOKEN**: In your CI (GitHub Actions secrets), or pass on command line as shown. Not usually a Fly secret.
+
+The other remaining delta items (STRIPE_PRICE_* and the post-deploy NEXTAUTH_URL etc.) are independent of this.
 
 ### 1.10 Ably (Best Realtime for Collab Room)
 - **Why (best services)**: Managed WebSockets with presence, history, auth, fan-out. Far superior to raw WS + Redis for multi-LLM collab rooms. Scales without ops.
