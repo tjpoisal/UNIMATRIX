@@ -7,7 +7,7 @@
   "type": "module",
   "scripts": {
     "postinstall": "PRISMA_HIDE_UPDATE_MESSAGE=true prisma generate",
-    "build": "prisma generate && tsc",
+    "build": "PRISMA_HIDE_UPDATE_MESSAGE=true prisma generate && tsc",
     "db:generate": "prisma generate",
     "db:migrate:deploy": "prisma migrate deploy",
     "dev": "tsc --watch"

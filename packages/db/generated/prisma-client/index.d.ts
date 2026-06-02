@@ -4071,21 +4071,27 @@ export namespace Prisma {
   }
 
   export type MemoryAvgAggregateOutputType = {
-    importanceScore: number | null
+    confidence: number | null
   }
 
   export type MemorySumAggregateOutputType = {
-    importanceScore: number | null
+    confidence: number | null
   }
 
   export type MemoryMinAggregateOutputType = {
     id: string | null
     userId: string | null
     spaceId: string | null
+    orgId: string | null
     content: Bytes | null
+    contentIv: Bytes | null
+    summary: string | null
     status: $Enums.MemoryStatus | null
+    supersededBy: string | null
+    supersededAt: Date | null
+    confidence: number | null
     source: $Enums.MemorySource | null
-    importanceScore: number | null
+    hint: string | null
     indexedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -4096,10 +4102,16 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     spaceId: string | null
+    orgId: string | null
     content: Bytes | null
+    contentIv: Bytes | null
+    summary: string | null
     status: $Enums.MemoryStatus | null
+    supersededBy: string | null
+    supersededAt: Date | null
+    confidence: number | null
     source: $Enums.MemorySource | null
-    importanceScore: number | null
+    hint: string | null
     indexedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -4110,10 +4122,16 @@ export namespace Prisma {
     id: number
     userId: number
     spaceId: number
+    orgId: number
     content: number
+    contentIv: number
+    summary: number
     status: number
+    supersededBy: number
+    supersededAt: number
+    confidence: number
     source: number
-    importanceScore: number
+    hint: number
     indexedAt: number
     createdAt: number
     updatedAt: number
@@ -4123,21 +4141,27 @@ export namespace Prisma {
 
 
   export type MemoryAvgAggregateInputType = {
-    importanceScore?: true
+    confidence?: true
   }
 
   export type MemorySumAggregateInputType = {
-    importanceScore?: true
+    confidence?: true
   }
 
   export type MemoryMinAggregateInputType = {
     id?: true
     userId?: true
     spaceId?: true
+    orgId?: true
     content?: true
+    contentIv?: true
+    summary?: true
     status?: true
+    supersededBy?: true
+    supersededAt?: true
+    confidence?: true
     source?: true
-    importanceScore?: true
+    hint?: true
     indexedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -4148,10 +4172,16 @@ export namespace Prisma {
     id?: true
     userId?: true
     spaceId?: true
+    orgId?: true
     content?: true
+    contentIv?: true
+    summary?: true
     status?: true
+    supersededBy?: true
+    supersededAt?: true
+    confidence?: true
     source?: true
-    importanceScore?: true
+    hint?: true
     indexedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -4162,10 +4192,16 @@ export namespace Prisma {
     id?: true
     userId?: true
     spaceId?: true
+    orgId?: true
     content?: true
+    contentIv?: true
+    summary?: true
     status?: true
+    supersededBy?: true
+    supersededAt?: true
+    confidence?: true
     source?: true
-    importanceScore?: true
+    hint?: true
     indexedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -4262,11 +4298,17 @@ export namespace Prisma {
   export type MemoryGroupByOutputType = {
     id: string
     userId: string
-    spaceId: string
+    spaceId: string | null
+    orgId: string | null
     content: Bytes
+    contentIv: Bytes
+    summary: string | null
     status: $Enums.MemoryStatus
+    supersededBy: string | null
+    supersededAt: Date | null
+    confidence: number | null
     source: $Enums.MemorySource
-    importanceScore: number | null
+    hint: string | null
     indexedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -4296,16 +4338,22 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     spaceId?: boolean
+    orgId?: boolean
     content?: boolean
+    contentIv?: boolean
+    summary?: boolean
     status?: boolean
+    supersededBy?: boolean
+    supersededAt?: boolean
+    confidence?: boolean
     source?: boolean
-    importanceScore?: boolean
+    hint?: boolean
     indexedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    space?: boolean | SpaceDefaultArgs<ExtArgs>
+    space?: boolean | Memory$spaceArgs<ExtArgs>
     tags?: boolean | Memory$tagsArgs<ExtArgs>
     _count?: boolean | MemoryCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["memory"]>
@@ -4314,79 +4362,103 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     spaceId?: boolean
+    orgId?: boolean
     content?: boolean
+    contentIv?: boolean
+    summary?: boolean
     status?: boolean
+    supersededBy?: boolean
+    supersededAt?: boolean
+    confidence?: boolean
     source?: boolean
-    importanceScore?: boolean
+    hint?: boolean
     indexedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    space?: boolean | SpaceDefaultArgs<ExtArgs>
+    space?: boolean | Memory$spaceArgs<ExtArgs>
   }, ExtArgs["result"]["memory"]>
 
   export type MemorySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     spaceId?: boolean
+    orgId?: boolean
     content?: boolean
+    contentIv?: boolean
+    summary?: boolean
     status?: boolean
+    supersededBy?: boolean
+    supersededAt?: boolean
+    confidence?: boolean
     source?: boolean
-    importanceScore?: boolean
+    hint?: boolean
     indexedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
-    space?: boolean | SpaceDefaultArgs<ExtArgs>
+    space?: boolean | Memory$spaceArgs<ExtArgs>
   }, ExtArgs["result"]["memory"]>
 
   export type MemorySelectScalar = {
     id?: boolean
     userId?: boolean
     spaceId?: boolean
+    orgId?: boolean
     content?: boolean
+    contentIv?: boolean
+    summary?: boolean
     status?: boolean
+    supersededBy?: boolean
+    supersededAt?: boolean
+    confidence?: boolean
     source?: boolean
-    importanceScore?: boolean
+    hint?: boolean
     indexedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
   }
 
-  export type MemoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "spaceId" | "content" | "status" | "source" | "importanceScore" | "indexedAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["memory"]>
+  export type MemoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "spaceId" | "orgId" | "content" | "contentIv" | "summary" | "status" | "supersededBy" | "supersededAt" | "confidence" | "source" | "hint" | "indexedAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["memory"]>
   export type MemoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    space?: boolean | SpaceDefaultArgs<ExtArgs>
+    space?: boolean | Memory$spaceArgs<ExtArgs>
     tags?: boolean | Memory$tagsArgs<ExtArgs>
     _count?: boolean | MemoryCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type MemoryIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    space?: boolean | SpaceDefaultArgs<ExtArgs>
+    space?: boolean | Memory$spaceArgs<ExtArgs>
   }
   export type MemoryIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
-    space?: boolean | SpaceDefaultArgs<ExtArgs>
+    space?: boolean | Memory$spaceArgs<ExtArgs>
   }
 
   export type $MemoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Memory"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
-      space: Prisma.$SpacePayload<ExtArgs>
+      space: Prisma.$SpacePayload<ExtArgs> | null
       tags: Prisma.$MemoryTagPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
-      spaceId: string
+      spaceId: string | null
+      orgId: string | null
       content: Prisma.Bytes
+      contentIv: Prisma.Bytes
+      summary: string | null
       status: $Enums.MemoryStatus
+      supersededBy: string | null
+      supersededAt: Date | null
+      confidence: number | null
       source: $Enums.MemorySource
-      importanceScore: number | null
+      hint: string | null
       indexedAt: Date | null
       createdAt: Date
       updatedAt: Date
@@ -4786,7 +4858,7 @@ export namespace Prisma {
   export interface Prisma__MemoryClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    space<T extends SpaceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SpaceDefaultArgs<ExtArgs>>): Prisma__SpaceClient<$Result.GetResult<Prisma.$SpacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    space<T extends Memory$spaceArgs<ExtArgs> = {}>(args?: Subset<T, Memory$spaceArgs<ExtArgs>>): Prisma__SpaceClient<$Result.GetResult<Prisma.$SpacePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     tags<T extends Memory$tagsArgs<ExtArgs> = {}>(args?: Subset<T, Memory$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemoryTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -4820,10 +4892,16 @@ export namespace Prisma {
     readonly id: FieldRef<"Memory", 'String'>
     readonly userId: FieldRef<"Memory", 'String'>
     readonly spaceId: FieldRef<"Memory", 'String'>
+    readonly orgId: FieldRef<"Memory", 'String'>
     readonly content: FieldRef<"Memory", 'Bytes'>
+    readonly contentIv: FieldRef<"Memory", 'Bytes'>
+    readonly summary: FieldRef<"Memory", 'String'>
     readonly status: FieldRef<"Memory", 'MemoryStatus'>
+    readonly supersededBy: FieldRef<"Memory", 'String'>
+    readonly supersededAt: FieldRef<"Memory", 'DateTime'>
+    readonly confidence: FieldRef<"Memory", 'Float'>
     readonly source: FieldRef<"Memory", 'MemorySource'>
-    readonly importanceScore: FieldRef<"Memory", 'Float'>
+    readonly hint: FieldRef<"Memory", 'String'>
     readonly indexedAt: FieldRef<"Memory", 'DateTime'>
     readonly createdAt: FieldRef<"Memory", 'DateTime'>
     readonly updatedAt: FieldRef<"Memory", 'DateTime'>
@@ -5221,6 +5299,25 @@ export namespace Prisma {
      * Limit how many Memories to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Memory.space
+   */
+  export type Memory$spaceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Space
+     */
+    select?: SpaceSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Space
+     */
+    omit?: SpaceOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SpaceInclude<ExtArgs> | null
+    where?: SpaceWhereInput
   }
 
   /**
@@ -9777,10 +9874,16 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     spaceId: 'spaceId',
+    orgId: 'orgId',
     content: 'content',
+    contentIv: 'contentIv',
+    summary: 'summary',
     status: 'status',
+    supersededBy: 'supersededBy',
+    supersededAt: 'supersededAt',
+    confidence: 'confidence',
     source: 'source',
-    importanceScore: 'importanceScore',
+    hint: 'hint',
     indexedAt: 'indexedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
@@ -9959,20 +10062,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'MemorySource'
-   */
-  export type EnumMemorySourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySource'>
-    
-
-
-  /**
-   * Reference to a field of type 'MemorySource[]'
-   */
-  export type ListEnumMemorySourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySource[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -9983,6 +10072,20 @@ export namespace Prisma {
    * Reference to a field of type 'Float[]'
    */
   export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'MemorySource'
+   */
+  export type EnumMemorySourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySource'>
+    
+
+
+  /**
+   * Reference to a field of type 'MemorySource[]'
+   */
+  export type ListEnumMemorySourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MemorySource[]'>
     
 
 
@@ -10244,30 +10347,42 @@ export namespace Prisma {
     AND?: MemoryWhereInput | MemoryWhereInput[]
     OR?: MemoryWhereInput[]
     NOT?: MemoryWhereInput | MemoryWhereInput[]
-    id?: StringFilter<"Memory"> | string
-    userId?: StringFilter<"Memory"> | string
-    spaceId?: StringFilter<"Memory"> | string
+    id?: UuidFilter<"Memory"> | string
+    userId?: UuidFilter<"Memory"> | string
+    spaceId?: UuidNullableFilter<"Memory"> | string | null
+    orgId?: UuidNullableFilter<"Memory"> | string | null
     content?: BytesFilter<"Memory"> | Bytes
+    contentIv?: BytesFilter<"Memory"> | Bytes
+    summary?: StringNullableFilter<"Memory"> | string | null
     status?: EnumMemoryStatusFilter<"Memory"> | $Enums.MemoryStatus
+    supersededBy?: UuidNullableFilter<"Memory"> | string | null
+    supersededAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
+    confidence?: FloatNullableFilter<"Memory"> | number | null
     source?: EnumMemorySourceFilter<"Memory"> | $Enums.MemorySource
-    importanceScore?: FloatNullableFilter<"Memory"> | number | null
+    hint?: StringNullableFilter<"Memory"> | string | null
     indexedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
     createdAt?: DateTimeFilter<"Memory"> | Date | string
     updatedAt?: DateTimeFilter<"Memory"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    space?: XOR<SpaceScalarRelationFilter, SpaceWhereInput>
+    space?: XOR<SpaceNullableScalarRelationFilter, SpaceWhereInput> | null
     tags?: MemoryTagListRelationFilter
   }
 
   export type MemoryOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
-    spaceId?: SortOrder
+    spaceId?: SortOrderInput | SortOrder
+    orgId?: SortOrderInput | SortOrder
     content?: SortOrder
+    contentIv?: SortOrder
+    summary?: SortOrderInput | SortOrder
     status?: SortOrder
+    supersededBy?: SortOrderInput | SortOrder
+    supersededAt?: SortOrderInput | SortOrder
+    confidence?: SortOrderInput | SortOrder
     source?: SortOrder
-    importanceScore?: SortOrderInput | SortOrder
+    hint?: SortOrderInput | SortOrder
     indexedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -10282,29 +10397,41 @@ export namespace Prisma {
     AND?: MemoryWhereInput | MemoryWhereInput[]
     OR?: MemoryWhereInput[]
     NOT?: MemoryWhereInput | MemoryWhereInput[]
-    userId?: StringFilter<"Memory"> | string
-    spaceId?: StringFilter<"Memory"> | string
+    userId?: UuidFilter<"Memory"> | string
+    spaceId?: UuidNullableFilter<"Memory"> | string | null
+    orgId?: UuidNullableFilter<"Memory"> | string | null
     content?: BytesFilter<"Memory"> | Bytes
+    contentIv?: BytesFilter<"Memory"> | Bytes
+    summary?: StringNullableFilter<"Memory"> | string | null
     status?: EnumMemoryStatusFilter<"Memory"> | $Enums.MemoryStatus
+    supersededBy?: UuidNullableFilter<"Memory"> | string | null
+    supersededAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
+    confidence?: FloatNullableFilter<"Memory"> | number | null
     source?: EnumMemorySourceFilter<"Memory"> | $Enums.MemorySource
-    importanceScore?: FloatNullableFilter<"Memory"> | number | null
+    hint?: StringNullableFilter<"Memory"> | string | null
     indexedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
     createdAt?: DateTimeFilter<"Memory"> | Date | string
     updatedAt?: DateTimeFilter<"Memory"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-    space?: XOR<SpaceScalarRelationFilter, SpaceWhereInput>
+    space?: XOR<SpaceNullableScalarRelationFilter, SpaceWhereInput> | null
     tags?: MemoryTagListRelationFilter
   }, "id">
 
   export type MemoryOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
-    spaceId?: SortOrder
+    spaceId?: SortOrderInput | SortOrder
+    orgId?: SortOrderInput | SortOrder
     content?: SortOrder
+    contentIv?: SortOrder
+    summary?: SortOrderInput | SortOrder
     status?: SortOrder
+    supersededBy?: SortOrderInput | SortOrder
+    supersededAt?: SortOrderInput | SortOrder
+    confidence?: SortOrderInput | SortOrder
     source?: SortOrder
-    importanceScore?: SortOrderInput | SortOrder
+    hint?: SortOrderInput | SortOrder
     indexedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -10320,13 +10447,19 @@ export namespace Prisma {
     AND?: MemoryScalarWhereWithAggregatesInput | MemoryScalarWhereWithAggregatesInput[]
     OR?: MemoryScalarWhereWithAggregatesInput[]
     NOT?: MemoryScalarWhereWithAggregatesInput | MemoryScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"Memory"> | string
-    userId?: StringWithAggregatesFilter<"Memory"> | string
-    spaceId?: StringWithAggregatesFilter<"Memory"> | string
+    id?: UuidWithAggregatesFilter<"Memory"> | string
+    userId?: UuidWithAggregatesFilter<"Memory"> | string
+    spaceId?: UuidNullableWithAggregatesFilter<"Memory"> | string | null
+    orgId?: UuidNullableWithAggregatesFilter<"Memory"> | string | null
     content?: BytesWithAggregatesFilter<"Memory"> | Bytes
+    contentIv?: BytesWithAggregatesFilter<"Memory"> | Bytes
+    summary?: StringNullableWithAggregatesFilter<"Memory"> | string | null
     status?: EnumMemoryStatusWithAggregatesFilter<"Memory"> | $Enums.MemoryStatus
+    supersededBy?: UuidNullableWithAggregatesFilter<"Memory"> | string | null
+    supersededAt?: DateTimeNullableWithAggregatesFilter<"Memory"> | Date | string | null
+    confidence?: FloatNullableWithAggregatesFilter<"Memory"> | number | null
     source?: EnumMemorySourceWithAggregatesFilter<"Memory"> | $Enums.MemorySource
-    importanceScore?: FloatNullableWithAggregatesFilter<"Memory"> | number | null
+    hint?: StringNullableWithAggregatesFilter<"Memory"> | string | null
     indexedAt?: DateTimeNullableWithAggregatesFilter<"Memory"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Memory"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Memory"> | Date | string
@@ -10841,27 +10974,39 @@ export namespace Prisma {
 
   export type MemoryCreateInput = {
     id?: string
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
     user: UserCreateNestedOneWithoutMemoriesInput
-    space: SpaceCreateNestedOneWithoutMemoriesInput
+    space?: SpaceCreateNestedOneWithoutMemoriesInput
     tags?: MemoryTagCreateNestedManyWithoutMemoryInput
   }
 
   export type MemoryUncheckedCreateInput = {
     id?: string
     userId: string
-    spaceId: string
+    spaceId?: string | null
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10871,27 +11016,39 @@ export namespace Prisma {
 
   export type MemoryUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutMemoriesNestedInput
-    space?: SpaceUpdateOneRequiredWithoutMemoriesNestedInput
+    space?: SpaceUpdateOneWithoutMemoriesNestedInput
     tags?: MemoryTagUpdateManyWithoutMemoryNestedInput
   }
 
   export type MemoryUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    spaceId?: StringFieldUpdateOperationsInput | string
+    spaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10902,11 +11059,17 @@ export namespace Prisma {
   export type MemoryCreateManyInput = {
     id?: string
     userId: string
-    spaceId: string
+    spaceId?: string | null
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10915,10 +11078,16 @@ export namespace Prisma {
 
   export type MemoryUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10928,11 +11097,17 @@ export namespace Prisma {
   export type MemoryUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    spaceId?: StringFieldUpdateOperationsInput | string
+    spaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11536,6 +11711,30 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type UuidFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidFilter<$PrismaModel> | string
+  }
+
+  export type UuidNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
+
   export type BytesFilter<$PrismaModel = never> = {
     equals?: Bytes | BytesFieldRefInput<$PrismaModel>
     in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
@@ -11550,13 +11749,6 @@ export namespace Prisma {
     not?: NestedEnumMemoryStatusFilter<$PrismaModel> | $Enums.MemoryStatus
   }
 
-  export type EnumMemorySourceFilter<$PrismaModel = never> = {
-    equals?: $Enums.MemorySource | EnumMemorySourceFieldRefInput<$PrismaModel>
-    in?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
-    notIn?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
-    not?: NestedEnumMemorySourceFilter<$PrismaModel> | $Enums.MemorySource
-  }
-
   export type FloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -11568,9 +11760,11 @@ export namespace Prisma {
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
-  export type SpaceScalarRelationFilter = {
-    is?: SpaceWhereInput
-    isNot?: SpaceWhereInput
+  export type EnumMemorySourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemorySource | EnumMemorySourceFieldRefInput<$PrismaModel>
+    in?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemorySourceFilter<$PrismaModel> | $Enums.MemorySource
   }
 
   export type MemoryTagListRelationFilter = {
@@ -11587,10 +11781,16 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     spaceId?: SortOrder
+    orgId?: SortOrder
     content?: SortOrder
+    contentIv?: SortOrder
+    summary?: SortOrder
     status?: SortOrder
+    supersededBy?: SortOrder
+    supersededAt?: SortOrder
+    confidence?: SortOrder
     source?: SortOrder
-    importanceScore?: SortOrder
+    hint?: SortOrder
     indexedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -11598,17 +11798,23 @@ export namespace Prisma {
   }
 
   export type MemoryAvgOrderByAggregateInput = {
-    importanceScore?: SortOrder
+    confidence?: SortOrder
   }
 
   export type MemoryMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     spaceId?: SortOrder
+    orgId?: SortOrder
     content?: SortOrder
+    contentIv?: SortOrder
+    summary?: SortOrder
     status?: SortOrder
+    supersededBy?: SortOrder
+    supersededAt?: SortOrder
+    confidence?: SortOrder
     source?: SortOrder
-    importanceScore?: SortOrder
+    hint?: SortOrder
     indexedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -11619,10 +11825,16 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     spaceId?: SortOrder
+    orgId?: SortOrder
     content?: SortOrder
+    contentIv?: SortOrder
+    summary?: SortOrder
     status?: SortOrder
+    supersededBy?: SortOrder
+    supersededAt?: SortOrder
+    confidence?: SortOrder
     source?: SortOrder
-    importanceScore?: SortOrder
+    hint?: SortOrder
     indexedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -11630,7 +11842,37 @@ export namespace Prisma {
   }
 
   export type MemorySumOrderByAggregateInput = {
-    importanceScore?: SortOrder
+    confidence?: SortOrder
+  }
+
+  export type UuidWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type UuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type BytesWithAggregatesFilter<$PrismaModel = never> = {
@@ -11653,16 +11895,6 @@ export namespace Prisma {
     _max?: NestedEnumMemoryStatusFilter<$PrismaModel>
   }
 
-  export type EnumMemorySourceWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.MemorySource | EnumMemorySourceFieldRefInput<$PrismaModel>
-    in?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
-    notIn?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
-    not?: NestedEnumMemorySourceWithAggregatesFilter<$PrismaModel> | $Enums.MemorySource
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumMemorySourceFilter<$PrismaModel>
-    _max?: NestedEnumMemorySourceFilter<$PrismaModel>
-  }
-
   export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -11677,6 +11909,16 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type EnumMemorySourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemorySource | EnumMemorySourceFieldRefInput<$PrismaModel>
+    in?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemorySourceWithAggregatesFilter<$PrismaModel> | $Enums.MemorySource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMemorySourceFilter<$PrismaModel>
+    _max?: NestedEnumMemorySourceFilter<$PrismaModel>
   }
 
   export type MemoryScalarRelationFilter = {
@@ -12361,16 +12603,16 @@ export namespace Prisma {
     set?: $Enums.MemoryStatus
   }
 
-  export type EnumMemorySourceFieldUpdateOperationsInput = {
-    set?: $Enums.MemorySource
-  }
-
   export type NullableFloatFieldUpdateOperationsInput = {
     set?: number | null
     increment?: number
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type EnumMemorySourceFieldUpdateOperationsInput = {
+    set?: $Enums.MemorySource
   }
 
   export type UserUpdateOneRequiredWithoutMemoriesNestedInput = {
@@ -12381,10 +12623,12 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMemoriesInput, UserUpdateWithoutMemoriesInput>, UserUncheckedUpdateWithoutMemoriesInput>
   }
 
-  export type SpaceUpdateOneRequiredWithoutMemoriesNestedInput = {
+  export type SpaceUpdateOneWithoutMemoriesNestedInput = {
     create?: XOR<SpaceCreateWithoutMemoriesInput, SpaceUncheckedCreateWithoutMemoriesInput>
     connectOrCreate?: SpaceCreateOrConnectWithoutMemoriesInput
     upsert?: SpaceUpsertWithoutMemoriesInput
+    disconnect?: SpaceWhereInput | boolean
+    delete?: SpaceWhereInput | boolean
     connect?: SpaceWhereUniqueInput
     update?: XOR<XOR<SpaceUpdateToOneWithWhereWithoutMemoriesInput, SpaceUpdateWithoutMemoriesInput>, SpaceUncheckedUpdateWithoutMemoriesInput>
   }
@@ -12653,6 +12897,28 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type NestedUuidFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidFilter<$PrismaModel> | string
+  }
+
+  export type NestedUuidNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedBytesFilter<$PrismaModel = never> = {
     equals?: Bytes | BytesFieldRefInput<$PrismaModel>
     in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel>
@@ -12667,13 +12933,6 @@ export namespace Prisma {
     not?: NestedEnumMemoryStatusFilter<$PrismaModel> | $Enums.MemoryStatus
   }
 
-  export type NestedEnumMemorySourceFilter<$PrismaModel = never> = {
-    equals?: $Enums.MemorySource | EnumMemorySourceFieldRefInput<$PrismaModel>
-    in?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
-    notIn?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
-    not?: NestedEnumMemorySourceFilter<$PrismaModel> | $Enums.MemorySource
-  }
-
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -12683,6 +12942,41 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumMemorySourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemorySource | EnumMemorySourceFieldRefInput<$PrismaModel>
+    in?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemorySourceFilter<$PrismaModel> | $Enums.MemorySource
+  }
+
+  export type NestedUuidWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel>
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidWithAggregatesFilter<$PrismaModel> | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedStringFilter<$PrismaModel>
+    _max?: NestedStringFilter<$PrismaModel>
+  }
+
+  export type NestedUuidNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type NestedBytesWithAggregatesFilter<$PrismaModel = never> = {
@@ -12705,16 +12999,6 @@ export namespace Prisma {
     _max?: NestedEnumMemoryStatusFilter<$PrismaModel>
   }
 
-  export type NestedEnumMemorySourceWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.MemorySource | EnumMemorySourceFieldRefInput<$PrismaModel>
-    in?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
-    notIn?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
-    not?: NestedEnumMemorySourceWithAggregatesFilter<$PrismaModel> | $Enums.MemorySource
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumMemorySourceFilter<$PrismaModel>
-    _max?: NestedEnumMemorySourceFilter<$PrismaModel>
-  }
-
   export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
     in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
@@ -12729,6 +13013,16 @@ export namespace Prisma {
     _sum?: NestedFloatNullableFilter<$PrismaModel>
     _min?: NestedFloatNullableFilter<$PrismaModel>
     _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumMemorySourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MemorySource | EnumMemorySourceFieldRefInput<$PrismaModel>
+    in?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MemorySource[] | ListEnumMemorySourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMemorySourceWithAggregatesFilter<$PrismaModel> | $Enums.MemorySource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMemorySourceFilter<$PrismaModel>
+    _max?: NestedEnumMemorySourceFilter<$PrismaModel>
   }
 
   export type NestedEnumTokenScopeFilter<$PrismaModel = never> = {
@@ -12871,25 +13165,37 @@ export namespace Prisma {
 
   export type MemoryCreateWithoutUserInput = {
     id?: string
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
-    space: SpaceCreateNestedOneWithoutMemoriesInput
+    space?: SpaceCreateNestedOneWithoutMemoriesInput
     tags?: MemoryTagCreateNestedManyWithoutMemoryInput
   }
 
   export type MemoryUncheckedCreateWithoutUserInput = {
     id?: string
-    spaceId: string
+    spaceId?: string | null
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13063,13 +13369,19 @@ export namespace Prisma {
     AND?: MemoryScalarWhereInput | MemoryScalarWhereInput[]
     OR?: MemoryScalarWhereInput[]
     NOT?: MemoryScalarWhereInput | MemoryScalarWhereInput[]
-    id?: StringFilter<"Memory"> | string
-    userId?: StringFilter<"Memory"> | string
-    spaceId?: StringFilter<"Memory"> | string
+    id?: UuidFilter<"Memory"> | string
+    userId?: UuidFilter<"Memory"> | string
+    spaceId?: UuidNullableFilter<"Memory"> | string | null
+    orgId?: UuidNullableFilter<"Memory"> | string | null
     content?: BytesFilter<"Memory"> | Bytes
+    contentIv?: BytesFilter<"Memory"> | Bytes
+    summary?: StringNullableFilter<"Memory"> | string | null
     status?: EnumMemoryStatusFilter<"Memory"> | $Enums.MemoryStatus
+    supersededBy?: UuidNullableFilter<"Memory"> | string | null
+    supersededAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
+    confidence?: FloatNullableFilter<"Memory"> | number | null
     source?: EnumMemorySourceFilter<"Memory"> | $Enums.MemorySource
-    importanceScore?: FloatNullableFilter<"Memory"> | number | null
+    hint?: StringNullableFilter<"Memory"> | string | null
     indexedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
     createdAt?: DateTimeFilter<"Memory"> | Date | string
     updatedAt?: DateTimeFilter<"Memory"> | Date | string
@@ -13285,10 +13597,16 @@ export namespace Prisma {
 
   export type MemoryCreateWithoutSpaceInput = {
     id?: string
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13300,10 +13618,16 @@ export namespace Prisma {
   export type MemoryUncheckedCreateWithoutSpaceInput = {
     id?: string
     userId: string
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13643,26 +13967,38 @@ export namespace Prisma {
 
   export type MemoryCreateWithoutTagsInput = {
     id?: string
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
     user: UserCreateNestedOneWithoutMemoriesInput
-    space: SpaceCreateNestedOneWithoutMemoriesInput
+    space?: SpaceCreateNestedOneWithoutMemoriesInput
   }
 
   export type MemoryUncheckedCreateWithoutTagsInput = {
     id?: string
     userId: string
-    spaceId: string
+    spaceId?: string | null
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -13687,26 +14023,38 @@ export namespace Prisma {
 
   export type MemoryUpdateWithoutTagsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     user?: UserUpdateOneRequiredWithoutMemoriesNestedInput
-    space?: SpaceUpdateOneRequiredWithoutMemoriesNestedInput
+    space?: SpaceUpdateOneWithoutMemoriesNestedInput
   }
 
   export type MemoryUncheckedUpdateWithoutTagsInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    spaceId?: StringFieldUpdateOperationsInput | string
+    spaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13979,11 +14327,17 @@ export namespace Prisma {
 
   export type MemoryCreateManyUserInput = {
     id?: string
-    spaceId: string
+    spaceId?: string | null
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14069,25 +14423,37 @@ export namespace Prisma {
 
   export type MemoryUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    space?: SpaceUpdateOneRequiredWithoutMemoriesNestedInput
+    space?: SpaceUpdateOneWithoutMemoriesNestedInput
     tags?: MemoryTagUpdateManyWithoutMemoryNestedInput
   }
 
   export type MemoryUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    spaceId?: StringFieldUpdateOperationsInput | string
+    spaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14097,11 +14463,17 @@ export namespace Prisma {
 
   export type MemoryUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    spaceId?: StringFieldUpdateOperationsInput | string
+    spaceId?: NullableStringFieldUpdateOperationsInput | string | null
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14234,10 +14606,16 @@ export namespace Prisma {
   export type MemoryCreateManySpaceInput = {
     id?: string
     userId: string
+    orgId?: string | null
     content: Bytes
+    contentIv: Bytes
+    summary?: string | null
     status?: $Enums.MemoryStatus
+    supersededBy?: string | null
+    supersededAt?: Date | string | null
+    confidence?: number | null
     source?: $Enums.MemorySource
-    importanceScore?: number | null
+    hint?: string | null
     indexedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14286,10 +14664,16 @@ export namespace Prisma {
 
   export type MemoryUpdateWithoutSpaceInput = {
     id?: StringFieldUpdateOperationsInput | string
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14301,10 +14685,16 @@ export namespace Prisma {
   export type MemoryUncheckedUpdateWithoutSpaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14315,10 +14705,16 @@ export namespace Prisma {
   export type MemoryUncheckedUpdateManyWithoutSpaceInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    orgId?: NullableStringFieldUpdateOperationsInput | string | null
     content?: BytesFieldUpdateOperationsInput | Bytes
+    contentIv?: BytesFieldUpdateOperationsInput | Bytes
+    summary?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
+    supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
+    supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    confidence?: NullableFloatFieldUpdateOperationsInput | number | null
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
-    importanceScore?: NullableFloatFieldUpdateOperationsInput | number | null
+    hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

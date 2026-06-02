@@ -39,84 +39,62 @@ export const prisma = new PrismaClient({
   log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
 });
 
-// Prisma RLS wrappers (new, for using real Prisma models while keeping RLS).
-// Example:
-//   await withUserContextPrisma(userId, async (tx) => tx.memory.create({...}));
-export async function withUserContextPrisma<T>(
-  userId: string,
-  fn: (tx: PrismaClient) => Promise<T>
-): Promise<T> {
-  if (!userId) throw new Error('withUserContextPrisma: userId is required');
-  return prisma.$transaction(async (tx) => {
-    await tx.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, true)`;
-    return fn(tx as unknown as PrismaClient);
-  });
-}
-
-export async function withUserContextReadOnlyPrisma<T>(
-  userId: string,
-  fn: (tx: PrismaClient) => Promise<T>
-): Promise<T> {
-  if (!userId) throw new Error('withUserContextReadOnlyPrisma: userId is required');
-  return prisma.$transaction(async (tx) => {
-    await tx.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, true)`;
-    return fn(tx as unknown as PrismaClient);
-  });
-}
-
-// Legacy raw versions (current default to avoid breaking all handlers during transition)
+// ===================================================================
+// RLS-aware Prisma (PRIMARY API - we are using Prisma for real now)
+// These wrap queries so RLS policies see the current user.
+// Prefer these for all new code. Returns a Prisma transaction client.
+// ===================================================================
 export async function withUserContext<T>(
   userId: string,
-  fn: (client: pg.PoolClient) => Promise<T>
+  fn: (tx: PrismaClient) => Promise<T>
 ): Promise<T> {
   if (!userId) throw new Error('withUserContext: userId is required');
-
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    await client.query(`SELECT set_config('app.current_user_id', $1, true)`, [userId]);
-    const result = await fn(client);
-    await client.query('COMMIT');
-    return result;
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
-  } finally {
-    client.release();
-  }
+  return prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, true)`;
+    return fn(tx as unknown as PrismaClient);
+  });
 }
 
 export async function withUserContextReadOnly<T>(
   userId: string,
-  fn: (client: pg.PoolClient) => Promise<T>
+  fn: (tx: PrismaClient) => Promise<T>
 ): Promise<T> {
   if (!userId) throw new Error('withUserContextReadOnly: userId is required');
-
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN READ ONLY');
-    await client.query(`SELECT set_config('app.current_user_id', $1, true)`, [userId]);
-    const result = await fn(client);
-    await client.query('COMMIT');
-    return result;
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
-  } finally {
-    client.release();
-  }
+  return prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT set_config('app.current_user_id', ${userId}, true)`;
+    return fn(tx as unknown as PrismaClient);
+  });
 }
 
-// Legacy raw pool wrappers (kept for complex queries during transition; prefer Prisma versions above)
+// Raw pool fallbacks (only for complex hand-written SQL during full Prisma migration)
 export async function withUserContextRaw<T>(
   userId: string,
   fn: (client: pg.PoolClient) => Promise<T>
 ): Promise<T> {
   if (!userId) throw new Error('withUserContextRaw: userId is required');
-
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    await client.query(`SELECT set_config('app.current_user_id', $1, true)`, [userId]);
+    const result = await fn(client);
+    await client.query('COMMIT');
+    return result;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+export async function withUserContextReadOnlyRaw<T>(
+  userId: string,
+  fn: (client: pg.PoolClient) => Promise<T>
+): Promise<T> {
+  if (!userId) throw new Error('withUserContextReadOnlyRaw: userId is required');
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN READ ONLY');
     await client.query(`SELECT set_config('app.current_user_id', $1, true)`, [userId]);
     const result = await fn(client);
     await client.query('COMMIT');
@@ -132,25 +110,4 @@ export async function withUserContextRaw<T>(
 export async function closePool(): Promise<void> {
   await pool.end();
   await prisma.$disconnect();
-}
-
-export async function withUserContextReadOnlyRaw<T>(
-  userId: string,
-  fn: (client: pg.PoolClient) => Promise<T>
-): Promise<T> {
-  if (!userId) throw new Error('withUserContextReadOnlyRaw: userId is required');
-
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN READ ONLY');
-    await client.query(`SELECT set_config('app.current_user_id', $1, true)`, [userId]);
-    const result = await fn(client);
-    await client.query('COMMIT');
-    return result;
-  } catch (err) {
-    await client.query('ROLLBACK');
-    throw err;
-  } finally {
-    client.release();
-  }
 }

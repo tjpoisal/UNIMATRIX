@@ -6,7 +6,7 @@
  * tag cloud, and aggregate statistics.
  */
 
-import { withUserContextReadOnly } from '../db/client.js';
+import { withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
 import type { MemoryStatus, MemorySource } from '../types/domain.js';
 
 // ---------------------------------------------------------------------------

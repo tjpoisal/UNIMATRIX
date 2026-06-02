@@ -27,7 +27,7 @@
  *   - Audit logging via withAudit wrapper
  */
 
-import { withUserContext, withUserContextRaw, pool } from '../db/client.js';
+import { withUserContextRaw, pool } from '../db/client.js';
 import { withAudit }                              from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';

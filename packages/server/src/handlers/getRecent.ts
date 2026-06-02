@@ -15,7 +15,7 @@
  * No provider / LLM filter. Memories written by any AI are returned equally.
  */
 
-import { withUserContextReadOnly } from '../db/client.js';
+import { withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
 import { withAudit }               from '../middleware/audit.js';
 import { estimateTokenCount }      from '../utils/tokens.js';
 import type { MemoryStatus, MemorySource } from '../types/db.js';

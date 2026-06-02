@@ -21,7 +21,7 @@
  *   lambda     = ln(2) / HALF_LIFE ≈ 0.0231
  */
 
-import { withUserContextReadOnly } from '../db/client.js';
+import { withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
 import { generateQueryEmbedding } from '../embeddings.js';
 
 // ---------------------------------------------------------------------------

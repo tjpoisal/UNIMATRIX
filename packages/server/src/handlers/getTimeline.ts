@@ -15,7 +15,7 @@
  *           content is decrypted with the user's derived key.
  */
 
-import { withUserContextReadOnly } from '../db/client.js';
+import { withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
 import { withAudit }               from '../middleware/audit.js';
 import { decryptContent }          from '../security/encryption.js';
 import type { TimelineEntry, MemoryStatus, MemorySource } from '../types/domain.js';

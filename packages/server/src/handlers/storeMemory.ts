@@ -15,7 +15,7 @@
  * Verbatim is only decrypted by get_timeline when explicitly requested.
  */
 
-import { withUserContext, withUserContextPrisma } from '../db/client.js';
+import { withUserContext } from '../db/client.js';
 import { withAudit }                              from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';
@@ -80,7 +80,7 @@ export const storeMemoryHandler = withAudit(
     // 4. Insert episodic row — indexed_at is NULL until Librarian runs
     //    Now using Prisma (with RLS via withUserContext transaction)
     // ------------------------------------------------------------------
-    const memoryId = await withUserContextPrisma(userId, async (tx) => {
+    const memoryId = await withUserContext(userId, async (tx) => {
       const memory = await tx.memory.create({
         data: {
           userId,
@@ -111,7 +111,7 @@ export const storeMemoryHandler = withAudit(
     };
 
     try {
-      await withUserContextPrisma(userId, async (tx) => {
+      await withUserContext(userId, async (tx) => {
         await tx.agentRun.create({
           data: {
             userId,

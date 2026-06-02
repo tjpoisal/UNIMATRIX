@@ -21,7 +21,7 @@
  *   - GET /api/explorer/stats — aggregate stats (totalMemories, memoriesByDay, etc.)
  */
 
-import { withUserContextReadOnly } from '../db/client.js';
+import { withUserContextRaw, withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
 import { withAudit }               from '../middleware/audit.js';
 import { generateQueryEmbedding }  from '../embeddings.js';
 import { estimateTokenCount }      from '../utils/tokens.js';

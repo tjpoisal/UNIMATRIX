@@ -10,7 +10,7 @@
  * Returns: array of { id, name, description, createdAt }
  */
 
-import { withUserContextReadOnly } from '../db/client.js';
+import { withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
 import { withAudit }               from '../middleware/audit.js';
 import type { Space } from '../types/domain.js';
 

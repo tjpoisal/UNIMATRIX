@@ -102,28 +102,37 @@ model Space {
 // ─────────────────────────────────────────────────────────────────────────────
 
 model Memory {
-  id     String @id @default(cuid())
-  userId String
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId String @map("user_id") @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  spaceId String
-  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceId String? @map("space_id") @db.Uuid
+  space   Space?  @relation(fields: [spaceId], references: [id], onDelete: SetNull)
 
-  content   Bytes // encrypted content stored as BYTEA
+  orgId String? @map("org_id") @db.Uuid
+
+  content   Bytes
+  contentIv Bytes @map("content_iv")
+
+  summary   String?
   embedding Unsupported("vector(512)")?
 
-  status          MemoryStatus @default(active)
-  source          MemorySource @default(mcp)
-  importanceScore Float?       @db.Real
+  status       MemoryStatus @default(active)
+  supersededBy String?      @map("superseded_by") @db.Uuid
+  supersededAt DateTime?    @map("superseded_at")
 
-  indexedAt DateTime?
+  confidence Float?
+  source     MemorySource @default(mcp)
+  hint       String?
+
+  indexedAt DateTime? @map("indexed_at")
 
   // Relations
   tags MemoryTag[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime? // soft delete
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@index([userId])
   @@index([spaceId])

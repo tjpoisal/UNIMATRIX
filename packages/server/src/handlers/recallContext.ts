@@ -22,7 +22,7 @@
  *   - mobile:    800 tokens — compact payload for cellular / SwiftUI clients
  */
 
-import { withUserContextReadOnly } from '../db/client.js';
+import { withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
 import { withAudit }               from '../middleware/audit.js';
 import { generateQueryEmbedding }  from '../embeddings.js';
 import { estimateTokenCount }      from '../utils/tokens.js';
