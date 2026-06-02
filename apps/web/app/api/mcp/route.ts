@@ -16,6 +16,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+// Extend NextRequest for internal org context passing (from API key auth to MCP handlers)
+declare module "next/server" {
+  interface NextRequest {
+    _unimatrixOrgId?: string | null;
+  }
+}
+
 // ─── API key auth ─────────────────────────────────────────────────────────────
 
 async function resolveUser(req: NextRequest): Promise<string | null> {
@@ -36,8 +43,7 @@ async function resolveUser(req: NextRequest): Promise<string | null> {
       // Update last-used timestamp async (don't await)
       prisma.apiKey.update({ where: { id: k.id }, data: { lastUsed: new Date() } }).catch(() => {});
       // Attach org to request for downstream (tools/call path)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (req as any)._unimatrixOrgId = k.organizationId;
+      req._unimatrixOrgId = k.organizationId;
       return k.userId;
     }
   }
@@ -439,8 +445,7 @@ export async function POST(req: NextRequest) {
 
     // Extract agent context (used for telemetry + HITL)
     const agentName = (args.agent_name || args.sender_name || 'unknown-agent') as string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const organizationId = (req as any)._unimatrixOrgId || null;
+    const organizationId = req._unimatrixOrgId || null;
 
     try {
       // === NEW: Spend Limit Check + Pre-execution Cost Estimation ===
