@@ -114,6 +114,7 @@ export async function sendMessage(
       senderName: validated.sender_name,
       senderType: validated.sender_type,
       message: validated.message,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       metadata: validated.metadata as any,
     },
   });
@@ -166,6 +167,7 @@ export async function getMessages(
 
   await assertRoomAccess(validated.room_id, organizationId);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = {
     roomId: validated.room_id,
   };
@@ -318,6 +320,7 @@ export async function listRooms(
 
 async function dispatchMessageWebhooks(
   roomId: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   message: any,
   organizationId: string
 ) {

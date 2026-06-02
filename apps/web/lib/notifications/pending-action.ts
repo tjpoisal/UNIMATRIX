@@ -4,9 +4,10 @@
  */
 
 // Resend is optional — project already depends on it in some environments
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
 let Resend: any;
 try {
-  // @ts-ignore - optional dependency
+  // @ts-expect-error - optional dependency, loaded via require for optional
   Resend = require('resend').Resend;
 } catch {}
 
@@ -54,8 +55,8 @@ export async function notifyPendingActionCreated(action: PendingActionNotificati
         subject,
         html,
       });
-    } catch (e) {
-      console.error('[notifications] Resend failed:', e);
+    } catch (_e) {
+      console.error('[notifications] Resend failed:', _e);
     }
   }
 
@@ -86,8 +87,8 @@ export async function notifyPendingActionCreated(action: PendingActionNotificati
           ],
         }),
       });
-    } catch (e) {
-      console.error('[notifications] Slack webhook failed:', e);
+    } catch (_e) {
+      console.error('[notifications] Slack webhook failed:', _e);
     }
   }
 }

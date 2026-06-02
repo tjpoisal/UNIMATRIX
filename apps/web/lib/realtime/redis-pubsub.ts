@@ -12,6 +12,7 @@
 
 import { Redis } from '@upstash/redis';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MessageHandler = (channel: string, message: any) => void;
 
 let redis: Redis | null = null;
@@ -34,6 +35,7 @@ function getRedis(): Redis | null {
 /**
  * Publish a message to a Collab room channel.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function publishToRoom(roomId: string, message: any) {
   const r = getRedis();
   const channel = `collab:${roomId}`;
