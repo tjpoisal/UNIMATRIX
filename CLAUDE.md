@@ -55,13 +55,13 @@ unimatrix/
 └── CLAUDE.md          ← You are here
 ```
 
-**URLs (Vercel legacy; current primary: Fly.io):**
+**URLs (Vercel legacy; current primary: Fly.io with best services stack):**
 - Old Cloud (Vercel): https://unimatrix-flax.vercel.app
 - Marketing site: https://deployunimatrix.com
 - MCP endpoint (legacy Vercel): https://unimatrix-flax.vercel.app/api/mcp
 - MCP endpoint (Fly.io primary): https://unimatrix-mcp.fly.dev/mcp (update after deploy; see DEPLOYMENT.md + fly.*.toml)
 - MCP endpoint (self-hosted or Render alt): http://[user-server]:PORT/mcp or your Render URL
-- See DEPLOYMENT.md for Fly.io steps, tomls, and scripts.
+- See DEPLOYMENT.md for Fly.io steps, tomls, and scripts. Prefer Ably for Collab Room.
 
 ---
 
@@ -141,7 +141,8 @@ git push origin main
 
 - **Only branch:** `main`
 - **GitHub repo:** `https://github.com/tjpoisal/UNIMATRIX`
-- **Current target:** Fly.io. Use `DEPLOYMENT.md`, `fly.web.toml`/`fly.mcp.toml`/`fly.worker.toml`, `scripts/fly-deploy.sh` for web + mcp + worker.
+- **Current target (best services for optimal perf):** Fly.io (web + MCP + worker with dedicated performance machines). Use `DEPLOYMENT.md`, `fly.web.toml`/`fly.mcp.toml`/`fly.worker.toml`, `scripts/fly-deploy.sh`.
+  - Best stack: Fly.io (persistent) + Neon (pgvector DB) + Ably (realtime collab - prefer over raw WS) + Upstash (Redis/QStash) + Voyage (embeddings).
 - Render alternative: `render.yaml` + `RENDER.md` (when billing resolved). Uses @unimatrix/db + @unimatrix/server, robust migrate, Docker or native.
 - Dockerfiles + docker-compose.yml for local parity / self-host / any platform.
 - vercel.json is legacy only. No more Vercel analytics or hard-coded vercel.app URLs in prod paths.

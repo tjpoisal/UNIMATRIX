@@ -24,9 +24,9 @@ primary_region = "iad"
   soft_limit = 300
 
 [[vm]]
-  cpu_kind = "shared"
-  cpus = 1
-  memory_mb = 1024
+  cpu_kind = "performance"  # Best for low-latency MCP calls from LLMs
+  cpus = 2
+  memory_mb = 2048  # More for embeddings/processing if needed
 
 [checks]
   [checks.mcp]

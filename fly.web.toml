@@ -24,9 +24,9 @@ primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "
   soft_limit = 500
 
 [[vm]]
-  cpu_kind = "shared"
+  cpu_kind = "performance"  # Better for WebSocket Collab Room low latency
   cpus = 1
-  memory_mb = 1024   # Increase for production Collab WS usage
+  memory_mb = 1024
 
 [checks]
   [checks.web]

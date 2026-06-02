@@ -22,7 +22,7 @@ primary_region = "iad"
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
-  memory_mb = 512   # Worker can be small
+  memory_mb = 512   # Worker is background, keep cheap; scale machines if backlog
 
 # No public services needed for a pure worker
 # It will just run the process in the machine

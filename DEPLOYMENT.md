@@ -1,12 +1,22 @@
 # Unimatrix Deployment Guide
 
-**Current target: Fly.io** (user request: "let's migrate vercel to fly.io" since Render billing blocks it).
+**Current target: Fly.io** (best for persistent long-lived processes, WS Collab, dedicated MCP server, background worker).
 
-The full migration work from Vercel (custom persistent server.ts for WS/Collab, dedicated MCP, worker, schema unification via packages/db with @@maps, auth bridge for MCP tokens, Docker parity, monorepo builds) has been completed by autonomous agent (commit 44921a1) and is 100% reusable for Fly.io.
+**Best services stack for optimal Unimatrix performance:**
+- **Compute/Hosting**: Fly.io (persistent Machines, global anycast, autoscaling, cheap dedicated CPU options for low-latency MCP/WS).
+- **Database**: Neon Postgres (serverless, pgvector for embeddings, branching for dev/prod, excellent perf/cost, works perfectly with Prisma).
+- **Realtime/Collab**: Ably (managed, scales better than raw WS+Redis for multi-LLM rooms with presence/history; already integrated in lib/realtime/ably.ts and collab system - prefer this in prod over self-hosted WS).
+- **Background Jobs/Worker**: Polling worker on Fly (simple); for production scale use Upstash QStash (already referenced in code) or Inngest to trigger librarian jobs reliably instead of DB poll.
+- **Embeddings**: Voyage AI (specialized, high quality for semantic memory).
+- **Auth**: Clerk (for MCP tokens) + NextAuth (web) with bridge (in progress unification).
+- **Email/Payments**: Resend + Stripe (standard).
+- **Caching/Rate limit/PubSub**: Upstash Redis (already in deps for rate-limit and redis-pubsub fallback).
 
-**DB:** Keep using your existing **Neon Postgres** (with pgvector). Provide `DATABASE_URL` and `DIRECT_URL` as Fly secrets. No DB migration required.
+This setup gives: low latency for LLMs, reliable real-time collab, efficient background processing, serverless DB scaling, global low-latency hosting.
 
-This guide prioritizes Fly.io. Render files (`render.yaml`, `RENDER.md`) are kept as ready alternative for when billing is resolved. Railway and VPS options also documented below.
+The autonomous migration agent + our work has prepared everything portable for this (custom server, Docker, Prisma unification, etc.).
+
+Render files kept as alt if billing fixed. Railway/VPS also viable but Fly is best balance for perf/cost/simplicity here.
 
 ## Why We Moved Away From Vercel (and why it's hard to go back)
 
@@ -227,10 +237,18 @@ Fly.io is very strong for exactly this kind of workload (custom servers, WebSock
    - Web: https://unimatrix-web.fly.dev
    - MCP: https://unimatrix-mcp.fly.dev/mcp   (use this in your Claude Desktop / Cursor mcp.json)
 
-**Important Fly notes for our setup:**
+**Best practices for Fly.io (optimal perf):**
+- Use `performance` CPU kind + dedicated resources for MCP (low latency LLM calls) and web (WS Collab) as in the tomls.
+- For worker: shared is fine; run as always-on machine with `fly machine update` or dedicated cheap VM.
+- Prefer Ably for Collab Room in production (see lib/realtime/ably.ts + lib/collab/ - handles auth, presence, history, scales without managing your own WS/Redis).
+- Raw WS + Upstash Redis pubsub (in server.ts) is fallback for self-hosted.
+- Worker: Current DB poll works for MVP; for best, integrate Upstash QStash to enqueue librarian jobs from handlers (see comments in code) for reliable async without constant polling.
+- Healthchecks, auto_start/stop (add to toml for web/worker to save $), multi-region if global users.
+- Secrets via `fly secrets`, not env in toml.
+- Monitor with `fly logs`, `fly metrics`, add Sentry if needed.
 - Our custom `server.ts` and Fastify server already listen on `process.env.PORT || 3000`. The toml files set `PORT=8080` which is standard for Fly.
 - Healthchecks are configured in the tomls (`/api/health` and `/health`).
-- For the Collab WebSocket: it will be available at `wss://unimatrix-web.fly.dev/ws/collab?roomId=xxx`
+- For the Collab WebSocket: it will be available at `wss://unimatrix-web.fly.dev/ws/collab?roomId=xxx` (but use Ably for prod).
 - No volumes needed (we use Neon for DB, no local persistent files required).
 - Update `NEXTAUTH_URL` to the actual Fly URL after first deploy.
 - The `docker-compose.yml` still works locally against the same Neon DB.
