@@ -19,7 +19,7 @@
     "build:android": "npx eas-cli@latest build --platform android --profile production --no-wait",
     "build:ios": "npx eas-cli@latest build --platform ios --profile production --no-wait"
   },
-  "_note": "IMPORTANT: EAS build commands MUST run with apps/mobile as CWD. From monorepo root use the pnpm aliases: pnpm mobile:build:all (or :ios, :android, :prod, :preview). For extra flags: pnpm --filter mobile exec npx eas-cli@latest build --platform all --profile production --non-interactive. NEVER run raw npx eas-cli from the Unimatrix/ root dir.",
+  "_note": "IMPORTANT: EAS build commands MUST run with apps/mobile as CWD. From monorepo root use the pnpm aliases: pnpm mobile:build:all (or :ios, :android, :prod, :preview). For extra flags: pnpm --filter mobile exec npx eas-cli@latest build --platform all --profile production --non-interactive. NEVER run raw npx eas-cli from the Unimatrix/ root dir. For iOS first-time: after unlocking Apple ID and generating app-specific password, run 'pnpm exec eas credentials:configure-build --platform ios --profile production' (interactive, use tjpoisal@gmail.com + app-specific pw). Then non-int builds work. Replace TEAM_ID_PLACEHOLDER in eas.json with your Apple Team ID.",
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.0.0",
