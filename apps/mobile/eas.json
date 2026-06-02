@@ -1,4 +1,12 @@
 {
+  // EAS Build config for Unimatrix mobile (Expo).
+  // IMPORTANT for iOS: Real device builds, distribution, and App Store submission require a paid Apple Developer Program membership ($99 USD / year).
+  // User currently cannot afford this fee. Therefore:
+  // - Use "preview" profile for iOS (simulator builds only - free).
+  // - Android production builds work fine (no Apple fee).
+  // - iOS production/submit sections are placeholders and will fail until membership + credentials are obtained.
+  // Run from monorepo root: pnpm mobile:build:android (or :ios for simulator, :all, etc.)
+  // See ACCOUNTS_AND_SECRETS.md and apps/mobile/README.md for details.
   "cli": {
     "version": "20.0.0",
     "appVersionSource": "remote"
@@ -29,6 +37,9 @@
       "ios": {
         "buildConfiguration": "Release",
         "credentialsSource": "remote"
+        // NOTE: Full iOS production builds (signed for real devices or App Store) require a paid Apple Developer Program membership ($99/year).
+        // Without it, use simulator builds (see "preview" profile) or Expo Go for development/testing on iOS.
+        // credentialsSource: remote will fail for iOS until you have Apple dev membership + configured credentials.
       },
       "android": {
         "buildType": "app-bundle",
@@ -44,9 +55,11 @@
   "submit": {
     "production": {
       "ios": {
+        // iOS App Store submission requires paid Apple Developer Program ($99/year) + App Store Connect access.
+        // User currently cannot afford the fee, so this is placeholder only. Use for Android only until membership obtained.
         "appleId": "tjpoisal@gmail.com",
         "ascAppId": "6748523981",
-        "appleTeamId": "TEAM_ID_PLACEHOLDER"  // TODO: replace with your 10-char Apple Team ID (e.g. from https://developer.apple.com/account/#/membership or eas configure output)
+        "appleTeamId": "TEAM_ID_PLACEHOLDER"  // TODO: replace with your 10-char Apple Team ID (e.g. from https://developer.apple.com/account/#/membership or eas configure output) AFTER obtaining membership
       },
       "android": {
         "serviceAccountKeyPath": "./google-services-key.json",

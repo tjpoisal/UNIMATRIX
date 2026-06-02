@@ -184,10 +184,15 @@ If any other obscure var from your paste isn't listed here (e.g. SVIX), it's opt
   - Local dev: `EXPO_PUBLIC_API_URL=http://YOUR_LAN_IP:3000/api pnpm --filter mobile start`
   - EAS builds: wired in apps/mobile/eas.json (production/preview point to Fly once web is live).
 - **Set EXPO_TOKEN** for CI or one-off: as above. Also set in GitHub repo secrets if using the .eas/workflows you started.
+- **iOS IMPORTANT (Apple Developer fee)**: Real iOS builds for physical devices or App Store submission require a paid Apple Developer Program membership ($99 USD/year). You currently cannot afford this fee, so:
+  - `pnpm mobile:build:ios` (and iOS part of :all) now uses the "preview" profile → simulator-only builds (free, works without membership).
+  - Full production iOS (signed .ipa for devices/store) and the submit section are disabled/placeholders until you obtain membership.
+  - Android production builds are fully supported with no extra fee.
+  - For iOS testing: use simulator via the alias, or Expo Go (limited, no custom native modules easily).
+  - When you can afford membership: fill TEAM_ID_PLACEHOLDER in eas.json, run interactive `pnpm exec eas credentials:configure-build --platform ios --profile production` (login with tjpoisal@gmail.com + app-specific password), then switch iOS back to production profile.
+- Check the dashboard at https://expo.dev for the status of the Android build that was queued.
 
-The other remaining delta items (STRIPE_PRICE_* and the post-deploy NEXTAUTH_URL etc.) are independent of this. Check the dashboard at https://expo.dev for the status of the Android build that was queued.
-
-**iOS credentials note (for non-interactive builds)**: iOS requires Distribution Certificate + provisioning profile set up in EAS (remote). First time, run interactively on your machine (after unlocking Apple account if locked from prior attempts): `pnpm exec eas credentials:configure-build --platform ios --profile production`. Login with tjpoisal@gmail.com (use app-specific password). Fill TEAM_ID_PLACEHOLDER in eas.json submit/ios with your real 10-char team ID. Then non-interactive `pnpm mobile:build:ios` will work. Apple account lock: visit https://iforgot.apple.com to unlock.
+(The other remaining delta items (STRIPE_PRICE_* and the post-deploy NEXTAUTH_URL etc.) are independent of this.)
 
 ### 1.10 Ably (Best Realtime for Collab Room)
 - **Why (best services)**: Managed WebSockets with presence, history, auth, fan-out. Far superior to raw WS + Redis for multi-LLM collab rooms. Scales without ops.

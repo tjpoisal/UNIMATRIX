@@ -15,11 +15,11 @@
     "eas:build": "npx eas-cli@latest build",
     "build:preview": "npx eas-cli@latest build --profile preview --no-wait",
     "build:prod": "npx eas-cli@latest build --profile production --no-wait",
-    "build:all": "npx eas-cli@latest build --platform all --profile production --no-wait",
+    "build:all": "npx eas-cli@latest build --platform all --profile production --no-wait",  // Note: iOS part will use production (may fail without Apple dev membership $99/yr). Use build:ios for free simulator preview.
     "build:android": "npx eas-cli@latest build --platform android --profile production --no-wait",
-    "build:ios": "npx eas-cli@latest build --platform ios --profile production --no-wait"
+    "build:ios": "npx eas-cli@latest build --platform ios --profile preview --no-wait"  // preview = simulator (free, no Apple dev fee needed). Production iOS requires $99/yr membership.
   },
-  "_note": "IMPORTANT: EAS build commands MUST run with apps/mobile as CWD. From monorepo root use the pnpm aliases: pnpm mobile:build:all (or :ios, :android, :prod, :preview). For extra flags: pnpm --filter mobile exec npx eas-cli@latest build --platform all --profile production --non-interactive. NEVER run raw npx eas-cli from the Unimatrix/ root dir. For iOS first-time: after unlocking Apple ID and generating app-specific password, run 'pnpm exec eas credentials:configure-build --platform ios --profile production' (interactive, use tjpoisal@gmail.com + app-specific pw). Then non-int builds work. Replace TEAM_ID_PLACEHOLDER in eas.json with your Apple Team ID.",
+  "_note": "IMPORTANT: EAS build commands MUST run with apps/mobile as CWD. From monorepo root use the pnpm aliases: pnpm mobile:build:all (or :ios, :android, :prod, :preview). For extra flags: pnpm --filter mobile exec npx eas-cli@latest build --platform all --profile production --non-interactive. NEVER run raw npx eas-cli from the Unimatrix/ root dir. iOS REAL builds (device/App Store) require $99/yr Apple Developer Program membership (user cannot currently afford). Use :ios alias for free simulator builds (preview profile). Android is fully supported. TEAM_ID_PLACEHOLDER in eas.json only needed if/when obtaining membership.",
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.0.0",

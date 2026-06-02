@@ -85,4 +85,11 @@ EXPO_TOKEN=your_token pnpm mobile:build:all
 See also `../ACCOUNTS_AND_SECRETS.md` (the "REMAINING DELTA" Expo section) and `eas.json`.
 
 The `.easignore` in this directory keeps the upload to EAS small.
+
+**iOS note (Apple Developer fee)**: Real iOS builds for physical devices/App Store require paid Apple Developer membership ($99/year). You currently cannot afford this. Therefore:
+- `pnpm mobile:build:ios` uses the "preview" profile (simulator builds only - free).
+- Full signed iOS production is disabled until membership.
+- Android works fully.
+- Test iOS via simulator or Expo Go for now.
+
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
