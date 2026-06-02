@@ -109,7 +109,7 @@ export default function McpTokensPage() {
             <label className="block text-sm text-[#94A3B8] mb-1">Scope</label>
             <select
               value={scope}
-              onChange={(e) => setScope(e.target.value as any)}
+              onChange={(e) => setScope(e.target.value as 'full' | 'readonly' | 'memory_only')}
               className="w-full bg-[#0A0F1C] border border-[#334155]/50 rounded px-3 py-2 text-sm focus:outline-none focus:border-[#00F5FF]"
             >
               <option value="full">Full access</option>
