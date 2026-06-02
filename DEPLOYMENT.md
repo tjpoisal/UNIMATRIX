@@ -1,12 +1,12 @@
 # Unimatrix Deployment Guide
 
-**Current recommendation: Fly.io** ("let's try fly.io").
+**Current target: Fly.io** (user request: "let's migrate vercel to fly.io" since Render billing blocks it).
 
-The architecture (custom `apps/web/server.ts` for persistent WebSockets/Collab Room, dedicated Fastify MCP server from `packages/server`, background worker for librarian/AgentRun, Dockerfiles, shared Neon Postgres) is fully portable and ready for Fly.io, Railway, self-hosted VPS, or Render (when billing is resolved).
+The full migration work from Vercel (custom persistent server.ts for WS/Collab, dedicated MCP, worker, schema unification via packages/db with @@maps, auth bridge for MCP tokens, Docker parity, monorepo builds) has been completed by autonomous agent (commit 44921a1) and is 100% reusable for Fly.io.
 
-**DB:** Keep using your existing **Neon Postgres**. Provide `DATABASE_URL`/`DIRECT_URL` as secrets on the platform. No DB move needed.
+**DB:** Keep using your existing **Neon Postgres** (with pgvector). Provide `DATABASE_URL` and `DIRECT_URL` as Fly secrets. No DB migration required.
 
-The autonomous migration agent completed the full Vercel→Render prep (including db unification, auth bridge, worker/AgentRun integration, Docker parity, docs). Those changes benefit Fly.io too (see commit 44921a1).
+This guide prioritizes Fly.io. Render files (`render.yaml`, `RENDER.md`) are kept as ready alternative for when billing is resolved. Railway and VPS options also documented below.
 
 ## Why We Moved Away From Vercel (and why it's hard to go back)
 
@@ -44,44 +44,84 @@ This is exactly why the custom server, Dockerfiles, and worker were built, and w
 
 ## Recommended Platforms (in order of ease for this stack)
 
-### 1. Railway (Easiest "Render-like" experience)
-Railway has excellent developer experience for monorepos, Docker, and long-running services. Very similar to Render.
+### 1. Fly.io (Current target - let's migrate Vercel to Fly.io)
 
-**How to deploy:**
+Fly.io is excellent for long-lived Node processes, WebSockets, background workers, and Docker. Generous free tier, often cheaper than Render for always-on.
 
-1. Go to [railway.app](https://railway.app), sign in, and connect this GitHub repo.
-2. Create **two separate services** from the *same repo*:
+**Recommended app names:** unimatrix-web, unimatrix-mcp, unimatrix-worker.
 
-   - **unimatrix-web**
-     - Dockerfile: `Dockerfile.web`
-     - Root directory: `.` (or the repo root)
-     - Port: 3000
-     - Environment variables (see list below). Set `NEXTAUTH_URL` to the public URL Railway gives this service.
+**Step-by-step (from repo root):**
 
-   - **unimatrix-mcp** (the one LLMs actually connect to)
-     - Dockerfile: `Dockerfile.server`
-     - Root directory: `.`
-     - Port: 3000
-     - Environment variables for the MCP server (Clerk, Voyage, encryption key, etc.).
+1. Install flyctl and login:
+   ```bash
+   curl -L https://fly.io/install.sh | sh
+   fly auth login
+   ```
 
-3. (Optional) Worker for background jobs:
-   - Deploy a third service using `Dockerfile.server`.
-   - Override the start command to: `node dist/worker.js` (or temporarily change the CMD in a copy of the Dockerfile).
+2. Create apps:
+   ```bash
+   fly apps create unimatrix-web
+   fly apps create unimatrix-mcp
+   fly apps create unimatrix-worker  # for background jobs
+   ```
 
-4. Database: Use your existing Neon `DATABASE_URL` + `DIRECT_URL`. Paste them into the environment variables for both services. Do **not** create a new Postgres on Railway unless you want to.
+3. Deploy using provided tomls (easiest):
+   ```bash
+   # Web (Next.js + custom server.ts for WS Collab)
+   cp fly.web.toml fly.toml
+   fly deploy --config fly.toml --app unimatrix-web
 
-5. Domains & scaling: Railway gives you `*.up.railway.app` URLs automatically. Add custom domains in the dashboard. Scale CPU/memory as needed.
+   # MCP server (Fastify, what LLMs connect to)
+   cp fly.mcp.toml fly.toml
+   fly deploy --config fly.toml --app unimatrix-mcp
+   ```
 
-**Environment variables** (copy from your current setup):
-- Shared: `DATABASE_URL`, `DIRECT_URL` (from Neon), `NODE_ENV=production`
-- Web: `NEXTAUTH_SECRET`, `NEXTAUTH_URL` (your web service public URL), Google/GitHub OAuth, `RESEND_API_KEY`, Stripe keys, etc.
-- MCP: `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET`, `VOYAGE_API_KEY`, `MASTER_ENCRYPTION_KEY`
+   Use the helper script:
+   ```bash
+   chmod +x scripts/fly-deploy.sh
+   ./scripts/fly-deploy.sh web
+   ./scripts/fly-deploy.sh mcp
+   ./scripts/fly-deploy.sh worker
+   ```
 
-Railway will build the Dockerfiles when you point the services at them.
+4. Set secrets (critical - use your Neon + other keys):
+   ```bash
+   fly secrets set \
+     DATABASE_URL="your-neon-pooled-url" \
+     DIRECT_URL="your-neon-direct-url" \
+     NEXTAUTH_SECRET="long-random-string" \
+     NEXTAUTH_URL="https://unimatrix-web.fly.dev" \
+     # Google, GitHub, Resend, Stripe etc.
+     --app unimatrix-web
 
-**Local development stays the same:** Your existing `docker-compose.yml` works (it already prefers remote Neon over the local `db` service).
+   fly secrets set \
+     DATABASE_URL="..." DIRECT_URL="..." \
+     CLERK_SECRET_KEY="sk_..." \
+     VOYAGE_API_KEY="..." \
+     MASTER_ENCRYPTION_KEY="32-byte-hex" \
+     --app unimatrix-mcp
 
-### 2. Fly.io (Great for long-lived apps + often cheaper)
+   # Same for worker
+   fly secrets set ... --app unimatrix-worker
+   ```
+
+5. After deploy:
+   - Web: https://unimatrix-web.fly.dev
+   - MCP: https://unimatrix-mcp.fly.dev/mcp (use in Claude Desktop etc. with token from web UI)
+   - Update MCP client configs.
+
+**Worker on Fly:** After deploy, run persistently e.g.:
+```bash
+fly machine run --app unimatrix-worker --vm-memory 512 node dist/worker.js
+```
+
+See `fly.*.toml` for regions, VM sizes, healthchecks (already configured for /api/health and /health).
+
+**Database:** Your existing Neon (no change needed).
+
+**Local dev:** `docker compose up --build` (uses remote Neon).
+
+### 2. Railway (Easiest "Render-like" experience)
 Fly.io is very strong for exactly this kind of workload (custom servers, WebSockets, background processes). It has a generous free allowance and is often cheaper than Render for always-on services.
 
 **Recommended app names:** `unimatrix-web` and `unimatrix-mcp` (you can change).
@@ -206,8 +246,6 @@ Example:
 ```
 
 Fly will automatically rebuild on `git push` if you connect the repo (or use `fly deploy` from CI).
-
-This should give you persistent long-lived processes for WS and the MCP server, exactly what we couldn't get on Vercel serverless.
 
 ### 3. Self-Hosted VPS + Docker Compose (Cheapest / full control)
 If you want to avoid PaaS billing surprises entirely:

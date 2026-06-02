@@ -55,12 +55,13 @@ unimatrix/
 └── CLAUDE.md          ← You are here
 ```
 
-**URLs (Vercel legacy - primary deployment now on Render):**
+**URLs (Vercel legacy; current primary: Fly.io):**
 - Old Cloud (Vercel): https://unimatrix-flax.vercel.app
 - Marketing site: https://deployunimatrix.com
 - MCP endpoint (legacy Vercel): https://unimatrix-flax.vercel.app/api/mcp
-- MCP endpoint: see DEPLOYMENT.md (Railway / Fly.io / self-hosted / etc.). Legacy: https://unimatrix-flax.vercel.app/api/mcp or old Render URLs.
-- MCP endpoint (self-hosted): http://[user-server]:PORT/mcp
+- MCP endpoint (Fly.io primary): https://unimatrix-mcp.fly.dev/mcp (update after deploy; see DEPLOYMENT.md + fly.*.toml)
+- MCP endpoint (self-hosted or Render alt): http://[user-server]:PORT/mcp or your Render URL
+- See DEPLOYMENT.md for Fly.io steps, tomls, and scripts.
 
 ---
 
@@ -111,36 +112,36 @@ unimatrix/
 
 ---
 
-## Environment Variables (Render Production - primary)
+## Environment Variables (Fly.io Production - current primary; also works for Render/Railway/VPS)
 
 | Variable | Where set | Notes |
 |----------|-----------|-------|
-| `DATABASE_URL` | Render (from db service) | Shared Postgres (Neon or Render PG) connection string |
-| `DIRECT_URL` | Render (from db) | For prisma etc |
-| `NEXTAUTH_SECRET` | Render | Random base64 |
-| `NEXTAUTH_URL` | Render | `https://unimatrix-web.onrender.com` (update if service name changes) |
-| `RESEND_API_KEY` | Render | `re_...` |
-| `EMAIL_FROM` | Render | `Unimatrix <onboarding@resend.dev>` |
-| OAuth, Stripe, etc. | Render | Same as before |
-| `CLERK_SECRET_KEY` | Render | For MCP server auth (hybrid with NextAuth during bridge) |
-| `VOYAGE_API_KEY`, `MASTER_ENCRYPTION_KEY` | Render | For embeddings + memory crypto in MCP/server |
+| `DATABASE_URL` | Fly secrets (from Neon) | Shared Postgres (Neon recommended) connection string |
+| `DIRECT_URL` | Fly secrets (from Neon) | For Prisma (direct, non-pooled) |
+| `NEXTAUTH_SECRET` | Fly secrets | Random base64 string (32+ chars) |
+| `NEXTAUTH_URL` | Fly secrets | `https://unimatrix-web.fly.dev` (update after deploy) |
+| `RESEND_API_KEY` | Fly secrets | `re_...` |
+| `EMAIL_FROM` | Fly secrets | `Unimatrix <onboarding@resend.dev>` |
+| OAuth (Google, GitHub), Stripe, etc. | Fly secrets | Same as before |
+| `CLERK_SECRET_KEY` | Fly secrets | For MCP server auth (hybrid with NextAuth during bridge) |
+| `VOYAGE_API_KEY`, `MASTER_ENCRYPTION_KEY` | Fly secrets | For embeddings + memory crypto in MCP/server |
 
 ---
 
 ## Deployment Workflow
 
-**Rule: Every change must be committed to GitHub (git push origin main triggers Render Blueprint deploy).**
+**Rule: Every change must be committed to GitHub (git push origin main triggers deploy on connected platform).**
 
 ```bash
 git add <files>
 git commit -m "type(scope): description"
 git push origin main
-# → Render (via render.yaml Blueprint) auto deploys web + mcp + worker
+# → Fly.io (via fly.toml or scripts/fly-deploy.sh) or Render (via render.yaml if billing resolved)
 ```
 
 - **Only branch:** `main`
 - **GitHub repo:** `https://github.com/tjpoisal/UNIMATRIX`
-- **Current target:** Fly.io (let's try it). Use `DEPLOYMENT.md`, `fly.web.toml`/`fly.mcp.toml`/`fly.worker.toml`, `scripts/fly-deploy.sh`.
+- **Current target:** Fly.io. Use `DEPLOYMENT.md`, `fly.web.toml`/`fly.mcp.toml`/`fly.worker.toml`, `scripts/fly-deploy.sh` for web + mcp + worker.
 - Render alternative: `render.yaml` + `RENDER.md` (when billing resolved). Uses @unimatrix/db + @unimatrix/server, robust migrate, Docker or native.
 - Dockerfiles + docker-compose.yml for local parity / self-host / any platform.
 - vercel.json is legacy only. No more Vercel analytics or hard-coded vercel.app URLs in prod paths.
@@ -173,7 +174,7 @@ git push origin main
 - **Mobile memory viewer** — show what the AI remembers, by context/device
 - **Real-time sync** (WebSocket) — push new memories to all connected clients immediately (custom server + redis-pubsub + ably option live)
 - **Collaborative desktop app** (Electron) — multi-LLM simultaneous conversation UI (planned)
-- Render migration complete (vercel legacy only; custom server, worker, Docker parity, schema maps, db package, builds all enforced)
+- Migration to persistent platforms complete (Vercel legacy only; custom server, worker, Docker parity, schema unification via @unimatrix/db + @@maps, auth bridge for MCP tokens, builds enforced). Current target Fly.io; Render alternative ready.
 
 ### 📋 Deferred
 - Desktop app full build (Electron + WebSocket multi-LLM room)
@@ -192,7 +193,7 @@ When a user configures an LLM client (Claude Desktop, Cursor, etc.) with the Uni
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://<your-render-mcp>.onrender.com/mcp",  // or legacy vercel /api/mcp
+      "url": "https://unimatrix-mcp.fly.dev/mcp",  // Fly.io primary; update after deploy. Legacy: vercel /api/mcp
       "apiKey": "USER_API_KEY"
     }
   }
@@ -252,7 +253,7 @@ Enterprise = self-hosted Docker option + priority support + team sharing.
 3. **`EMAIL_FROM` must use `onboarding@resend.dev`** until a custom domain is verified on Resend.
 4. **Mobile API URL** is set via `EXPO_PUBLIC_API_URL` env var (defaults to `http://localhost:3000/api`).
 5. **Git lock files** sometimes appear — run `rm -f .git/*.lock` before committing if git fails.
-6. **Old AWS stack** (DynamoDB, AppSync, Lambda) is documented in `CLAUDE_CODE_SYSTEM_PROMPT.md` — that's the old architecture. We are on Neon/Render PG + Render now (Vercel is legacy only).
+6. **Old AWS stack** (DynamoDB, AppSync, Lambda) is documented in `CLAUDE_CODE_SYSTEM_PROMPT.md` — that's the old architecture. We are on Neon PG + Fly.io (or Render when billing resolved); Vercel is legacy only.
 7. **`pnpm-lock.yaml` conflicts** — always use `pnpm install --frozen-lockfile` in CI.
 
 ---
