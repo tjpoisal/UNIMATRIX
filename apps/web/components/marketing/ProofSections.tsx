@@ -3,6 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 
+// eslint-disable react/no-unescaped-entities -- illustrative terminal/code examples contain quotes for realism
+
 interface ProofSectionProps {
   title: string;
   description: string;
@@ -34,11 +36,11 @@ export function CrossClientMemoryDemo() {
           </div>
           <div className="p-5 font-mono text-sm bg-[#0D1117]">
             <div className="text-text-secondary">
-              User: "Remember that we're using a custom auth middleware that validates JWTs against our internal service."<br /><br />
+              User: &quot;Remember that we&apos;re using a custom auth middleware that validates JWTs against our internal service.&quot;<br /><br />
               <span className="text-[#22C55E]">→ Cursor called: unimatrix_store_memory</span><br />
-              location_id: "loc_proj_auth_7842"<br />
-              content: "Custom JWT validation middleware against internal auth service..."<br />
-              tags: ["auth", "middleware", "security"]
+              location_id: &quot;loc_proj_auth_7842&quot;<br />
+              content: &quot;Custom JWT validation middleware against internal auth service...&quot;<br />
+              tags: [&quot;auth&quot;, &quot;middleware&quot;, &quot;security&quot;]
             </div>
           </div>
           <div className="bg-[#111827] px-4 py-1.5 text-[10px] text-text-muted border-t border-border/50">

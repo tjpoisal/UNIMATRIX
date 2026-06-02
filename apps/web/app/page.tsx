@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ProofOfReality } from '@/components/marketing/ProofSections';
 
+// eslint-disable react/no-unescaped-entities -- marketing/landing copy uses real quotes in prose and examples for readability
+
 export const metadata = {
   title: 'Unimatrix — MCP Memory Server for AI Tools',
   description:
@@ -334,7 +336,7 @@ export default async function Home() {
               Mem0 is a lightweight, embeddable memory layer designed primarily for single-agent applications. You typically run it yourself as a key-value store inside your own agent loop.
             </p>
             <p>
-              Unimatrix is a managed, multi-tenant <strong>MCP server</strong> built for developers who use many different AI clients (Claude Desktop, Cursor, Windsurf, Continue, custom agents). It provides a standardized protocol interface, hierarchical "Memory Palace" organization, semantic search, and first-class support for cross-client federation without writing per-tool glue code.
+              Unimatrix is a managed, multi-tenant <strong>MCP server</strong> built for developers who use many different AI clients (Claude Desktop, Cursor, Windsurf, Continue, custom agents). It provides a standardized protocol interface, hierarchical &quot;Memory Palace&quot; organization, semantic search, and first-class support for cross-client federation without writing per-tool glue code.
             </p>
             <p className="mt-4 text-xs text-text-muted">
               Choose Mem0 if you want a simple store inside one agent you fully control.<br />
