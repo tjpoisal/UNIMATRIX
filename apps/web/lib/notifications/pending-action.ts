@@ -3,9 +3,6 @@
  * Supports Resend (email) and Slack webhooks.
  */
 
-// Resend client loaded dynamically only if API key present (avoids require + optional dep issues in CI/lint/typecheck)
-let resend: any = null;
-
 interface PendingActionNotification {
   id: string;
   roomId: string;
