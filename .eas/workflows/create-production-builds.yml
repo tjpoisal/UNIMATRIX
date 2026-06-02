@@ -1,2 +1,28 @@
-# EAS Workflows (repo root). See https://docs.expo.dev/eas/workflows/
-# Example production build on push can go here. User created the dir in the build attempt.
+# EAS Workflows (see https://docs.expo.dev/eas/workflows/)
+#
+# This file was created during a build attempt from the monorepo root.
+# Workflows run on EAS and can trigger builds, submissions, etc.
+#
+# Example: build production on push to main (requires EXPO_TOKEN secret in your EAS account or repo if using GitHub integration).
+#
+# name: create-production-builds
+# on:
+#   push:
+#     branches: [ main ]
+# jobs:
+#   build-prod:
+#     name: Build production
+#     steps:
+#       - name: Build all platforms
+#         uses: eas/build
+#         with:
+#           profile: production
+#           platform: all
+#           # token: ${{ secrets.EXPO_TOKEN }}  # if needed for the workflow runner
+
+# For now, use the pnpm scripts from the repo root instead:
+#   pnpm mobile:build:all
+#   pnpm mobile:build:ios
+#   etc.
+#
+# These ensure the correct working directory (apps/mobile) and our pinned config.
