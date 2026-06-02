@@ -9,8 +9,7 @@ interface PendingAction {
   status: string;
   createdAt: string;
   requested_by?: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  args: any;
+  args: Record<string, unknown>;
 }
 
 export default function PendingActionsPage() {
