@@ -18,8 +18,7 @@
     "build:android": "npx eas-cli@latest build --platform android --profile production",
     "build:ios": "npx eas-cli@latest build --platform ios --profile production"
   },
-  "_note": "IMPORTANT: EAS build commands (and any eas-*) MUST be run with apps/mobile as the current working directory so the correct app.json + eas.json + node_modules are used. Use `pnpm --filter mobile run build:prod` (from monorepo root) or `cd apps/mobile && pnpm run build:prod`. Running npx eas-cli directly from the monorepo root creates wrong root eas.json/app.json and uploads huge incorrect archives (as seen in the failed attempt)."
-  },
+  "_note": "IMPORTANT: EAS build commands (and any eas-*) MUST be run with apps/mobile as the current working directory so the correct app.json + eas.json + node_modules are used. Use `pnpm --filter mobile run build:prod` (from monorepo root) or `cd apps/mobile && pnpm run build:prod`. Running npx eas-cli directly from the monorepo root creates wrong root eas.json/app.json and uploads huge incorrect archives (as seen in the failed attempt).",
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.0.0",
