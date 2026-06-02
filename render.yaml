@@ -1,7 +1,10 @@
-# Unimatrix — Render Blueprint
+# Unimatrix — Render Blueprint (use when billing resolved)
 # Deploys the full stack: PostgreSQL + Core MCP Server (Fastify) + Web Portal (Next.js + Collab WS)
 #
-# Usage:
+# Current active target: Fly.io — see DEPLOYMENT.md, fly.web.toml / fly.mcp.toml / fly.worker.toml, and scripts/fly-deploy.sh
+# This file is ready as alternative Blueprint.
+#
+# Usage (Render):
 #   1. Push this file to main
 #   2. In Render Dashboard → Blueprints → New Blueprint Instance
 #   3. Connect this repo

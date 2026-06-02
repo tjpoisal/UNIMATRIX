@@ -140,13 +140,14 @@ git push origin main
 
 - **Only branch:** `main`
 - **GitHub repo:** `https://github.com/tjpoisal/UNIMATRIX`
-- **Primary deploy:** Render Blueprint (see render.yaml + RENDER.md): shared Postgres + @unimatrix/server (Fastify MCP on /mcp) + unimatrix-web (Next.js + custom server.ts for WS) + optional background worker.
-- Dockerfiles + docker-compose.yml for local parity / self-host. Native node or docker runtimes supported in Render.
+- **Current target:** Fly.io (let's try it). Use `DEPLOYMENT.md`, `fly.web.toml`/`fly.mcp.toml`/`fly.worker.toml`, `scripts/fly-deploy.sh`.
+- Render alternative: `render.yaml` + `RENDER.md` (when billing resolved). Uses @unimatrix/db + @unimatrix/server, robust migrate, Docker or native.
+- Dockerfiles + docker-compose.yml for local parity / self-host / any platform.
 - vercel.json is legacy only. No more Vercel analytics or hard-coded vercel.app URLs in prod paths.
 - Custom server binds to 0.0.0.0:PORT; start:prod = node dist/server.js after build:server.
 - Monorepo: always `pnpm --filter @unimatrix/db build` before web/server in CI/deploys. Use path or @scope filters.
 - Migrations auto-attempted in startCommands + Docker CMDs (raw SQL for core tables + prisma push fallback + db:migrate:deploy).
-- git push to main triggers the full stack on Render.
+- git push to main triggers deploys on the connected platform (Fly, Render, etc.).
 
 ---
 

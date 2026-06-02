@@ -1,6 +1,12 @@
-# Unimatrix Deployment Guide (Render Alternatives)
+# Unimatrix Deployment Guide
 
-**Note:** If you currently can't use Render (e.g. billing/owe money issues), use this guide instead. The architecture (custom Next.js server for persistent WebSockets + Collab Room, separate Fastify MCP server from `packages/server`, background worker for librarian/AgentRun jobs, Docker support) is fully portable.
+**Current recommendation: Fly.io** ("let's try fly.io").
+
+The architecture (custom `apps/web/server.ts` for persistent WebSockets/Collab Room, dedicated Fastify MCP server from `packages/server`, background worker for librarian/AgentRun, Dockerfiles, shared Neon Postgres) is fully portable and ready for Fly.io, Railway, self-hosted VPS, or Render (when billing is resolved).
+
+**DB:** Keep using your existing **Neon Postgres**. Provide `DATABASE_URL`/`DIRECT_URL` as secrets on the platform. No DB move needed.
+
+The autonomous migration agent completed the full Vercel→Render prep (including db unification, auth bridge, worker/AgentRun integration, Docker parity, docs). Those changes benefit Fly.io too (see commit 44921a1).
 
 ## Why We Moved Away From Vercel (and why it's hard to go back)
 
