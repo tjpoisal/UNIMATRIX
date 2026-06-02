@@ -22,34 +22,29 @@ pnpm install
 
 ---
 
-## 2. Start PostgreSQL
+## 2. Database
 
-You need a local Postgres with the `pgvector` extension. Pick one:
+The project now primarily uses **Prisma Postgres** (remote, pooled endpoint) for the web app and collaboration features.
 
-### Option A: Docker (Recommended)
+### Recommended: Use your Prisma Postgres connection string
+
+Get your connection string(s) from the Prisma dashboard:
+- `DATABASE_URL`: the pooled connection string (for the app)
+- `DIRECT_URL`: a direct (non-pooled) connection string (preferred for `prisma migrate`, `db push`, Studio, and DDL)
+
+Set these in the env files (see below). The local Docker Postgres is now **optional** (useful for pgvector/embeddings in packages/server or fully offline dev).
+
+### Optional: Local Postgres + Docker (for pgvector / full local mode)
+
+If you want a local DB (e.g. for the older packages/server schema or embeddings):
 
 ```bash
-docker run -d \
-  --name unimatrix-postgres \
-  -e POSTGRES_USER=unimatrix \
-  -e POSTGRES_PASSWORD=unimatrix \
-  -e POSTGRES_DB=unimatrix \
-  -p 5432:5432 \
-  ankane/pgvector:latest
+docker compose up -d db
 ```
 
-Then create the database:
-```bash
-docker exec -it unimatrix-postgres psql -U unimatrix -c "CREATE EXTENSION IF NOT EXISTS vector;"
-```
+(Or the old manual docker run + `CREATE EXTENSION vector;`.)
 
-### Option B: Local Postgres
-
-Ensure your local Postgres has `pgvector` installed, then:
-```bash
-createdb unimatrix
-psql unimatrix -c "CREATE EXTENSION IF NOT EXISTS vector;"
-```
+See `docker-compose.yml` — the `web` and `mcp-server` services are pre-configured to use the remote DB by default.
 
 ---
 
@@ -57,100 +52,62 @@ psql unimatrix -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
 Create `.env` files in **three** locations:
 
-### A. Root `.env` (used by packages/server)
+### A. Root + packages/server
 
-Create `/workspace/UNIMATRIX/.env`:
+Root `.env.local` and `packages/server/.env` have been created/updated with your Prisma Postgres URL (see the actual files). The old local example is no longer the default.
 
-```env
-# Database (same DB for both web and server)
-DATABASE_URL=postgresql://unimatrix:unimatrix@localhost:5432/unimatrix
+### B. Web App
 
-# NextAuth v5
-AUTH_SECRET=dev-secret-change-in-production
-NEXTAUTH_URL=http://localhost:3000
+`apps/web/.env` (for `prisma` CLI) and `apps/web/.env.local` (Next.js) have already been updated with your Prisma Postgres connection string.
 
-# Google OAuth (optional — skip if you only use Credentials login)
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
+### C. packages/mcp-server (stdio client for Claude Desktop, Cursor, etc.)
 
-# GitHub OAuth (optional)
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
-
-# Encryption (generate a real one for production)
-MASTER_ENCRYPTION_KEY=REDACTED_MASTER_KEY_32BYTES00000000000000000000000000000000  # dev only; generate real with openssl rand -hex 32 for any real use
-
-# Voyage AI (optional — needed for semantic search/embedding generation)
-VOYAGE_API_KEY=
-
-# Node environment
-NODE_ENV=development
-```
-
-### B. Web App `.env.local`
-
-Create `/workspace/UNIMATRIX/apps/web/.env.local`:
+Update `packages/mcp-server/.env`:
 
 ```env
-# Same database
-DATABASE_URL=postgresql://unimatrix:unimatrix@localhost:5432/unimatrix
-
-# NextAuth
-AUTH_SECRET=dev-secret-change-in-production
-NEXTAUTH_URL=http://localhost:3000
-
-# OAuth (optional)
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
-
-# Stripe (optional — only needed for subscription features)
-STRIPE_SECRET_KEY=
-STRIPE_PUBLISHABLE_KEY=
-STRIPE_WEBHOOK_SECRET=
-
-# Voyage AI (optional)
-VOYAGE_API_KEY=
-```
-
-### C. MCP Server `.env` (packages/mcp-server)
-
-Create `/workspace/UNIMATRIX/packages/mcp-server/.env`:
-
-```env
-# Points to the local Fastify server
-UNIMATRIX_API_URL=http://localhost:3001
-
-# You'll generate this API key from the web app dashboard after first login
-UNIMATRIX_API_KEY=your-api-key-here
+UNIMATRIX_API_URL=http://localhost:3000
+UNIMATRIX_API_KEY=umx_...   # generate from the web dashboard
 ```
 
 ---
 
 ## 4. Initialize the Database
 
+Since we are using a remote Prisma Postgres DB:
+
 ### Web App (Prisma)
 
 ```bash
 cd /workspace/UNIMATRIX/apps/web
-pnpm prisma db push
+pnpm prisma migrate dev
+# or for quick sync without migration history:
+# pnpm prisma db push
 ```
 
-### Server (Raw SQL Migrations)
+(We already ran the initial migration for you when you provided the connection string.)
+
+### Server (packages/server - raw SQL + its own Prisma schema)
 
 ```bash
 cd /workspace/UNIMATRIX/packages/server
-pnpm db:migrate
+pnpm db:migrate   # runs the raw .sql files against $DATABASE_URL
+# or
+pnpm prisma migrate deploy
 ```
 
-> **Note:** The server migrations create the `pgvector` column and RLS policies. The Prisma schema handles user/auth tables. Both can coexist on the same database.
+> **Important:** The web app (Prisma) and packages/server have **different schemas**.
+> - web: Palaces, Locations, Memories, Organizations, CollabRoom/CollabMessage, WebhookSubscription, etc.
+> - server: Spaces, Memories with pgvector, mcp_tokens, Clerk integration.
+> 
+> They *can* share the same Prisma Postgres DB, but migrations must be applied carefully (or use separate DBs/branches). The `web` schema is the primary one for the new collab features.
 
 ---
 
 ## 5. Start the Services
 
-### Terminal 1 — MCP Server (Fastify)
+With the remote Prisma Postgres wired in, the local `db` container is optional.
+
+### Terminal 1 — MCP Server (Fastify / packages/server)
 
 ```bash
 cd /workspace/UNIMATRIX/packages/server
@@ -167,6 +124,8 @@ pnpm dev
 ```
 
 Runs on **http://localhost:3000**
+
+You can still run `docker compose up -d db` if you need the local pgvector instance for other experiments.
 
 ---
 
@@ -257,12 +216,12 @@ Should return the memory you just stored.
 
 | Variable | Location | Value | Purpose |
 |----------|----------|-------|---------|
-| `DATABASE_URL` | Root `.env`, Web `.env.local` | `postgresql://unimatrix:unimatrix@localhost:5432/unimatrix` | Shared Postgres connection |
-| `AUTH_SECRET` | Root `.env`, Web `.env.local` | `dev-secret-change-in-production` | NextAuth encryption |
-| `NEXTAUTH_URL` | Root `.env`, Web `.env.local` | `http://localhost:3000` | Auth callback URL |
-| `MASTER_ENCRYPTION_KEY` | Root `.env` | `00000000000000000000000000000000` | Memory encryption (dev only) |
-| `UNIMATRIX_API_URL` | `packages/mcp-server/.env` | `http://localhost:3001` | MCP → Server connection |
-| `UNIMATRIX_API_KEY` | `packages/mcp-server/.env` | (generate from dashboard) | MCP authentication |
+| `DATABASE_URL` | Root `.env*`, `apps/web/.env*`, `packages/server/.env` | Your Prisma Postgres **pooled** connection string | Main DB for web + collab (and server if sharing) |
+| `DIRECT_URL` | Same files as above | Your Prisma Postgres **direct** (non-pooled) connection string | Used by Prisma Migrate, db push, Studio |
+| `AUTH_SECRET` | Root `.env*`, Web `.env*` | `dev-secret-change-in-production` | NextAuth encryption |
+| `NEXTAUTH_URL` | Root `.env*`, Web `.env*` | `http://localhost:3000` | Auth callback URL |
+| `UNIMATRIX_API_URL` | `packages/mcp-server/.env` | `http://localhost:3000` (or your deployed URL) | MCP stdio client → server |
+| `UNIMATRIX_API_KEY` | `packages/mcp-server/.env` | (generate from web dashboard) | MCP authentication |
 
 ### Optional
 
@@ -283,14 +242,15 @@ Should return the memory you just stored.
 
 ### "pgvector extension not found"
 
+Only relevant if using the optional local `db` container or a local Postgres for embeddings:
+
 ```bash
-# Connect to your database and install the extension
-psql postgresql://unimatrix:unimatrix@localhost:5432/unimatrix -c "CREATE EXTENSION IF NOT EXISTS vector;"
+docker compose exec db psql -U unimatrix -d unimatrix -c "CREATE EXTENSION IF NOT EXISTS vector;"
 ```
 
 ### "DATABASE_URL is required"
 
-Ensure `.env` exists in `/workspace/UNIMATRIX/` (root) — the server loads it from there.
+Make sure one of the `.env` / `.env.local` files contains your Prisma Postgres `DATABASE_URL` (the files we updated should have it). The web Prisma CLI primarily reads `apps/web/.env`.
 
 ### "Unauthorized" from MCP
 
@@ -306,9 +266,6 @@ Ensure `.env` exists in `/workspace/UNIMATRIX/` (root) — the server loads it f
 - MCP server runs on **3001** (Fastify default)
 
 If either port is taken, set `PORT` in the respective `.env`:
-```env
-PORT=3002  # for server
-```
 
 For the web app, Next.js doesn't use `PORT` env — use:
 ```bash
@@ -317,21 +274,23 @@ pnpm dev -- -p 3002
 
 ---
 
-## Architecture Overview (Local)
+## Architecture Overview (Local / Remote DB)
 
 ```
-┌─────────────────┐      ┌──────────────────┐      ┌─────────────────┐
-│   Web App       │      │   MCP Server     │      │   PostgreSQL    │
-│   (Next.js)     │      │   (Fastify)      │      │   + pgvector    │
-│   localhost:3000│◄────►│   localhost:3001 │◄────►│   localhost:5432│
-│                 │      │                  │      │                 │
-│  - Auth/NextAuth│      │  - MCP tools     │      │  - Users        │
-│  - Dashboard    │      │  - REST API      │      │  - Palaces      │
-│  - API Key Mgmt │      │  - Embeddings    │      │  - Memories     │
-└─────────────────┘      └──────────────────┘      └─────────────────┘
+┌─────────────────┐      ┌──────────────────┐      ┌────────────────────────┐
+│   Web App       │      │   MCP Server     │      │   Prisma Postgres      │
+│   (Next.js)     │      │   (Fastify)      │      │   (pooled + direct)    │
+│   localhost:3000│◄────►│   localhost:3001 │◄────►│   pooled.db.prisma.io  │
+│                 │      │                  │      │                        │
+│  - Auth/NextAuth│      │  - MCP tools     │      │  - Users, Palaces      │
+│  - Dashboard    │      │  - REST API      │      │  - CollabRooms         │
+│  - API Key Mgmt │      │  - Embeddings*   │      │  - Memories, etc.      │
+└─────────────────┘      └──────────────────┘      └────────────────────────┘
          ▲                                              ▲
          │                                              │
-         └────────────── Same DB ───────────────────────┘
+         └────────────── Same remote DB ────────────────┘
+
+* pgvector/embeddings may still benefit from the optional local docker db in some server flows.
 ```
 
-Both the web app and MCP server connect to the **same PostgreSQL database**. The web app uses Prisma for auth/user tables; the server uses raw SQL for memory/vector tables.
+The web app and (optionally) the Fastify server connect to the **Prisma Postgres** instance. The local Docker Postgres (`docker compose up -d db`) is now optional.

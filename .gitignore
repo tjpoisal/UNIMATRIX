@@ -57,3 +57,5 @@ postcss
 package-lock.json
 .vercel
 .env*.local
+
+/generated/prisma

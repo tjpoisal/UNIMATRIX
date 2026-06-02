@@ -12,7 +12,7 @@
 
 import { z } from 'zod';
 import { TOOLS as legacyMemoryTools, handleTool as legacyHandleTool } from '@/app/api/mcp/route';
-import { sendMessage, getMessages, subscribeWebhook } from '@/lib/collab/service';
+import { sendMessage, getMessages, subscribeWebhook, createRoom, listRooms } from '@/lib/collab/service';
 import type { McpTool, OpenAITool } from '@/lib/mcp-client';
 
 export interface ToolDefinition {
@@ -42,11 +42,35 @@ legacyMemoryTools.forEach((tool: any) => {
   });
 });
 
-// New Collaboration Tools
+// New Collaboration Tools (multi-agent + human)
 const collabTools: ToolDefinition[] = [
   {
+    name: 'collab.create_room',
+    description: 'Create a new collaboration room scoped to your organization. Required before sending messages.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', minLength: 1, maxLength: 120 },
+        description: { type: 'string', maxLength: 500 },
+        is_private: { type: 'boolean', default: true },
+      },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'collab.list_rooms',
+    description: 'List collaboration rooms visible to the authenticated organization/API key.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'integer', minimum: 1, maximum: 100, default: 50 },
+      },
+      required: [],
+    },
+  },
+  {
     name: 'collab.send_message',
-    description: 'Send a message to a shared collaboration room. Supports humans and AI agents.',
+    description: 'Send a message to a shared collaboration room. Supports humans and AI agents. All agents in the org can observe.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -62,7 +86,7 @@ const collabTools: ToolDefinition[] = [
   },
   {
     name: 'collab.get_messages',
-    description: 'Retrieve recent messages from a collaboration room with cursor pagination.',
+    description: 'Retrieve recent messages from a collaboration room with cursor-based pagination (stable since_id).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -75,7 +99,7 @@ const collabTools: ToolDefinition[] = [
   },
   {
     name: 'collab.subscribe_webhook',
-    description: 'Subscribe an HTTPS endpoint to receive real-time events from a room (message.created).',
+    description: 'Subscribe an HTTPS endpoint to receive real-time events (message.created) from a room. Secret returned only once.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -121,23 +145,47 @@ async function executeCollabTool(
   args: Record<string, unknown>,
   context: ToolExecutionContext
 ): Promise<{ content: Array<{ type: 'text'; text: string }> }> {
+  const orgId = context.organizationId;
+  if (!orgId) {
+    return {
+      content: [{ type: 'text', text: 'Error: Organization context required. Use an organization-scoped API key or ensure your account has a workspace.' }],
+    };
+  }
+
   try {
+    if (name === 'collab.create_room') {
+      const result = await createRoom(
+        {
+          name: args.name as string,
+          description: args.description as string | undefined,
+          isPrivate: (args.is_private as boolean) ?? true,
+        },
+        orgId
+      );
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
+    }
+
+    if (name === 'collab.list_rooms') {
+      const rooms = await listRooms({ limit: args.limit as number | undefined }, orgId);
+      return { content: [{ type: 'text' as const, text: JSON.stringify(rooms) }] };
+    }
+
     if (name === 'collab.send_message') {
-      const result = await sendMessage(args as any, context.organizationId ?? ''); // TODO: tighten during migration
+      const result = await sendMessage(args as any, orgId);
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(result) }],
       };
     }
 
     if (name === 'collab.get_messages') {
-      const messages = await getMessages(args as any, context.organizationId ?? '');
+      const messages = await getMessages(args as any, orgId);
       return {
         content: [{ type: 'text', text: JSON.stringify(messages) }],
       };
     }
 
     if (name === 'collab.subscribe_webhook') {
-      const result = await subscribeWebhook(args as any, context.organizationId ?? '');
+      const result = await subscribeWebhook(args as any, orgId);
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(result) }],
       };
@@ -145,8 +193,10 @@ async function executeCollabTool(
 
     throw new Error(`Unknown collaboration tool: ${name}`);
   } catch (error: any) {
+    const msg = error instanceof Error ? error.message : 'Tool execution failed';
+    // Surface CollabError status if present for better client UX
     return {
-      content: [{ type: 'text', text: `Error: ${error.message || 'Tool execution failed'}` }],
+      content: [{ type: 'text', text: `Error: ${msg}` }],
     };
   }
 }

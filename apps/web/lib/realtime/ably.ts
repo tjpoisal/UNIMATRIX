@@ -26,7 +26,9 @@ function getAblyClient() {
 
   const key = process.env.ABLY_API_KEY;
   if (!key) {
-    throw new Error('ABLY_API_KEY is not configured');
+    // Graceful degradation: realtime is best-effort when not configured
+    console.warn('[realtime] ABLY_API_KEY not set — realtime publish will be a no-op. Configure for production multi-agent UX.');
+    return null;
   }
 
   ablyClient = new Ably.Rest(key);
@@ -36,6 +38,7 @@ function getAblyClient() {
 /**
  * Publish a message to a collaboration room channel.
  * Call this after a successful sendMessage in the service.
+ * No-op if Ably is not configured (webhooks + polling still work).
  */
 export async function publishToRoom(
   roomId: string,
@@ -43,9 +46,15 @@ export async function publishToRoom(
   data: unknown
 ) {
   const client = getAblyClient();
-  const channel = client.channels.get(`collab:room:${roomId}`);
+  if (!client) return;
 
-  await channel.publish(event, data);
+  try {
+    const channel = client.channels.get(`collab:room:${roomId}`);
+    await channel.publish(event, data);
+  } catch (err) {
+    // Never throw from realtime — it is auxiliary to persistence + webhooks
+    console.warn('[ably] publish error (non-fatal):', (err as Error)?.message);
+  }
 }
 
 /**

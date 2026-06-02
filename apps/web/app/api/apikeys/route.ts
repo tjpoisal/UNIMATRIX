@@ -13,7 +13,7 @@ export async function GET() {
 
   const keys = await prisma.apiKey.findMany({
     where: { userId: session.user.id, revokedAt: null },
-    select: { id: true, name: true, keyPrefix: true, lastUsed: true, createdAt: true },
+    select: { id: true, name: true, keyPrefix: true, organizationId: true, lastUsed: true, createdAt: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -27,9 +27,35 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name } = await request.json();
+  const body = await request.json();
+  const { name, organizationId } = body;
+
   if (!name?.trim()) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
+  }
+
+  // Validate organization belongs to user if provided (multi-tenant key scoping)
+  let resolvedOrgId: string | null = null;
+  if (organizationId) {
+    const membership = await prisma.organizationMember.findFirst({
+      where: {
+        organizationId,
+        userId: session.user.id,
+      },
+      select: { organizationId: true },
+    });
+    if (!membership) {
+      return NextResponse.json({ error: "Organization not found or access denied" }, { status: 403 });
+    }
+    resolvedOrgId = membership.organizationId;
+  } else {
+    // Default to primary (oldest) personal org for backward compat during migration
+    const orgs = await prisma.organization.findMany({
+      where: { members: { some: { userId: session.user.id } } },
+      orderBy: { createdAt: 'asc' },
+      take: 1,
+    });
+    resolvedOrgId = orgs[0]?.id ?? null;
   }
 
   // Generate: umx_ prefix + 32 random hex chars
@@ -40,6 +66,7 @@ export async function POST(request: NextRequest) {
   const apiKey = await prisma.apiKey.create({
     data: {
       userId: session.user.id,
+      organizationId: resolvedOrgId,
       name: name.trim(),
       keyHash,
       keyPrefix,
@@ -50,6 +77,7 @@ export async function POST(request: NextRequest) {
     id: apiKey.id,
     name: apiKey.name,
     keyPrefix: apiKey.keyPrefix,
+    organizationId: apiKey.organizationId,
     createdAt: apiKey.createdAt,
     key: raw, // Only returned once — user must copy it now
   }, { status: 201 });

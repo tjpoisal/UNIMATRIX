@@ -5,11 +5,12 @@ import { getUserOrganizations } from './organizations';
 
 /**
  * Auth context returned by the platform.
- * organizationId will become non-null as we complete the multi-tenant migration.
+ * For multi-tenant collab, organizationId is REQUIRED for all room operations.
+ * API keys should be created under a specific organization.
  */
 export interface AuthContext {
   userId: string;
-  organizationId: string | null;
+  organizationId: string; // Always resolved to a valid org for collab features
 }
 
 /**
@@ -63,16 +64,17 @@ export async function getUserIdFromRequest(req: NextRequest): Promise<string | n
  * Returns full auth context (user + organization).
  * 
  * Resolution order (for API keys and sessions):
- * 1. If the API key is linked to an organization → use it
+ * 1. If the API key is explicitly linked to an organization → use it (preferred for agents)
  * 2. Otherwise, return the user's oldest (primary/personal) organization
  * 
- * This is the preferred function for all new collab + multi-tenant features.
+ * For collab features, this **never returns null organizationId**.
+ * If no org can be resolved, the caller must treat as 403.
  */
 export async function getAuthContext(req: NextRequest): Promise<AuthContext | null> {
   const userId = await getUserIdFromRequest(req);
   if (!userId) return null;
 
-  // Check if the API key being used is org-scoped (future state)
+  // Check if the API key being used is org-scoped
   const authHeader = req.headers.get('authorization') ?? '';
   if (authHeader.startsWith('Bearer umx_')) {
     const rawKey = authHeader.slice(7);
@@ -91,11 +93,10 @@ export async function getAuthContext(req: NextRequest): Promise<AuthContext | nu
     }
   }
 
-  // Fallback: Get the user's primary organization (usually their Personal org created on signup)
+  // Fallback: Get the user's primary organization (personal workspace created on signup)
   const organizations = await getUserOrganizations(userId);
 
   if (organizations.length > 0) {
-    // Prefer the oldest one (personal workspace)
     const primaryOrg = organizations[0];
     return {
       userId,
@@ -103,10 +104,10 @@ export async function getAuthContext(req: NextRequest): Promise<AuthContext | nu
     };
   }
 
-  // Last resort: no organization yet (should be rare after the auth.ts change)
+  // No organization possible — caller should 403 for org-scoped ops
   return {
     userId,
-    organizationId: null,
+    organizationId: '', // sentinel; callers must check truthiness
   };
 }
 
@@ -125,4 +126,26 @@ export async function requireUser(req: NextRequest): Promise<string> {
   }
   
   return userId;
+}
+
+/**
+ * Require authenticated context with a valid organization.
+ * Returns 401 for missing auth, 403 for authenticated but no org context.
+ * Use this for all collaboration / multi-tenant routes.
+ */
+export async function requireAuthContext(req: NextRequest): Promise<AuthContext> {
+  const ctx = await getAuthContext(req);
+  if (!ctx) {
+    throw new Response(JSON.stringify({ error: 'Unauthorized — missing or invalid API key' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  if (!ctx.organizationId) {
+    throw new Response(JSON.stringify({ error: 'Forbidden — organization context required for this resource' }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+  return ctx;
 }

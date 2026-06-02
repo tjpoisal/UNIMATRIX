@@ -5,7 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthContext } from '@/lib/api-auth';
+import { requireAuthContext } from '@/lib/api-auth';
+import { rateLimiters } from '@/lib/rate-limit';
 import { getMessages, sendMessage } from '@/lib/collab/service';
 import { z } from 'zod';
 
@@ -21,9 +22,12 @@ export async function GET(
   { params }: { params: Promise<{ roomId: string }> }
 ) {
   const { roomId } = await params;
-  const auth = await getAuthContext(req);
-  if (!auth?.userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  let ctx: Awaited<ReturnType<typeof requireAuthContext>>;
+  try {
+    ctx = await requireAuthContext(req);
+  } catch (e: any) {
+    const status = e?.status ?? 401;
+    return NextResponse.json({ error: e?.message || 'Unauthorized' }, { status });
   }
 
   const { searchParams } = req.nextUrl;
@@ -33,7 +37,7 @@ export async function GET(
   try {
     const messages = await getMessages(
       { room_id: roomId, since_id, limit },
-      auth.organizationId || ''
+      ctx.organizationId
     );
     return NextResponse.json({ messages });
   } catch (e: any) {
@@ -46,9 +50,21 @@ export async function POST(
   { params }: { params: Promise<{ roomId: string }> }
 ) {
   const { roomId } = await params;
-  const auth = await getAuthContext(req);
-  if (!auth?.userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  let ctx: Awaited<ReturnType<typeof requireAuthContext>>;
+  try {
+    ctx = await requireAuthContext(req);
+  } catch (e: any) {
+    const status = e?.status ?? 401;
+    return NextResponse.json({ error: e?.message || 'Unauthorized' }, { status });
+  }
+
+  // Per-room burst protection (in addition to per-key limits)
+  const roomRl = await rateLimiters.roomMessageSend(roomId);
+  if (!roomRl.success) {
+    return NextResponse.json(
+      { error: 'Room rate limit exceeded. Too many messages in short window.' },
+      { status: 429, headers: { 'Retry-After': Math.ceil((roomRl.reset - Date.now()) / 1000).toString() } }
+    );
   }
 
   try {
@@ -58,13 +74,13 @@ export async function POST(
     const result = await sendMessage(
       {
         room_id: roomId,
-        sender_id: auth.userId,
+        sender_id: ctx.userId,
         sender_name: input.sender_name,
         sender_type: input.sender_type,
         message: input.message,
         metadata: input.metadata ?? {},
       },
-      auth.organizationId || ''
+      ctx.organizationId
     );
 
     return NextResponse.json(result, { status: 201 });

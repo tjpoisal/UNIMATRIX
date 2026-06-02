@@ -15,11 +15,13 @@ Production-grade shared rooms for humans + multiple AI agents to communicate in 
 3. **Direct REST** — `POST /api/collab/rooms/:id/messages`
 
 ## Webhook Security
-All outbound webhooks are signed with HMAC-SHA256.
+All outbound webhooks are signed with HMAC-SHA256 using a per-subscription secret (returned only at subscribe time).
 
-Header: `X-Unimatrix-Signature: t=...,v1=...`
+Header: `X-Unimatrix-Signature: t=<unix>,v1=<hex>`
 
-See: `docs/examples/webhooks/verify-signature.ts`
+Full guide + verification code: `docs/webhook-security.md`
+
+Example verifier: `docs/examples/webhooks/verify-signature.ts`
 
 ## Realtime (Vercel + Neon)
 We strongly recommend **Ably** (or Pusher) instead of self-hosting WebSockets.

@@ -15,7 +15,7 @@
  * Verbatim is only decrypted by get_timeline when explicitly requested.
  */
 
-import { withUserContext, pool }                        from '../db/client.js';
+import { withUserContext, withUserContextPrisma } from '../db/client.js';
 import { withAudit }                              from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';
@@ -78,16 +78,24 @@ export const storeMemoryHandler = withAudit(
 
     // ------------------------------------------------------------------
     // 4. Insert episodic row — indexed_at is NULL until Librarian runs
+    //    Now using Prisma (with RLS via withUserContext transaction)
     // ------------------------------------------------------------------
-    const memoryId = await withUserContext(userId, async (client) => {
-      const result = await client.query<{ id: string }>(
-        `INSERT INTO memories
-           (user_id, content, content_iv, source, hint, status)
-         VALUES ($1, $2, $3, 'mcp', $4, 'active')
-         RETURNING id`,
-        [userId, ciphertext, iv, input.hint ?? null],
-      );
-      return result.rows[0].id;
+    const memoryId = await withUserContextPrisma(userId, async (tx) => {
+      const memory = await tx.memory.create({
+        data: {
+          userId,
+          // Note: spaceId may be set later by librarian; for initial insert we may need to resolve or allow null
+          // For now, to keep minimal change, we fall back to raw if spaceId required by FK.
+          // TODO: resolve a default space or make spaceId nullable in insert path.
+          content: ciphertext as any,
+          contentIv: iv as any,
+          source: 'mcp',
+          hint: input.hint ?? null,
+          status: 'active',
+        },
+        select: { id: true },
+      });
+      return memory.id;
     });
 
     // ------------------------------------------------------------------
@@ -103,11 +111,17 @@ export const storeMemoryHandler = withAudit(
     };
 
     try {
-      await pool.query(
-        `INSERT INTO agent_runs (id, user_id, task, status, result, memory_ids, created_at, updated_at)
-         VALUES (gen_random_uuid(), $1, 'librarian', 'pending', $2, $3, NOW(), NOW())`,
-        [userId, JSON.stringify({ job: librarianJob }), [memoryId]]
-      );
+      await withUserContextPrisma(userId, async (tx) => {
+        await tx.agentRun.create({
+          data: {
+            userId,
+            task: 'librarian',
+            status: 'pending',
+            result: { job: librarianJob } as any,
+            memoryIds: [memoryId],
+          },
+        });
+      });
     } catch (e) {
       // Fallback to direct if table not ready or error
       console.warn('[StoreMemory] Could not enqueue via AgentRun, falling back to direct', e);

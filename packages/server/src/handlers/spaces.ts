@@ -19,7 +19,7 @@
  */
 
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { withUserContext, withUserContextReadOnly } from '../db/client.js';
+import { withUserContextRaw, withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
 import { indexSpace } from '../librarian/classifySpace.js';
 import { verifyUser } from '../auth/verifyUser.js';
 import type { Space } from '../types/domain.js';
@@ -86,7 +86,7 @@ export async function createSpace(
     return reply.status(400).send({ error: 'name is required' });
   }
 
-  const row = await withUserContext(userId, async (client) => {
+  const row = await withUserContextRaw(userId, async (client) => {
     const res = await client.query<SpaceRow>(
       `INSERT INTO spaces (user_id, parent_id, name, description, is_scratchpad)
        VALUES (current_user_id()::uuid, $1, $2, $3, $4)
@@ -198,7 +198,7 @@ export async function updateSpace(
     return reply.status(400).send({ error: 'No updatable fields provided' });
   }
 
-  const row = await withUserContext(userId, async (client) => {
+  const row = await withUserContextRaw(userId, async (client) => {
     const res = await client.query<SpaceRow>(
       `UPDATE spaces
           SET ${sets.join(', ')}
@@ -234,7 +234,7 @@ export async function deleteSpace(
   const userId = await authUser(request);
   const { id } = request.params;
 
-  const deleted = await withUserContext(userId, async (client) => {
+  const deleted = await withUserContextRaw(userId, async (client) => {
     const res = await client.query<{ id: string }>(
       `DELETE FROM spaces
         WHERE id      = $1

@@ -24,6 +24,7 @@ const apiKeySupportedPaths = [
   "/api/sync",
   "/api/tools",
   "/api/mcp",
+  "/api/collab",
 ];
 
 function supportsApiKeys(pathname: string): boolean {

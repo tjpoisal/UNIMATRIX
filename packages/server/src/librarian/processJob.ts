@@ -18,7 +18,7 @@
  * Phase 2: replace the inline call with Inngest/Trigger.dev job dispatch.
  */
 
-import { withUserContext }        from '../db/client.js';
+import { withUserContextRaw } from '../db/client.js';
 import { generateEmbedding }      from '../embeddings.js';
 import { extractiveSummarize }    from './summarize.js';
 import { extractTags }            from './extractTags.js';
@@ -57,7 +57,7 @@ export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianR
   const { spaceId, confidence, altSpaceId } = await classifySpace(embedding, userId);
 
   // 5. Write back to memories + insert tags (within RLS context)
-  await withUserContext(userId, async (client) => {
+  await withUserContextRaw(userId, async (client) => {
     // UPDATE memories — set semantic layer fields
     await client.query(
       `UPDATE memories

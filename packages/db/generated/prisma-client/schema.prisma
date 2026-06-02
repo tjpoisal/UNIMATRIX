@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma-client" // local output (package root) to avoid clobbering shared @prisma/client used by web's legacy schema; copied/bundled for consumers
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum MemoryStatus {
+  active
+  superseded
+  archived
+}
+
+enum MemorySource {
+  mcp
+  api
+  import
+  librarian
+}
+
+enum AgentRunStatus {
+  pending
+  running
+  completed
+  failed
+}
+
+enum TokenScope {
+  full
+  readonly
+  memory_only
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// User
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id               String  @id @default(cuid())
+  clerk_id         String  @unique
+  email            String  @unique
+  name             String?
+  image            String?
+  tier             String  @default("free") // free | pro | team
+  stripeCustomerId String? @unique
+
+  // Relations
+  spaces    Space[]
+  memories  Memory[]
+  mcpTokens McpToken[]
+  agentRuns AgentRun[]
+  auditLogs AuditLog[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete
+
+  @@index([clerk_id])
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Space (hierarchical — replaces Palace/Location)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Space {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   Space?  @relation("NestedSpaces", fields: [parentId], references: [id], onDelete: Cascade)
+  children Space[] @relation("NestedSpaces")
+
+  orgId        String?
+  name         String
+  description  String?
+  isScratchpad Boolean                     @default(false)
+  embedding    Unsupported("vector(512)")?
+
+  // Relations
+  memories Memory[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete
+
+  @@index([userId])
+  @@index([parentId])
+  @@map("spaces")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Memory
+// ─────────────────────────────────────────────────────────────────────────────
+
+model Memory {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  spaceId String
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  content   Bytes // encrypted content stored as BYTEA
+  embedding Unsupported("vector(512)")?
+
+  status          MemoryStatus @default(active)
+  source          MemorySource @default(mcp)
+  importanceScore Float?       @db.Real
+
+  indexedAt DateTime?
+
+  // Relations
+  tags MemoryTag[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // soft delete
+
+  @@index([userId])
+  @@index([spaceId])
+  @@index([status])
+  @@index([indexedAt])
+  @@map("memories")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MemoryTag (upsert pattern — unique per memory+tag)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model MemoryTag {
+  id       String @id @default(cuid())
+  memoryId String
+  memory   Memory @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+
+  tag String
+
+  createdAt DateTime @default(now())
+
+  @@unique([memoryId, tag])
+  @@index([memoryId])
+  @@index([tag])
+  @@map("memory_tags")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// McpToken
+// ─────────────────────────────────────────────────────────────────────────────
+
+model McpToken {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token       String? @unique // raw token (or public id) — unique; nullable per security (only hash stored)
+  hashedToken String  @map("hashed_token") // bcrypt hash for validation
+
+  scope      TokenScope @default(full)
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+  lastUsedAt DateTime?
+  createdAt  DateTime   @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@map("mcp_tokens")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AgentRun
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AgentRun {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  task     String
+  status   AgentRunStatus @default(pending)
+  errorMsg String?
+
+  llmProvider  String?
+  model        String?
+  inputTokens  Int?
+  outputTokens Int?
+  latencyMs    Int?     @map("latency_ms")
+  costUsd      Decimal? @map("cost_usd") @db.Decimal(10, 6)
+
+  result    Json?
+  memoryIds String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("agent_runs")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AuditLog
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  action     String // e.g. "memory.store", "memory.recall", "token.revoke"
+  resource   String? // affected resource type
+  resourceId String? // affected resource id
+  metadata   Json? // extra context
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

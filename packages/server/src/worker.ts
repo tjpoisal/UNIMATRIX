@@ -20,34 +20,30 @@
 
 import { processLibrarianJob } from './librarian/processJob.js';
 import type { LibrarianJob } from './types/domain.js';
-import { pool } from './db/client.js';
+import { prisma, pool } from './db/client.js';
 
 const POLL_INTERVAL_MS = 15_000; // 15 seconds
 const BATCH_SIZE = 10;
 
 async function getPendingLibrarianAgentRuns(): Promise<Array<{ id: string; userId: string; job: LibrarianJob }>> {
-  const { rows } = await pool.query<{
-    id: string;
-    user_id: string;
-    result: any;
-  }>(
-    `SELECT id, user_id, result
-     FROM agent_runs
-     WHERE task = 'librarian'
-       AND status = 'pending'
-     ORDER BY created_at ASC
-     LIMIT $1`,
-    [BATCH_SIZE]
-  );
+  const runs = await prisma.agentRun.findMany({
+    where: {
+      task: 'librarian',
+      status: 'pending',
+    },
+    orderBy: { createdAt: 'asc' },
+    take: BATCH_SIZE,
+    select: { id: true, userId: true, result: true },
+  });
 
   const out: Array<{ id: string; userId: string; job: LibrarianJob }> = [];
-  for (const r of rows) {
+  for (const r of runs) {
     try {
-      const payload = typeof r.result === 'string' ? JSON.parse(r.result) : r.result;
+      const payload = r.result as any;
       if (payload?.job) {
         out.push({
           id: r.id,
-          userId: r.user_id,
+          userId: r.userId,
           job: payload.job as LibrarianJob,
         });
       }
@@ -59,23 +55,31 @@ async function getPendingLibrarianAgentRuns(): Promise<Array<{ id: string; userI
 }
 
 async function markAgentRunCompleted(runId: string, result: any, memoryId: string) {
-  await pool.query(
-    `UPDATE agent_runs
-     SET status = 'completed', result = $1, memory_ids = $2, updated_at = NOW()
-     WHERE id = $3`,
-    [JSON.stringify(result), [memoryId], runId]
-  );
+  await prisma.agentRun.update({
+    where: { id: runId },
+    data: {
+      status: 'completed',
+      result: result as any,
+      memoryIds: [memoryId],
+    },
+  });
 }
 
 async function markAgentRunFailed(runId: string, errMsg: string) {
-  await pool.query(
-    `UPDATE agent_runs SET status = 'failed', error_msg = $1, updated_at = NOW() WHERE id = $2`,
-    [errMsg, runId]
-  );
+  await prisma.agentRun.update({
+    where: { id: runId },
+    data: {
+      status: 'failed',
+      errorMsg: errMsg,
+    },
+  });
 }
 
 async function markMemoryIndexed(memoryId: string) {
-  await pool.query(`UPDATE memories SET indexed_at = NOW() WHERE id = $1`, [memoryId]);
+  await prisma.memory.update({
+    where: { id: memoryId },
+    data: { indexedAt: new Date() },
+  });
 }
 
 async function processBatch() {

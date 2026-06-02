@@ -27,7 +27,7 @@
  *   - Audit logging via withAudit wrapper
  */
 
-import { withUserContext, pool }                        from '../db/client.js';
+import { withUserContext, withUserContextRaw, pool } from '../db/client.js';
 import { withAudit }                              from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';
@@ -53,7 +53,7 @@ export const supersedeMemoryHandler = withAudit(
     // 1. Validate target memory exists and belongs to this user (RLS does
     //    the ownership check; we just need to confirm the row exists first).
     // ------------------------------------------------------------------
-    const target = await withUserContext(userId, async (client) => {
+    const target = await withUserContextRaw(userId, async (client) => {
       const res = await client.query<{ id: string; status: string }>(
         `SELECT id, status FROM memories
           WHERE id      = $1
@@ -118,7 +118,7 @@ export const supersedeMemoryHandler = withAudit(
       const { ciphertext, iv } = await encryptContent(input.content, userId);
 
       // Insert new memory row
-      replacementId = await withUserContext(userId, async (client) => {
+      replacementId = await withUserContextRaw(userId, async (client) => {
         const res = await client.query<{ id: string }>(
           `INSERT INTO memories
              (user_id, content, content_iv, source, hint, status)
@@ -155,7 +155,7 @@ export const supersedeMemoryHandler = withAudit(
     // ------------------------------------------------------------------
     // 3. Mark the old memory as superseded (atomic single UPDATE)
     // ------------------------------------------------------------------
-    await withUserContext(userId, async (client) => {
+    await withUserContextRaw(userId, async (client) => {
       await client.query(
         `UPDATE memories
             SET status        = 'superseded',

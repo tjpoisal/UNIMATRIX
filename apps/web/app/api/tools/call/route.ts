@@ -32,7 +32,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthContext } from "@/lib/api-auth";
+import { getAuthContext, requireAuthContext } from "@/lib/api-auth";
+import { rateLimiters } from "@/lib/rate-limit";
 import {
   callMcpTool,
   type ToolCallRequest,
@@ -53,9 +54,10 @@ export async function POST(
   req: NextRequest
 ): Promise<NextResponse<ToolCallSuccessResponse | ErrorResponseBody>> {
   let userId: string | null = null;
+  let organizationId: string | null = null;
 
   try {
-    // ─── 1. Authentication (required for all tool execution) ────────────────
+    // ─── 1. Authentication + Organization (required for tool execution) ─────
     const auth = await getAuthContext(req);
 
     if (!auth?.userId) {
@@ -69,7 +71,36 @@ export async function POST(
       );
     }
 
+    // For org-scoped tools (collab.*), require a valid organization
+    if (!auth.organizationId) {
+      return NextResponse.json<ErrorResponseBody>(
+        {
+          status: "error",
+          error: "Forbidden — this tool requires an organization-scoped API key or active organization membership.",
+          code: "FORBIDDEN",
+        },
+        { status: 403 }
+      );
+    }
+
     userId = auth.userId;
+    organizationId = auth.organizationId;
+
+    // ─── 1b. Rate limit per API key (best effort identifier) ───────────────
+    // Extract prefix for rate limiting key (avoids full key material)
+    const authHeader = req.headers.get("authorization") ?? "";
+    const rateKey = authHeader.startsWith("Bearer umx_") ? authHeader.slice(7, 19) : `user:${userId}`;
+    const rl = await rateLimiters.apiKeyToolExecution(rateKey);
+    if (!rl.success) {
+      return NextResponse.json<ErrorResponseBody>(
+        {
+          status: "error",
+          error: "Rate limit exceeded for tool execution. Retry later.",
+          code: "RATE_LIMITED",
+        },
+        { status: 429, headers: { "Retry-After": Math.ceil((rl.reset - Date.now()) / 1000).toString() } }
+      );
+    }
 
     // ─── 2. Parse and validate request body ─────────────────────────────────
     let body: unknown;
@@ -116,7 +147,7 @@ export async function POST(
 
     // ─── 3. Execute via internal MCP client (translates to tools/call) ──────
     // The MCP layer now handles HITL + telemetry internally
-    const mcpResult = await callMcpTool(toolName, safeArgs, userId, auth.organizationId);
+    const mcpResult = await callMcpTool(toolName, safeArgs, userId, organizationId);
 
     // Extract the primary text content (consistent with MCP text responses)
     const primaryText =
