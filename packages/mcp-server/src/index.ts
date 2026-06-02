@@ -7,8 +7,10 @@
  * across all their palaces through a single stdio interface.
  *
  * Required environment variables:
- *   UNIMATRIX_API_KEY  — API key generated from your Unimatrix dashboard
- *   UNIMATRIX_API_URL  — Base API URL (default: https://unimatrix-flax.vercel.app/api)
+ *   UNIMATRIX_API_KEY  — API key generated from your Unimatrix dashboard (web or MCP tokens)
+ *   UNIMATRIX_API_URL  — Base API URL (default for Render: https://<your-mcp-service>.onrender.com or your web /api if using the embedded route)
+ *
+ * After Vercel -> Render migration, set UNIMATRIX_API_URL to your Render service URL (e.g. the unimatrix-mcp service).
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -20,7 +22,7 @@ import { z } from "zod";
 
 const API_KEY = process.env.UNIMATRIX_API_KEY ?? "";
 const API_BASE = (
-  process.env.UNIMATRIX_API_URL ?? "https://unimatrix-flax.vercel.app/api"
+  process.env.UNIMATRIX_API_URL ?? "http://localhost:3000/api" // Update for production Render: your unimatrix-mcp or web service URL
 ).replace(/\/$/, "");
 
 const CHARACTER_LIMIT = 25_000;
@@ -649,13 +651,144 @@ Examples:
   }
 );
 
+// ──────────────────────────────────────────────────────────────────────────────
+// COLLABORATION TOOLS (Multi-Agent Rooms)
+// These enable cross-LLM async communication. All operations are org-scoped via your API key.
+// ──────────────────────────────────────────────────────────────────────────────
+
+server.registerTool(
+  "collab.create_room",
+  {
+    title: "Create Collaboration Room",
+    description: "Create a shared room for multiple AI agents and humans to exchange messages asynchronously. Returns room_id for subsequent calls.",
+    inputSchema: z.object({
+      name: z.string().min(1).max(120).describe("Room name"),
+      description: z.string().max(500).optional().describe("Optional purpose of the room"),
+      is_private: z.boolean().default(true).describe("Whether the room is private to the organization"),
+    }).strict(),
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  async (args) => {
+    try {
+      // Prefer the universal tools/call for new domains to avoid route duplication
+      const result = await api<{ room_id: string; name: string }>("/tools/call", "POST", {
+        toolName: "collab.create_room",
+        args,
+      });
+      return { content: [{ type: "text", text: JSON.stringify(result.result || result) }] };
+    } catch (e) {
+      return { content: [{ type: "text", text: handleError(e) }] };
+    }
+  }
+);
+
+server.registerTool(
+  "collab.list_rooms",
+  {
+    title: "List Collaboration Rooms",
+    description: "List all collaboration rooms your organization/API key has access to.",
+    inputSchema: z.object({
+      limit: z.number().int().min(1).max(100).default(50).optional(),
+    }).strict(),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  },
+  async (args) => {
+    try {
+      const result = await api("/tools/call", "POST", { toolName: "collab.list_rooms", args });
+      return { content: [{ type: "text", text: JSON.stringify((result as any).result || result) }] };
+    } catch (e) {
+      return { content: [{ type: "text", text: handleError(e) }] };
+    }
+  }
+);
+
+server.registerTool(
+  "collab.send_message",
+  {
+    title: "Send Message to Collab Room",
+    description: `Send a message (from human or agent) into a shared room. Other connected LLMs and webhooks will receive it.
+
+Use this for cross-agent handoff, debate, or logging findings that should be visible to the whole team of AIs.`,
+    inputSchema: z.object({
+      room_id: z.string().min(1),
+      sender_id: z.string().optional(),
+      sender_name: z.string().min(1).max(120),
+      sender_type: z.enum(["human", "agent", "system"]),
+      message: z.string().min(1).max(8000),
+      metadata: z.record(z.unknown()).optional(),
+    }).strict(),
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: false,
+    },
+  },
+  async (args) => {
+    try {
+      const result = await api("/tools/call", "POST", { toolName: "collab.send_message", args });
+      return { content: [{ type: "text", text: JSON.stringify((result as any).result || result) }] };
+    } catch (e) {
+      return { content: [{ type: "text", text: handleError(e) }] };
+    }
+  }
+);
+
+server.registerTool(
+  "collab.get_messages",
+  {
+    title: "Get Messages from Room",
+    description: "Fetch messages since a cursor (since_id) or the most recent N. Use for context reconstruction at the start of a new agent session.",
+    inputSchema: z.object({
+      room_id: z.string().min(1),
+      since_id: z.string().optional(),
+      limit: z.number().int().min(1).max(100).default(50).optional(),
+    }).strict(),
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  },
+  async (args) => {
+    try {
+      const result = await api("/tools/call", "POST", { toolName: "collab.get_messages", args });
+      return { content: [{ type: "text", text: JSON.stringify((result as any).result || result) }] };
+    } catch (e) {
+      return { content: [{ type: "text", text: handleError(e) }] };
+    }
+  }
+);
+
+server.registerTool(
+  "collab.subscribe_webhook",
+  {
+    title: "Subscribe Webhook to Room",
+    description: "Register an HTTPS endpoint to receive signed message.created events. The webhook_secret is returned only on this call.",
+    inputSchema: z.object({
+      room_id: z.string().min(1),
+      target_url: z.string().url(),
+    }).strict(),
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  },
+  async (args) => {
+    try {
+      const result = await api("/tools/call", "POST", { toolName: "collab.subscribe_webhook", args });
+      return { content: [{ type: "text", text: JSON.stringify((result as any).result || result) }] };
+    } catch (e) {
+      return { content: [{ type: "text", text: handleError(e) }] };
+    }
+  }
+);
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
   if (!API_KEY) {
     console.error(
       "ERROR: UNIMATRIX_API_KEY is not set.\n" +
-      "Generate an API key at https://unimatrix-flax.vercel.app/onboarding\n" +
+      "Generate an API key / MCP token at your Unimatrix dashboard (e.g. https://<your-render-web>.onrender.com/onboarding or /settings/mcp-tokens)\n" +
       "and set it as UNIMATRIX_API_KEY in your environment."
     );
     process.exit(1);

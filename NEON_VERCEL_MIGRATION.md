@@ -1,4 +1,6 @@
-# Migration from AWS + Supabase to Neon + Vercel
+# Migration from AWS + Supabase to Neon + Vercel (Historical)
+
+> **Note:** This is the 2025-era move to Neon+ Vercel. The runtime has since been migrated from Vercel to **Render** (see root `render.yaml`, `RENDER.md`, Dockerfiles, custom `server.ts`, etc.). Vercel config is now legacy. Database remains Neon-compatible Postgres.
 
 ## Overview
 

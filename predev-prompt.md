@@ -31,7 +31,7 @@ unimatrix/
 - **Auth:** NextAuth v5 — credentials + Google + GitHub, JWT sessions, bcryptjs
 - **Payments:** Stripe — Free / Pro $9.99/mo / Enterprise $29.99/mo
 - **Email:** Resend API
-- **MCP endpoint (cloud):** `https://unimatrix-flax.vercel.app/api/mcp`
+- **MCP endpoint (cloud - Render primary):** `https://<your-mcp-service>.onrender.com/mcp` (legacy Vercel: https://<your-mcp>.onrender.com/mcp  # or legacy vercel)
 
 **Data model:**
 - `Palace` = workspace / project (e.g. "Work Research", "Personal")
@@ -102,7 +102,7 @@ Cursor natively supports MCP servers. Document and test the config:
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix-flax.vercel.app/api/mcp",
+      "url": "https://<your-mcp>.onrender.com/mcp  # or legacy vercel",
       "apiKey": "USER_API_KEY"
     }
   }
@@ -124,7 +124,7 @@ Warp AI supports MCP servers natively. Provide config and setup guide at `/docs/
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix-flax.vercel.app/api/mcp",
+      "url": "https://<your-mcp>.onrender.com/mcp  # or legacy vercel",
       "apiKey": "USER_API_KEY"
     }
   }

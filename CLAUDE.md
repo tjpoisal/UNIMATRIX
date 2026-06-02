@@ -55,10 +55,11 @@ unimatrix/
 └── CLAUDE.md          ← You are here
 ```
 
-**URLs:**
-- Cloud: https://unimatrix-flax.vercel.app
+**URLs (Vercel legacy - primary deployment now on Render):**
+- Old Cloud (Vercel): https://unimatrix-flax.vercel.app
 - Marketing site: https://deployunimatrix.com
-- MCP endpoint (cloud): https://unimatrix-flax.vercel.app/api/mcp
+- MCP endpoint (legacy Vercel): https://unimatrix-flax.vercel.app/api/mcp
+- MCP endpoint (Render primary): https://<your-unimatrix-mcp-service>.onrender.com/mcp (see render.yaml, RENDER.md)
 - MCP endpoint (self-hosted): http://[user-server]:PORT/mcp
 
 ---
@@ -116,7 +117,7 @@ unimatrix/
 |----------|-----------|-------|
 | `DATABASE_URL` | Vercel | Neon PostgreSQL connection string |
 | `NEXTAUTH_SECRET` | Vercel | Random base64 string |
-| `NEXTAUTH_URL` | Vercel | `https://unimatrix-flax.vercel.app` |
+| `NEXTAUTH_URL` | Render (or Vercel legacy) | `https://<your-web-service>.onrender.com` (or old vercel) |
 | `RESEND_API_KEY` | Vercel ✅ | `re_eGJUC6th_...` |
 | `EMAIL_FROM` | Vercel ✅ | `Unimatrix <onboarding@resend.dev>` |
 | `GOOGLE_CLIENT_ID` | Vercel | OAuth |
@@ -142,10 +143,10 @@ git push origin main
 ```
 
 - **Only branch:** `main`
-- **Vercel project:** `unimatrix-flax` (production deployment)
 - **GitHub repo:** `https://github.com/tjpoisal/UNIMATRIX`
-- Vercel watches `main` and deploys automatically on every push
-- No manual `vercel deploy` needed — git push IS the deploy
+- **Primary deploy:** Render via render.yaml Blueprint (Postgres + unimatrix-mcp Fastify + unimatrix-web custom server + optional worker). See RENDER.md
+- **Legacy:** Vercel (vercel.json marked as legacy; old project unimatrix-flax)
+- git push to main triggers Render Blueprint deploys (and legacy Vercel if still connected)
 
 ---
 
@@ -189,7 +190,7 @@ When a user configures an LLM client (Claude Desktop, Cursor, etc.) with the Uni
 {
   "mcpServers": {
     "unimatrix": {
-      "url": "https://unimatrix-flax.vercel.app/api/mcp",
+      "url": "https://<your-render-mcp>.onrender.com/mcp",  // or legacy vercel /api/mcp
       "apiKey": "USER_API_KEY"
     }
   }

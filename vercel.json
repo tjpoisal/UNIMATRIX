@@ -1,12 +1,7 @@
 {
+  "_comment": "LEGACY - Unimatrix has migrated to Render (see render.yaml, RENDER.md). This file is kept only for historical Vercel deploys if needed.",
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm turbo run build --filter=web",
   "outputDirectory": "apps/web/.next",
-  "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/cron/reset-spend",
-      "schedule": "0 0 * * *"
-    }
-  ]
+  "framework": "nextjs"
 }

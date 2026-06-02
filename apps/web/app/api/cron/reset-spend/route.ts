@@ -1,13 +1,10 @@
 /**
- * Vercel Cron Job: Reset daily spend for all AgentConfigs
+ * Cron Job: Reset daily spend for all AgentConfigs
  * 
- * Add to vercel.json:
- * {
- *   "crons": [{
- *     "path": "/api/cron/reset-spend",
- *     "schedule": "0 0 * * *"
- *   }]
- * }
+ * On Vercel (legacy): configured in vercel.json
+ * On Render (primary): Create a Render Cron Job service that hits this endpoint
+ *   with Authorization: Bearer $CRON_SECRET (set CRON_SECRET env).
+ *   Schedule: daily at 00:00 UTC.
  */
 
 import { NextResponse } from 'next/server';

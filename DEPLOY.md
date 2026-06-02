@@ -1,4 +1,6 @@
-# Unimatrix — Deployment Guide
+# Unimatrix — Deployment Guide (Legacy - see RENDER.md for current Render instructions)
+
+> **Primary deployment is now Render.** This file contains older Clerk + separate portal notes and is kept for reference. Use `render.yaml` + `RENDER.md` + Dockerfiles for the current monorepo Render + custom server + Fastify MCP setup. Vercel is legacy.
 
 ## Architecture
 
