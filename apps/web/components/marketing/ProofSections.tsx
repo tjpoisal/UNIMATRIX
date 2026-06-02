@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 
-// eslint-disable react/no-unescaped-entities -- illustrative terminal/code examples contain quotes for realism
+/* eslint-disable react/no-unescaped-entities -- illustrative terminal/code examples and marketing copy contain quotes/apostrophes for realism and readability */
 
 interface ProofSectionProps {
   title: string;
@@ -56,9 +56,9 @@ export function CrossClientMemoryDemo() {
           </div>
           <div className="p-5 font-mono text-sm bg-[#0D1117]">
             <div className="text-text-secondary">
-              User: "What's our current approach to authentication?"<br /><br />
+              User: &quot;What&apos;s our current approach to authentication?&quot;<br /><br />
               <span className="text-[#22C55E]">→ Context auto-loaded from Unimatrix via custom instructions</span><br /><br />
-              Claude: "You're using a custom JWT validation middleware... (pulled from Palace 'Project Phoenix')"
+              Claude: &quot;You&apos;re using a custom JWT validation middleware... (pulled from Palace &apos;Project Phoenix&apos;)&quot;
             </div>
           </div>
           <div className="bg-[#111827] px-4 py-1.5 text-[10px] text-text-muted border-t border-border/50">
@@ -145,7 +145,7 @@ export function RealWorldWorkflowExample() {
           <div>
             <div className="font-medium text-text">9:30 AM — Cursor</div>
             <div className="text-text-secondary mt-1">
-              Exploring legacy service. Ask Cursor to store key invariants in "Legacy Migration" Palace.
+              Exploring legacy service. Ask Cursor to store key invariants in &quot;Legacy Migration&quot; Palace.
             </div>
             <div className="mt-2 text-[10px] bg-[#111827] border border-border/50 px-2 py-1 rounded text-text-muted inline-block">
               Screenshot placeholder: Cursor storing context
