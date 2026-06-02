@@ -28,8 +28,7 @@
       "autoIncrement": true,
       "ios": {
         "buildConfiguration": "Release",
-        "credentialsSource": "remote",
-        "appleId": "tim@getstackmax.com"
+        "credentialsSource": "remote"
       },
       "android": {
         "buildType": "app-bundle",
