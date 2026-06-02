@@ -19,11 +19,11 @@
     "type-check": "tsc --noEmit",
     "mobile:eas:login": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH eas login",
     "mobile:eas:init": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH eas init --id a93ce64a-bd02-4777-a432-35f72349253d",
-    "mobile:build": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --profile production --non-interactive",
-    "mobile:build:all": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform all --profile production --non-interactive",
-    "mobile:build:ios": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform ios --profile production --non-interactive",
-    "mobile:build:android": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform android --profile production --non-interactive",
-    "mobile:build:preview": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --profile preview --non-interactive"
+    "mobile:build": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --profile production --non-interactive --no-wait",
+    "mobile:build:all": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform all --profile production --non-interactive --no-wait",
+    "mobile:build:ios": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform ios --profile production --non-interactive --no-wait",
+    "mobile:build:android": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform android --profile production --non-interactive --no-wait",
+    "mobile:build:preview": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --profile preview --non-interactive --no-wait"
   },
   "_eas_mobile_note": "Use these for the React Native / Expo app (apps/mobile). They guarantee the correct working directory. See apps/mobile/README.md and ACCOUNTS_AND_SECRETS.md for details. Direct npx eas-cli from here is the #1 cause of 'expo-modules-autolinking' errors and huge uploads.",
   "dependencies": {
