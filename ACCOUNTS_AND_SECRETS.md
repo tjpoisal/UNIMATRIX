@@ -187,7 +187,7 @@ If any other obscure var from your paste isn't listed here (e.g. SVIX), it's opt
 
 The other remaining delta items (STRIPE_PRICE_* and the post-deploy NEXTAUTH_URL etc.) are independent of this. Check the dashboard at https://expo.dev for the status of the Android build that was queued.
 
-**iOS credentials note (for non-interactive builds)**: iOS requires Distribution Certificate + provisioning profile set up in EAS (remote). First time, run interactively on your machine (after unlocking Apple account if locked from prior attempts): `pnpm exec eas credentials:configure-build --platform ios --profile production`. Login with tim@getstackmax.com (use app-specific password). Fill TEAM_ID_PLACEHOLDER in eas.json submit/ios with your real 10-char team ID. Then non-interactive `pnpm mobile:build:ios` will work. Apple account lock: visit https://iforgot.apple.com to unlock.
+**iOS credentials note (for non-interactive builds)**: iOS requires Distribution Certificate + provisioning profile set up in EAS (remote). First time, run interactively on your machine (after unlocking Apple account if locked from prior attempts): `pnpm exec eas credentials:configure-build --platform ios --profile production`. Login with tjpoisal@gmail.com (use app-specific password). Fill TEAM_ID_PLACEHOLDER in eas.json submit/ios with your real 10-char team ID. Then non-interactive `pnpm mobile:build:ios` will work. Apple account lock: visit https://iforgot.apple.com to unlock.
 
 ### 1.10 Ably (Best Realtime for Collab Room)
 - **Why (best services)**: Managed WebSockets with presence, history, auth, fan-out. Far superior to raw WS + Redis for multi-LLM collab rooms. Scales without ops.
