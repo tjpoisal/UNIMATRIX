@@ -1,13 +1,14 @@
 # Fly.io config for the web service (Next.js custom server + Collab WS)
+# Usage: cp fly.web.toml fly.toml && fly deploy --config fly.toml --app your-app-name
 app = "unimatrix-web"
-primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "fra")
+primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "fra", "lhr")
 
 [build]
   dockerfile = "Dockerfile.web"
 
 [env]
   NODE_ENV = "production"
-  PORT = "8080"   # Fly usually routes to 8080; our server respects PORT
+  PORT = "8080"   # Fly routes to 8080 internally; our server.ts respects process.env.PORT
 
 [[services]]
   protocol = "tcp"
@@ -25,7 +26,7 @@ primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
-  memory_mb = 1024   # Start here; increase for production (Collab WS + Next.js)
+  memory_mb = 1024   # Increase for production Collab WS usage
 
 [checks]
   [checks.web]

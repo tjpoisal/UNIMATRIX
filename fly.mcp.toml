@@ -1,4 +1,5 @@
-# Fly.io config for the core MCP server (Fastify)
+# Fly.io config for the core MCP server (Fastify) - what LLMs connect to
+# Usage: cp fly.mcp.toml fly.toml && fly deploy --config fly.toml --app your-mcp-app-name
 app = "unimatrix-mcp"
 primary_region = "iad"
 
@@ -25,7 +26,7 @@ primary_region = "iad"
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
-  memory_mb = 1024   # MCP + potential worker work
+  memory_mb = 1024
 
 [checks]
   [checks.mcp]

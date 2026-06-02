@@ -76,33 +76,132 @@ Railway will build the Dockerfiles when you point the services at them.
 **Local development stays the same:** Your existing `docker-compose.yml` works (it already prefers remote Neon over the local `db` service).
 
 ### 2. Fly.io (Great for long-lived apps + often cheaper)
-Fly.io is very strong for exactly this kind of workload (custom servers, WebSockets, background processes).
+Fly.io is very strong for exactly this kind of workload (custom servers, WebSockets, background processes). It has a generous free allowance and is often cheaper than Render for always-on services.
 
-**How to deploy:**
+**Recommended app names:** `unimatrix-web` and `unimatrix-mcp` (you can change).
 
-1. Install `flyctl` and log in (`fly auth login`).
-2. Create two apps:
+**Step-by-step deployment:**
+
+1. Install flyctl and authenticate:
    ```bash
-   fly apps create your-unimatrix-web
-   fly apps create your-unimatrix-mcp
+   curl -L https://fly.io/install.sh | sh
+   fly auth login
    ```
-3. Deploy using the Dockerfiles:
+
+2. Create the two apps (run from repo root):
    ```bash
-   fly deploy --dockerfile Dockerfile.web --app your-unimatrix-web
-   fly deploy --dockerfile Dockerfile.server --app your-unimatrix-mcp
+   fly apps create unimatrix-web
+   fly apps create unimatrix-mcp
    ```
-4. Set secrets (recommended over env in toml for sensitive values):
+
+3. **Best way: Use the provided toml configs** (they are pre-tuned for our Dockerfiles, healthchecks, and PORT=8080 which our apps respect via `server.ts` and the Fastify server).
+
+   For web (Collab + dashboard):
    ```bash
-   fly secrets set DATABASE_URL=... DIRECT_URL=... --app your-unimatrix-web
-   # repeat for all other keys
+   cp fly.web.toml fly.toml
+   fly deploy --config fly.toml --app unimatrix-web
    ```
-5. For the worker you can add it as another process/machine in one of the apps or a third app.
 
-See the example `fly.web.toml` and `fly.mcp.toml` files in the repo root (copy/rename as needed and use `--config`).
+   For MCP server:
+   ```bash
+   cp fly.mcp.toml fly.toml
+   fly deploy --config fly.toml --app unimatrix-mcp
+   ```
 
-**Database:** Use your Neon connection strings as secrets.
+   (You can keep separate tomls and always use `--config`.)
 
-Fly has a generous free tier and is usually cheaper than Render for always-on services.
+4. Set all secrets (do this for each app; use your real values from Neon, etc.):
+   ```bash
+   # For web
+   fly secrets set \
+     DATABASE_URL="your-neon-db-url" \
+     DIRECT_URL="your-neon-direct-url" \
+     NEXTAUTH_SECRET="random-32+chars" \
+     NEXTAUTH_URL="https://unimatrix-web.fly.dev" \
+     # add GOOGLE_*, GITHUB_*, RESEND_API_KEY, STRIPE_*, etc.
+     --app unimatrix-web
+
+   # For mcp
+   fly secrets set \
+     DATABASE_URL="your-neon-db-url" \
+     DIRECT_URL="your-neon-direct-url" \
+     CLERK_SECRET_KEY="sk_..." \
+     CLERK_WEBHOOK_SECRET="whsec_..." \
+     VOYAGE_API_KEY="..." \
+     MASTER_ENCRYPTION_KEY="32-byte-hex-here" \
+     # any other keys the MCP server needs
+     --app unimatrix-mcp
+   ```
+
+5. (Optional but recommended) Deploy the background worker.
+
+   We've included `fly.worker.toml` for this.
+
+   ```bash
+   fly apps create unimatrix-worker
+   cp fly.worker.toml fly.toml
+   fly deploy --config fly.toml --app unimatrix-worker
+   fly secrets set \
+     DATABASE_URL="..." \
+     DIRECT_URL="..." \
+     VOYAGE_API_KEY="..." \
+     MASTER_ENCRYPTION_KEY="..." \
+     # other keys the worker needs (same as mcp)
+     --app unimatrix-worker
+   ```
+
+   To run the worker persistently (it loops and processes jobs):
+
+   - The simplest reliable way on Fly is to start a machine with the worker command:
+     ```bash
+     fly machine run \
+       --app unimatrix-worker \
+       --region iad \
+       --vm-memory 512 \
+       --env NODE_ENV=production \
+       $(fly apps list | grep unimatrix-worker | awk '{print $1}') \
+       node dist/worker.js
+     ```
+
+   - Or use `fly console --app unimatrix-worker` and run `node dist/worker.js` inside (for testing).
+
+   - For production always-on worker without public exposure, the toml + a dedicated cheap machine works well. You can scale the machine count if needed.
+
+   The worker will poll for pending librarian/AgentRun jobs and process embeddings etc. using your Neon DB.
+
+   See packages/server/src/worker.ts for details.
+
+6. After first deploy, you can scale:
+   ```bash
+   fly scale count 1 --app unimatrix-web   # or more for WS
+   fly scale vm shared-cpu-1x --memory 1024 --app unimatrix-mcp
+   ```
+
+7. Get your URLs:
+   - Web: https://unimatrix-web.fly.dev
+   - MCP: https://unimatrix-mcp.fly.dev/mcp   (use this in your Claude Desktop / Cursor mcp.json)
+
+**Important Fly notes for our setup:**
+- Our custom `server.ts` and Fastify server already listen on `process.env.PORT || 3000`. The toml files set `PORT=8080` which is standard for Fly.
+- Healthchecks are configured in the tomls (`/api/health` and `/health`).
+- For the Collab WebSocket: it will be available at `wss://unimatrix-web.fly.dev/ws/collab?roomId=xxx`
+- No volumes needed (we use Neon for DB, no local persistent files required).
+- Update `NEXTAUTH_URL` to the actual Fly URL after first deploy.
+- The `docker-compose.yml` still works locally against the same Neon DB.
+
+See the full `fly.web.toml` and `fly.mcp.toml` in the repo root for more options (regions, concurrency, VM sizes).
+
+There's also a helper script: `scripts/fly-deploy.sh` (make it executable with `chmod +x`).
+
+Example:
+```bash
+./scripts/fly-deploy.sh web
+./scripts/fly-deploy.sh mcp
+```
+
+Fly will automatically rebuild on `git push` if you connect the repo (or use `fly deploy` from CI).
+
+This should give you persistent long-lived processes for WS and the MCP server, exactly what we couldn't get on Vercel serverless.
 
 ### 3. Self-Hosted VPS + Docker Compose (Cheapest / full control)
 If you want to avoid PaaS billing surprises entirely:
