@@ -98,7 +98,7 @@ services:
       - key: NEXTAUTH_SECRET
         sync: false
       - key: NEXTAUTH_URL
-        value: https://unimatrix-web.onrender.com
+        value: https://unimatrix-web.fly.dev  # or your actual Fly URL; update after deploy. Legacy Render example kept in comment.
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: GOOGLE_CLIENT_SECRET

@@ -8,9 +8,9 @@
  *
  * Required environment variables:
  *   UNIMATRIX_API_KEY  — API key generated from your Unimatrix dashboard (web or MCP tokens)
- *   UNIMATRIX_API_URL  — Base API URL (default: http://localhost:3000/api ; for Render MCP: https://<your-unimatrix-mcp>.onrender.com or the web's /api if proxying)
+ *   UNIMATRIX_API_URL  — Base API URL (default: http://localhost:3000/api)
  *
- * Set UNIMATRIX_API_URL to your Render unimatrix-mcp service (e.g. https://unimatrix-mcp.onrender.com) or web URL.
+ * Set UNIMATRIX_API_URL to your Fly.io (or Render/Railway) MCP service URL, e.g. https://unimatrix-mcp.fly.dev or the web's /api if using embedded. See DEPLOYMENT.md.
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -788,7 +788,7 @@ async function main(): Promise<void> {
   if (!API_KEY) {
     console.error(
       "ERROR: UNIMATRIX_API_KEY is not set.\n" +
-      "Generate an API key / MCP token at your Unimatrix dashboard (e.g. https://<your-render-web>.onrender.com/onboarding or /settings/mcp-tokens)\n" +
+      "Generate an API key / MCP token at your Unimatrix dashboard (e.g. https://unimatrix-web.fly.dev/onboarding or /settings/mcp-tokens)\n" +
       "and set it as UNIMATRIX_API_KEY in your environment."
     );
     process.exit(1);
