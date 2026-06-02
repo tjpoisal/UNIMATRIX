@@ -12,22 +12,24 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
           node-version: 22
-
-      - name: Install Expo CLI + EAS CLI
-        run: npm install -g expo-cli eas-cli
+          cache: pnpm
 
       - name: Install dependencies
-        working-directory: apps/mobile
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: Build iOS (EAS)
-        working-directory: apps/mobile
+      - name: Build iOS (EAS via pnpm alias for correct CWD + bins)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform ios --profile production --non-interactive
+          EAS_BUILD_NO_EXPO_GO_WARNING: 'true'
+          EXPO_NO_TELEMETRY: '1'
+        run: pnpm mobile:build:ios
 
   build-android:
     name: Android (.aab via EAS)
@@ -35,19 +37,21 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v5
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
           node-version: 22
-
-      - name: Install Expo CLI + EAS CLI
-        run: npm install -g expo-cli eas-cli
+          cache: pnpm
 
       - name: Install dependencies
-        working-directory: apps/mobile
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: Build Android (EAS)
-        working-directory: apps/mobile
+      - name: Build Android (EAS via pnpm alias for correct CWD + bins)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform android --profile production --non-interactive
+          EAS_BUILD_NO_EXPO_GO_WARNING: 'true'
+          EXPO_NO_TELEMETRY: '1'
+        run: pnpm mobile:build:android

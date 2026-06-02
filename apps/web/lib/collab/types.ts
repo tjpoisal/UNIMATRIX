@@ -43,9 +43,11 @@ export const CreateRoomInput = z.object({
 
 export type CreateRoomInput = z.infer<typeof CreateRoomInput>;
 
-export const ListRoomsInput = z.object({
-  limit: z.number().int().min(1).max(100).default(50),
-});
+export const ListRoomsInput = z
+  .object({
+    limit: z.number().int().min(1).max(100).default(50),
+  })
+  .partial();
 
 export type ListRoomsInput = z.infer<typeof ListRoomsInput>;
 

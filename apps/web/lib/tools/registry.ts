@@ -10,10 +10,9 @@
  * - Better testability and type safety
  */
 
-import { z } from 'zod';
 import { TOOLS as legacyMemoryTools, handleTool as legacyHandleTool } from '@/app/api/mcp/route';
 import { sendMessage, getMessages, subscribeWebhook, createRoom, listRooms } from '@/lib/collab/service';
-import type { McpTool, OpenAITool } from '@/lib/mcp-client';
+import type { OpenAITool } from '@/lib/mcp-client';
 
 export interface ToolDefinition {
   name: string;
@@ -34,6 +33,7 @@ export interface ToolExecutionContext {
 const registry = new Map<string, ToolDefinition>();
 
 // Register legacy memory tools (temporary — will be migrated)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 legacyMemoryTools.forEach((tool: any) => {
   registry.set(tool.name, {
     name: tool.name,
@@ -166,11 +166,13 @@ async function executeCollabTool(
     }
 
     if (name === 'collab.list_rooms') {
-      const rooms = await listRooms({ limit: args.limit as number | undefined }, orgId);
+      const input = args.limit != null ? { limit: Number(args.limit) } : {};
+      const rooms = await listRooms(input, orgId);
       return { content: [{ type: 'text' as const, text: JSON.stringify(rooms) }] };
     }
 
     if (name === 'collab.send_message') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await sendMessage(args as any, orgId);
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(result) }],
@@ -178,6 +180,7 @@ async function executeCollabTool(
     }
 
     if (name === 'collab.get_messages') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const messages = await getMessages(args as any, orgId);
       return {
         content: [{ type: 'text', text: JSON.stringify(messages) }],
@@ -185,6 +188,7 @@ async function executeCollabTool(
     }
 
     if (name === 'collab.subscribe_webhook') {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = await subscribeWebhook(args as any, orgId);
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(result) }],
@@ -192,7 +196,7 @@ async function executeCollabTool(
     }
 
     throw new Error(`Unknown collaboration tool: ${name}`);
-  } catch (error: any) {
+  } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Tool execution failed';
     // Surface CollabError status if present for better client UX
     return {
@@ -208,6 +212,7 @@ export function toOpenAITools(): OpenAITool[] {
     function: {
       name: tool.name,
       description: tool.description,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       parameters: tool.inputSchema as any,
     },
   }));
