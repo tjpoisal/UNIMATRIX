@@ -16,7 +16,7 @@ export async function PATCH(
 
   // Only allow safe fields
   const allowed = ['daily_spend_limit', 'requires_hitl', 'context_window_max', 'hitl_tool_rules'];
-  const data: any = {};
+  const data: Record<string, unknown> = {};
 
   for (const key of allowed) {
     if (key in body) data[key] = body[key];

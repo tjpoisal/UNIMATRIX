@@ -45,7 +45,7 @@ function getRatelimit() {
 
 export async function checkRateLimit(
   identifier: string,
-  options?: { limit?: number; window?: string }
+  _options?: { limit?: number; window?: string }
 ) {
   const limiter = getRatelimit();
   if (!limiter) {

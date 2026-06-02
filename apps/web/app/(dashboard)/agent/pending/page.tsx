@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface PendingAction {
   id: string;
@@ -9,6 +9,7 @@ interface PendingAction {
   status: string;
   createdAt: string;
   requested_by?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any;
 }
 

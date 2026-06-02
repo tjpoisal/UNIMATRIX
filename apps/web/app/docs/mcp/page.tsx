@@ -122,7 +122,7 @@ export default function MCPReferencePage() {
 
               <div>
                 <div className="font-semibold mb-1">unimatrix_create_location</div>
-                <div className="text-text-secondary">Create a "room" inside a palace (supports parent_id for nesting).</div>
+                <div className="text-text-secondary">Create a &quot;room&quot; inside a palace (supports parent_id for nesting).</div>
                 <div className="mt-1 text-xs font-mono text-text-muted">Requires: palace_id, name</div>
               </div>
 

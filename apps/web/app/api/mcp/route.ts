@@ -36,6 +36,7 @@ async function resolveUser(req: NextRequest): Promise<string | null> {
       // Update last-used timestamp async (don't await)
       prisma.apiKey.update({ where: { id: k.id }, data: { lastUsed: new Date() } }).catch(() => {});
       // Attach org to request for downstream (tools/call path)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (req as any)._unimatrixOrgId = k.organizationId;
       return k.userId;
     }
@@ -438,6 +439,7 @@ export async function POST(req: NextRequest) {
 
     // Extract agent context (used for telemetry + HITL)
     const agentName = (args.agent_name || args.sender_name || 'unknown-agent') as string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const organizationId = (req as any)._unimatrixOrgId || null;
 
     try {

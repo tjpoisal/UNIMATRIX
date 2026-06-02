@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
   let effectiveUserId = userId;
 
   if (!effectiveUserId) {
-    const body = await req.json().catch(() => ({} as any));
-    effectiveUserId = body.userId; // only for testing; secure this
+    const body = await req.json().catch(() => ({} as Record<string, unknown>));
+    effectiveUserId = (body as Record<string, string>).userId; // only for testing; secure this
   }
 
   if (!effectiveUserId) {
@@ -45,8 +45,9 @@ export async function POST(req: NextRequest) {
       ...tokenData,
       note: 'Store this token securely. It will not be shown again.',
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Failed to generate token' }, { status: 400 });
+  } catch (err: unknown) {
+    const e = err as { message?: string };
+    return NextResponse.json({ error: e.message || 'Failed to generate token' }, { status: 400 });
   }
 }
 

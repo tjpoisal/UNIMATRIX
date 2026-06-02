@@ -50,7 +50,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error:  "/auth/error",
   },
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account: _account }) {
       if (!user.email) return true;
 
       // Auto-create user record for OAuth

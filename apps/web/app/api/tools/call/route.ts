@@ -32,13 +32,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthContext, requireAuthContext } from "@/lib/api-auth";
+import { getAuthContext } from "@/lib/api-auth";
 import { rateLimiters } from "@/lib/rate-limit";
 import {
   callMcpTool,
   type ToolCallRequest,
   type ToolCallSuccessResponse,
-  type ToolCallErrorResponse,
 } from "@/lib/mcp-client";
 
 export const dynamic = "force-dynamic";
@@ -162,6 +161,7 @@ export async function POST(
 
     return NextResponse.json(successResponse, { status: 200 });
   } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const toolNameForError =
       (req as any)._parsedBody?.toolName ?? "unknown";
 
