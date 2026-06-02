@@ -59,7 +59,7 @@ unimatrix/
 - Old Cloud (Vercel): https://unimatrix-flax.vercel.app
 - Marketing site: https://deployunimatrix.com
 - MCP endpoint (legacy Vercel): https://unimatrix-flax.vercel.app/api/mcp
-- MCP endpoint (Render primary): https://<your-unimatrix-mcp-service>.onrender.com/mcp (see render.yaml, RENDER.md)
+- MCP endpoint: see DEPLOYMENT.md (Railway / Fly.io / self-hosted / etc.). Legacy: https://unimatrix-flax.vercel.app/api/mcp or old Render URLs.
 - MCP endpoint (self-hosted): http://[user-server]:PORT/mcp
 
 ---

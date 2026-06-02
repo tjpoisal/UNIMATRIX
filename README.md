@@ -199,7 +199,7 @@ recall_context: "Where were we on auth?"
 - [`MVP_Scope.md`](./MVP_Scope.md) — 10-week build plan and scope decisions
 - [`IMPLEMENTATION_STATUS.md`](./IMPLEMENTATION_STATUS.md) — What's done, what's next
 - [`LLM_ARCHITECTURE.md`](./LLM_ARCHITECTURE.md) — Multi-LLM routing system
-- [`NEON_VERCEL_MIGRATION.md`](./NEON_VERCEL_MIGRATION.md) — Historical AWS → Neon + Vercel (now Render primary, see RENDER.md)
+- [`NEON_VERCEL_MIGRATION.md`](./NEON_VERCEL_MIGRATION.md) — Historical AWS → Neon + Vercel (see DEPLOYMENT.md for current options: Railway, Fly.io, VPS, etc.)
 - [`UNIMATRIX_QUICKSTART.md`](./UNIMATRIX_QUICKSTART.md) — Step-by-step local setup
 
 ---

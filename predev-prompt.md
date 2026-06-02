@@ -31,7 +31,7 @@ unimatrix/
 - **Auth:** NextAuth v5 — credentials + Google + GitHub, JWT sessions, bcryptjs
 - **Payments:** Stripe — Free / Pro $9.99/mo / Enterprise $29.99/mo
 - **Email:** Resend API
-- **MCP endpoint (cloud - Render primary):** `https://<your-mcp-service>.onrender.com/mcp` (legacy Vercel: https://<your-mcp>.onrender.com/mcp  # or legacy vercel)
+- **MCP endpoint (cloud):** See DEPLOYMENT.md for current host (Railway / Fly / VPS etc.). Legacy Vercel: https://unimatrix-flax.vercel.app/api/mcp
 
 **Data model:**
 - `Palace` = workspace / project (e.g. "Work Research", "Personal")

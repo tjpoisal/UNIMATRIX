@@ -25,7 +25,7 @@
   - apps/mobile (Expo ~54): Scaffold, incomplete
   - apps/desktop (Electron ^36 + electron-builder): Scaffold/wrapper, release workflows
 - **Infra:** .github/workflows (CI type/lint/build, desktop releases signed, mobile EAS), Dependabot (weekly npm + actions, groups minor/patch, ignores major Next)
-- **Deployment:** Render primary (see render.yaml + RENDER.md: web custom server + Fastify MCP + Postgres). Legacy Vercel. Homepage: your .onrender.com or deployunimatrix.com
+- **Deployment:** See DEPLOYMENT.md (Railway, Fly.io, VPS + Docker, etc.). The architecture supports persistent platforms. Legacy Vercel. Homepage: deployunimatrix.com or your chosen host.
 - **Encryption & Privacy:** App-layer (not just at-rest). Episodic (verbatim encrypted) + Semantic (Librarian summary + vector). RLS + redaction defense-in-depth.
 
 ## Memory Model (MVP, evolved from docs)
