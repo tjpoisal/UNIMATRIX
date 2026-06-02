@@ -80,3 +80,34 @@ jobs:
 
       - name: Lint
         run: cd apps/web && pnpm lint
+
+  typecheck-server:
+    name: Typecheck server (non-blocking / experimental)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages (for types, e.g. @unimatrix/db)
+        run: pnpm --filter @unimatrix/db build
+
+      - name: Typecheck @unimatrix/server
+        run: NODE_OPTIONS="--max-old-space-size=8192" pnpm --filter @unimatrix/server exec tsc --noEmit
+        env:
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
+          CLERK_SECRET_KEY: sk_placeholder
+          CLERK_WEBHOOK_SECRET: whsec_placeholder
