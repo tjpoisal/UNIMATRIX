@@ -63,7 +63,12 @@ pnpm mobile:build:android
 pnpm mobile:build:preview
 ```
 
-These use `pnpm --filter mobile` which sets the working directory correctly to `apps/mobile` so the right `app.json`, `eas.json`, `.easignore`, and `node_modules` are used.
+These use `pnpm --filter mobile` which sets the working directory correctly to `apps/mobile`.
+
+For custom flags:
+```bash
+pnpm --filter mobile exec npx eas-cli@latest build --platform all --profile production --non-interactive
+```
 
 Current production identifiers (after last interactive EAS run):
 - iOS bundle: `com.tjpoisal.unimatrix`

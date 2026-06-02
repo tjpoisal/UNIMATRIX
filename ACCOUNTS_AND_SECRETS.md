@@ -170,11 +170,13 @@ If any other obscure var from your paste isn't listed here (e.g. SVIX), it's opt
 - **Existing EAS project**: We are using ID `a93ce64a-bd02-4777-a432-35f72349253d` (the one in your command).
 - **What you get**: `EXPO_TOKEN` (long-lived token for non-interactive `eas build` in CI or local scripts).
 - **How to link + build (CRITICAL: EAS must see the correct project dir — apps/mobile — or you get wrong bundle IDs, missing autolinking errors, and 30MB+ wrong uploads of the whole monorepo)**:
-  1. From monorepo root use the convenience scripts (they delegate with correct CWD via pnpm filter):
+  1. From monorepo root **always use the pnpm aliases** (they ensure correct CWD inside apps/mobile via --filter):
      - `pnpm mobile:eas:login`
      - `pnpm mobile:eas:init`   (uses --id a93ce64a-bd02-4777-a432-35f72349253d)
      - `pnpm mobile:build:all`   (or mobile:build:ios / mobile:build:android / mobile:build:prod / mobile:build:preview)
-  2. Or manually: `cd apps/mobile && npx eas-cli@latest login` then `npx eas-cli@latest build --platform all --profile production`
+  2. For extra EAS flags (e.g. --non-interactive, --wait, --local): 
+     `pnpm --filter mobile exec npx eas-cli@latest build --platform all --profile production --non-interactive`
+  3. Never run raw `npx eas-cli@latest ...` while your shell is in the monorepo root. It generates bad root config and uploads the entire monorepo (33MB+).
   3. (Configs were pre-cleaned + updated after your last run: bundleIdentifier + package now `com.tjpoisal.unimatrix` to match the IDs you chose in the prompts, versionCode bumped, EXPO_PUBLIC_API_URL injected per profile for the Fly backend, .easignore added.)
   4. Create / use `EXPO_TOKEN`: Expo dashboard → Access Tokens for the @tjpoisal/unimatrix project. Then `EXPO_TOKEN=xxx pnpm mobile:build:all`.
 - **What happened in your last `npx ... build --platform all` run (from root)**: It created root eas.json + app.json, detected the old ./unimatrix/ skeleton (from prior create-expo-app), started an Android build with the new package + cloud keystore, asked for iOS bundle (you picked com.tjpoisal.unimatrix), then failed on iOS with "Cannot find 'expo-modules-autolinking'" because the build context/CWD was wrong (no proper expo in the tarball). We cleaned the root junk and ./unimatrix/ dir.
