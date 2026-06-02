@@ -44,7 +44,7 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "tim@getstackmax.com",
+        "appleId": "tjpoisal@gmail.com",
         "ascAppId": "6748523981",
         "appleTeamId": "TEAM_ID_PLACEHOLDER"  // TODO: replace with your 10-char Apple Team ID (e.g. from https://developer.apple.com/account/#/membership or eas configure output)
       },
