@@ -3,8 +3,8 @@
  *
  * Builds and configures the Fastify application without calling listen().
  * Imported by:
- *   - src/index.ts  → local dev / Railway  (calls fastify.listen())
- *   - api/index.ts  → Vercel serverless    (emits requests to fastify.server)
+ *   - src/index.ts  → local dev / Render / Railway  (calls fastify.listen() on 0.0.0.0 + PORT)
+ *   - api/index.ts  → legacy Vercel serverless only (deprecated post Render migration)
  */
 
 import Fastify                           from 'fastify';

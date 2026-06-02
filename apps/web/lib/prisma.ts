@@ -2,7 +2,8 @@ import { PrismaClient } from "@prisma/client";
 
 // During schema unification (see packages/db + SCHEMA_ALIGNMENT.md) we keep the
 // web-specific client for legacy Palace/Location models + NextAuth tables.
-// New cross-cutting models like McpToken are now present in this client too.
+// McpToken (and other cross models) are now ONLY in the rich @unimatrix/db client;
+// bridge (mcp-bridge.ts) writes MCP tokens via rich client to shared mcp_tokens table.
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 export const prisma =

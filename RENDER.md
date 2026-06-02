@@ -7,8 +7,8 @@ This document is kept for when you resolve the Render billing. The architecture 
 ## Architecture on Render
 
 - **PostgreSQL**: Managed Postgres (with pgvector) via Render
-- **unimatrix-mcp**: Core Fastify MCP server (`packages/server`) — this is what Claude Desktop, Cursor, etc. connect to
-- **unimatrix-web**: Next.js portal + custom WebSocket server for Collab Room
+- **unimatrix-mcp**: Core Fastify MCP server (`packages/server` now published as `@unimatrix/server`) — this is what Claude Desktop, Cursor, etc. connect to
+- **unimatrix-web**: Next.js portal + custom WebSocket server (apps/web/server.ts) for Collab Room
 - **(Optional) unimatrix-worker**: Background processor for embeddings, summarization, librarian jobs
 
 ## Quick Deploy (Recommended)
@@ -67,7 +67,7 @@ Run migrations locally against the container DB:
 
 ```bash
 docker compose exec web pnpm --filter web db:migrate:deploy
-docker compose exec mcp-server pnpm --filter server db:migrate:deploy
+docker compose exec mcp-server pnpm --filter @unimatrix/server db:migrate:deploy || docker compose exec mcp-server pnpm --filter @unimatrix/server exec prisma db push --skip-generate || true
 ```
 
 ## Health Checks
@@ -85,11 +85,21 @@ Both are implemented and used by Render.
 
 ## Worker / Background Jobs
 
-See the commented worker service in `render.yaml`.
+See the commented worker service in `render.yaml` (supports both native node and Docker).
 
-The worker skeleton lives at `packages/server/src/worker.ts`.
+The worker (polls AgentRun for 'librarian' tasks) lives at `packages/server/src/worker.ts` + `librarian/processJob.ts`. It is production-critical for embeddings/search to work fully.
 
-Future: Replace the simple loop with Trigger.dev, Inngest, or BullMQ + Redis.
+In Docker/server start, raw SQL + prisma bootstrap now included.
+
+## Schema, Auth Bridge & MCP Tokens (Render specifics)
+
+- Shared DB; rich schema (Spaces, embeddings, McpToken, AgentRun) is in `packages/db/prisma/schema.prisma` (with @@map for snake_case tables matching raw SQL/RLS).
+- Web still uses legacy Palace/Location schema + NextAuth; `McpToken` model removed from web schema to prevent management conflict (bridge now uses `@unimatrix/db` rich client exclusively).
+- Auth bridge (`apps/web/lib/mcp-bridge.ts` + `/api/mcp-tokens`) generates tokens usable by MCP server: it stubs a `users` row (with derived clerk_id) so FK/RLS work for NextAuth-originated tokens.
+- MCP tokens UI at `/(dashboard)/settings/mcp-tokens` (and link from providers settings).
+- For fresh Render DBs, startCommands run migrations/push to create tables (mcp_tokens, agent_runs, etc.).
+
+See also `SCHEMA_ALIGNMENT.md`, `packages/server/src/auth/mcpToken.ts`, `verifyUser.ts`.
 
 ## One-Command Local Parity
 

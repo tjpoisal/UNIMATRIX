@@ -1,5 +1,5 @@
 {
-  "name": "unimatrix",
+  "name": "@unimatrix/server",
   "version": "0.1.0",
   "description": "Memory Palace for LLMs via MCP",
   "main": "dist/index.js",

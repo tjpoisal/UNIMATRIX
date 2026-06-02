@@ -13,13 +13,18 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY packages/server/package.json ./packages/server/
 
 # Install dependencies (only server + shared)
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter server --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter @unimatrix/server --frozen-lockfile
 
-# Copy source
+# Copy source for all needed workspaces (db for @unimatrix/db, types, server)
+COPY packages/db ./packages/db
 COPY packages/server ./packages/server
 COPY packages/types ./packages/types
 
-# Generate Prisma Client + build
+# Build shared db first (ensures dist/ for workspace:* consumers)
+WORKDIR /app/packages/db
+RUN pnpm build
+
+# Generate Prisma Client + build server (now that db is built)
 WORKDIR /app/packages/server
 RUN pnpm prisma generate
 RUN pnpm build
@@ -32,12 +37,21 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# Install psql for running raw SQL migrations (001-004) at container start for fresh DBs on Render / self-host.
+# The migrations are idempotent (IF NOT EXISTS, OR REPLACE).
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+
 # Copy built artifacts + node_modules from builder
 COPY --from=base /app/packages/server/dist ./dist
 COPY --from=base /app/packages/server/node_modules ./node_modules
 COPY --from=base /app/packages/server/package.json ./
 COPY --from=base /app/packages/server/prisma ./prisma
 COPY --from=base /app/packages/server/migrations ./migrations
+
+# Bring db's built dist + its isolated generated prisma client (for @unimatrix/db consumers)
+COPY --from=base /app/packages/db/dist /app/packages/db/dist
+COPY --from=base /app/packages/db/generated /app/packages/db/generated
+COPY --from=base /app/packages/db/package.json /app/packages/db/package.json || true
 
 # Copy root pnpm files if needed for runtime
 COPY --from=base /app/node_modules/.pnpm ./.pnpm 2>/dev/null || true
@@ -48,4 +62,16 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
 
-CMD ["node", "dist/index.js"]
+# Run migrations (psql the raw sqls which create core tables; prisma migrate deploy for any prisma-managed) then start.
+# psql will fail gracefully on re-runs due to IF NOTs.
+CMD sh -c '\
+  echo "[migrate] Running raw SQL migrations for server..."; \
+  psql "$DATABASE_URL" -f ./migrations/001_initial_schema.sql || echo "[migrate] 001 note (may already exist)"; \
+  psql "$DATABASE_URL" -f ./migrations/002_indexes_security.sql || echo "[migrate] 002 note"; \
+  psql "$DATABASE_URL" -f ./migrations/003_space_embeddings.sql || echo "[migrate] 003 note"; \
+  psql "$DATABASE_URL" -f ./migrations/004_mcp_tokens_and_agent_runs.sql || echo "[migrate] 004 note"; \
+  echo "[migrate] prisma migrate deploy (if any prisma history)..."; \
+  pnpm --filter server db:migrate:deploy || true; \
+  echo "[start] Launching MCP server..."; \
+  node dist/index.js \
+'

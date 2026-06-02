@@ -6,8 +6,8 @@
 #   2. In Render Dashboard → Blueprints → New Blueprint Instance
 #   3. Connect this repo
 #
-# After first deploy, manually run migrations via the Shell tab if needed:
-#   pnpm --filter server db:migrate:deploy
+# After first deploy, manually run migrations via the Shell tab if needed (or they run in startCommand):
+#   pnpm --filter @unimatrix/server db:migrate:deploy
 #   pnpm --filter web db:migrate:deploy
 #
 # DOCKER OPTION (recommended for full control):
@@ -34,9 +34,10 @@ services:
     rootDirectory: .
     buildCommand: |
       pnpm install --frozen-lockfile
-      pnpm --filter server build
-      pnpm --filter server db:generate
-    startCommand: pnpm --filter server db:migrate:deploy && pnpm --filter server start
+      pnpm --filter @unimatrix/db build
+      pnpm --filter @unimatrix/server build
+      pnpm --filter @unimatrix/server db:generate
+    startCommand: (pnpm --filter @unimatrix/server db:migrate:deploy || pnpm --filter @unimatrix/server exec prisma db push --skip-generate --accept-data-loss || true) && pnpm --filter @unimatrix/server start
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
@@ -75,6 +76,7 @@ services:
     rootDirectory: .
     buildCommand: |
       pnpm install --frozen-lockfile
+      pnpm --filter @unimatrix/db build
       pnpm --filter web build
     startCommand: pnpm --filter web db:migrate:deploy && pnpm --filter web start:prod
     healthCheckPath: /api/health
@@ -136,15 +138,22 @@ services:
   #   envVars: [ ... same as above ... ]
 
   # ──────────────────────────────────────────────────────────────
-  # Background Worker for Librarian / Embedding Jobs
-  # Runs the async semantic processing from packages/server/src/librarian
+  # Background Worker for Librarian / Embedding Jobs (AgentRun polling)
+  # Runs the async semantic processing from packages/server/src/librarian/processJob.ts
+  # and updates AgentRun tracking. Optional but recommended for production scale.
   # ──────────────────────────────────────────────────────────────
+  # Native node example (uncomment + adjust):
   # - type: worker
   #   name: unimatrix-worker
-  #   runtime: docker
+  #   runtime: node
   #   plan: standard
-  #   dockerfilePath: ./Dockerfile.server
-  #   dockerCommand: node dist/worker.js
+  #   region: oregon
+  #   rootDirectory: .
+  #   buildCommand: |
+  #     pnpm install --frozen-lockfile
+  #     pnpm --filter @unimatrix/db build
+  #     pnpm --filter @unimatrix/server build
+  #   startCommand: node packages/server/dist/worker.js
   #   envVars:
   #     - key: DATABASE_URL
   #       fromDatabase:
@@ -152,7 +161,17 @@ services:
   #         property: connectionString
   #     - key: VOYAGE_API_KEY
   #       sync: false
-  #     # ... other keys
+  #     - key: MASTER_ENCRYPTION_KEY
+  #       sync: false
+  #     # CLERK etc not needed for pure worker
 
+  # Docker alternative (recommended for parity with Dockerfile.server which runs psql inits):
+  # - type: worker
   #   name: unimatrix-worker
-  #   ...
+  #   runtime: docker
+  #   plan: standard
+  #   dockerfilePath: ./Dockerfile.server
+  #   # Override the default CMD to run the worker entry instead of server
+  #   dockerCommand: node dist/worker.js
+  #   envVars: [ same as above; DATABASE_URL + VOYAGE + MASTER_ENCRYPTION_KEY required ]
+

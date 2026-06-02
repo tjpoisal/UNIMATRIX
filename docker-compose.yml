@@ -1,23 +1,29 @@
-version: '3.8'
-
 services:
+  # NOTE: DATABASE_URL / DIRECT_URL are now loaded via env_file: .env.local (or .env)
+  # which should contain your Prisma Postgres pooled + direct connection strings.
+  #
   # Core MCP Server (Fastify) — what LLMs connect to
+
   mcp-server:
     build:
       context: .
       dockerfile: Dockerfile.server
     ports:
       - "3001:3000"
+    env_file:
+      - .env.local   # or .env
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://unimatrix:unimatrix@db:5432/unimatrix
-      DIRECT_URL: postgresql://unimatrix:unimatrix@db:5432/unimatrix
+      # These can be overridden by the env_file above or by setting them here.
+      # DATABASE_URL: ...
+      # DIRECT_URL: ...
       # Add your local secrets here or via .env
       # CLERK_SECRET_KEY: ...
       # VOYAGE_API_KEY: ...
-    depends_on:
-      db:
-        condition: service_healthy
+    # Local db service is optional now; remote Prisma Postgres is used above.
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
       interval: 10s
@@ -31,23 +37,25 @@ services:
       dockerfile: Dockerfile.web
     ports:
       - "3000:3000"
+    env_file:
+      - .env.local   # or .env
     environment:
       NODE_ENV: development
-      DATABASE_URL: postgresql://unimatrix:unimatrix@db:5432/unimatrix
-      DIRECT_URL: postgresql://unimatrix:unimatrix@db:5432/unimatrix
       NEXTAUTH_URL: http://localhost:3000
       NEXTAUTH_SECRET: dev-secret-change-in-production
-      # Add other keys as needed
-    depends_on:
-      db:
-        condition: service_healthy
+      # Add other keys as needed (DATABASE_URL / DIRECT_URL come from env_file above)
+    # Local db service is optional now (remote DB used).
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 15s
       timeout: 5s
       retries: 5
 
-  # PostgreSQL (mimics Render Postgres)
+  # PostgreSQL (optional local pgvector DB - useful for packages/server embeddings or full local-only mode)
+  # Main services (web, mcp-server) are now configured to use the remote Prisma Postgres by default.
   db:
     image: pgvector/pgvector:pg16
     environment:

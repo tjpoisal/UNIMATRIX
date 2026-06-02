@@ -10,7 +10,7 @@
  *   import { prisma } from '@unimatrix/db';
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/prisma-client/index.js';
 
 declare global {
   // eslint-disable-next-line no-var
@@ -27,5 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
   global.__unimatrixPrisma = prisma;
 }
 
-export * from '@prisma/client';
-export type { Prisma } from '@prisma/client';
+// Re-export the rich models + PrismaClient from our isolated generated client (avoids polluting / conflicting with web's @prisma/client from legacy schema)
+export { PrismaClient } from '../generated/prisma-client/index.js';
+export type { Prisma } from '../generated/prisma-client/index.js';
+export * from '../generated/prisma-client/index.js';  // brings in model types like User, McpToken, Space, etc. for richPrisma.mcpToken etc.

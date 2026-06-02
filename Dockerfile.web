@@ -15,13 +15,17 @@ COPY apps/web/package.json ./apps/web/
 # Install dependencies for web workspace
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter web --frozen-lockfile
 
-# Copy source
+# Copy source (full packages for workspace deps like @unimatrix/db)
 COPY apps/web ./apps/web
 COPY packages ./packages
 
+# Build shared @unimatrix/db first (monorepo workspace dep for future unification / bridge)
+WORKDIR /app/packages/db
+RUN pnpm build
+
 WORKDIR /app/apps/web
 
-# Generate Prisma + build Next.js + custom server
+# Generate Prisma (web's local schema) + build Next.js + custom server
 RUN pnpm prisma generate
 RUN pnpm build
 
@@ -40,6 +44,12 @@ COPY --from=base /app/apps/web/public ./public
 COPY --from=base /app/apps/web/package.json ./
 COPY --from=base /app/apps/web/prisma ./prisma
 COPY --from=base /app/apps/web/node_modules ./node_modules
+
+# Ensure @unimatrix/db built output + its isolated generated client (rich models) are present
+COPY --from=base /app/packages/db/dist /app/packages/db/dist
+COPY --from=base /app/packages/db/generated /app/packages/db/generated
+COPY --from=base /app/packages/db/package.json /app/packages/db/package.json
+COPY --from=base /app/packages/db/node_modules /app/packages/db/node_modules 2>/dev/null || true
 
 # Copy server.ts compiled output (dist/server.js)
 # Also bring in any runtime config

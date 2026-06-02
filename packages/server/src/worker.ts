@@ -12,7 +12,7 @@
  * - Designed to be run as dedicated Render Worker (see render.yaml) or sidecar.
  *
  * To run locally:
- *   pnpm --filter server build
+ *   pnpm --filter @unimatrix/server build
  *   DATABASE_URL=... node dist/worker.js
  *
  * On Render: Use the worker service definition in render.yaml (Docker recommended).

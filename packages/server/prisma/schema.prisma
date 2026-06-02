@@ -62,6 +62,7 @@ model User {
   deletedAt DateTime? // soft delete
 
   @@index([clerk_id])
+  @@map("users")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -92,6 +93,7 @@ model Space {
 
   @@index([userId])
   @@index([parentId])
+  @@map("spaces")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -126,6 +128,7 @@ model Memory {
   @@index([spaceId])
   @@index([status])
   @@index([indexedAt])
+  @@map("memories")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -144,6 +147,7 @@ model MemoryTag {
   @@unique([memoryId, tag])
   @@index([memoryId])
   @@index([tag])
+  @@map("memory_tags")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -155,7 +159,7 @@ model McpToken {
   userId       String
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  token        String    @unique // raw token (or public id) — unique
+  token        String?   @unique // raw token (or public id) — unique; nullable per security (only hash stored)
   hashedToken  String    @map("hashed_token") // bcrypt hash for validation
 
   scope        TokenScope @default(full)
@@ -166,6 +170,7 @@ model McpToken {
 
   @@index([userId])
   @@index([token])
+  @@map("mcp_tokens")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -197,6 +202,7 @@ model AgentRun {
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+  @@map("agent_runs")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -218,4 +224,5 @@ model AuditLog {
   @@index([userId])
   @@index([action])
   @@index([createdAt])
+  @@map("audit_logs")
 }

@@ -111,43 +111,42 @@ unimatrix/
 
 ---
 
-## Environment Variables (Vercel Production)
+## Environment Variables (Render Production - primary)
 
 | Variable | Where set | Notes |
 |----------|-----------|-------|
-| `DATABASE_URL` | Vercel | Neon PostgreSQL connection string |
-| `NEXTAUTH_SECRET` | Vercel | Random base64 string |
-| `NEXTAUTH_URL` | Render (or Vercel legacy) | `https://<your-web-service>.onrender.com` (or old vercel) |
-| `RESEND_API_KEY` | Vercel ✅ | `re_eGJUC6th_...` |
-| `EMAIL_FROM` | Vercel ✅ | `Unimatrix <onboarding@resend.dev>` |
-| `GOOGLE_CLIENT_ID` | Vercel | OAuth |
-| `GOOGLE_CLIENT_SECRET` | Vercel | OAuth |
-| `GITHUB_CLIENT_ID` | Vercel | OAuth |
-| `GITHUB_CLIENT_SECRET` | Vercel | OAuth |
-| `STRIPE_SECRET_KEY` | Vercel | Payments |
-| `STRIPE_WEBHOOK_SECRET` | Vercel | Webhook validation |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Vercel | Client-side Stripe |
+| `DATABASE_URL` | Render (from db service) | Shared Postgres (Neon or Render PG) connection string |
+| `DIRECT_URL` | Render (from db) | For prisma etc |
+| `NEXTAUTH_SECRET` | Render | Random base64 |
+| `NEXTAUTH_URL` | Render | `https://unimatrix-web.onrender.com` (update if service name changes) |
+| `RESEND_API_KEY` | Render | `re_...` |
+| `EMAIL_FROM` | Render | `Unimatrix <onboarding@resend.dev>` |
+| OAuth, Stripe, etc. | Render | Same as before |
+| `CLERK_SECRET_KEY` | Render | For MCP server auth (hybrid with NextAuth during bridge) |
+| `VOYAGE_API_KEY`, `MASTER_ENCRYPTION_KEY` | Render | For embeddings + memory crypto in MCP/server |
 
 ---
 
 ## Deployment Workflow
 
-**Rule: Every change must be committed to GitHub AND deployed to Vercel.**
+**Rule: Every change must be committed to GitHub (git push origin main triggers Render Blueprint deploy).**
 
 ```bash
-# Stage auth-related changes
 git add <files>
 git commit -m "type(scope): description"
 git push origin main
-# → Vercel auto-deploys from main (webhook connected)
+# → Render (via render.yaml Blueprint) auto deploys web + mcp + worker
 ```
 
 - **Only branch:** `main`
 - **GitHub repo:** `https://github.com/tjpoisal/UNIMATRIX`
-- **Primary deploy options:** See `DEPLOYMENT.md` (Railway recommended if Render billing is an issue, Fly.io, self-hosted VPS + Docker Compose, etc.).
-- The repo has `Dockerfile.server`, `Dockerfile.web`, `docker-compose.yml`, `fly.*.toml`, `railway.toml`, `docker-compose.prod.yml`, custom `server.ts`, worker, etc. ready.
-- **Vercel note:** The web dashboard + HTTP `/api/mcp` route can still run on Vercel (serverless-friendly). However the full product (real WS Collab Room via custom server, persistent MCP, background worker) cannot — see "Why not Vercel?" in DEPLOYMENT.md. vercel.json is legacy.
-- git push to main triggers deploys on your chosen platform.
+- **Primary deploy:** Render Blueprint (see render.yaml + RENDER.md): shared Postgres + @unimatrix/server (Fastify MCP on /mcp) + unimatrix-web (Next.js + custom server.ts for WS) + optional background worker.
+- Dockerfiles + docker-compose.yml for local parity / self-host. Native node or docker runtimes supported in Render.
+- vercel.json is legacy only. No more Vercel analytics or hard-coded vercel.app URLs in prod paths.
+- Custom server binds to 0.0.0.0:PORT; start:prod = node dist/server.js after build:server.
+- Monorepo: always `pnpm --filter @unimatrix/db build` before web/server in CI/deploys. Use path or @scope filters.
+- Migrations auto-attempted in startCommands + Docker CMDs (raw SQL for core tables + prisma push fallback + db:migrate:deploy).
+- git push to main triggers the full stack on Render.
 
 ---
 
@@ -168,11 +167,12 @@ git push origin main
 - DNS + email forwarding: deployunimatrix.com via ImprovMX
 
 ### ⏳ In Progress / Next
-- **MCP protocol completeness** — ensure the MCP server exposes: `remember`, `recall`, `list_contexts`, `continue_from`, `get_recent`
-- **Cross-LLM handoff** — when Claude connects via MCP, it should get the last N messages from *any* LLM session
+- **MCP protocol completeness** — ensure the MCP server exposes: `remember`, `recall`, `list_contexts`, `continue_from`, `get_recent` (handlers exist in packages/server/src/handlers/*)
+- **Cross-LLM handoff + auth bridge** — MCP tokens from web (NextAuth) now bridge to MCP server (clerk + rich schema) via user stub + shared mcp_tokens table. See lib/mcp-bridge.ts + settings/mcp-tokens UI + /api/mcp-tokens
 - **Mobile memory viewer** — show what the AI remembers, by context/device
-- **Real-time sync** (WebSocket) — push new memories to all connected clients immediately
-- **Collaborative desktop app** (Electron) — multi-LLM simultaneous conversation UI
+- **Real-time sync** (WebSocket) — push new memories to all connected clients immediately (custom server + redis-pubsub + ably option live)
+- **Collaborative desktop app** (Electron) — multi-LLM simultaneous conversation UI (planned)
+- Render migration complete (vercel legacy only; custom server, worker, Docker parity, schema maps, db package, builds all enforced)
 
 ### 📋 Deferred
 - Desktop app full build (Electron + WebSocket multi-LLM room)
@@ -251,7 +251,7 @@ Enterprise = self-hosted Docker option + priority support + team sharing.
 3. **`EMAIL_FROM` must use `onboarding@resend.dev`** until a custom domain is verified on Resend.
 4. **Mobile API URL** is set via `EXPO_PUBLIC_API_URL` env var (defaults to `http://localhost:3000/api`).
 5. **Git lock files** sometimes appear — run `rm -f .git/*.lock` before committing if git fails.
-6. **Old AWS stack** (DynamoDB, AppSync, Lambda) is documented in `CLAUDE_CODE_SYSTEM_PROMPT.md` — that's the old architecture. We are on Neon + Vercel now.
+6. **Old AWS stack** (DynamoDB, AppSync, Lambda) is documented in `CLAUDE_CODE_SYSTEM_PROMPT.md` — that's the old architecture. We are on Neon/Render PG + Render now (Vercel is legacy only).
 7. **`pnpm-lock.yaml` conflicts** — always use `pnpm install --frozen-lockfile` in CI.
 
 ---

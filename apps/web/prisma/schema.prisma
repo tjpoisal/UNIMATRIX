@@ -194,35 +194,11 @@ model ApiKey {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MCP Tokens — for authenticating external LLMs to the core MCP server
-// (shared table with packages/server for cross-auth bridging during migration)
-// This model is being added as part of schema unification (see packages/db)
-// ─────────────────────────────────────────────────────────────────────────────
+// MCP Tokens table is managed by the rich schema in packages/db (@@map("mcp_tokens")) for cross-auth bridging.
+// Web no longer defines the model here to avoid duplicate table management / migration conflicts during unification.
+// The @unimatrix/db Prisma client + bridge logic handles token CRUD targeting the shared table.
+// See apps/web/lib/mcp-bridge.ts and packages/db/prisma/schema.prisma
 
-enum TokenScope {
-  full
-  readonly
-  memory_only
-}
-
-model McpToken {
-  id          String    @id @default(cuid())
-  userId      String
-  // user relation omitted temporarily to avoid conflict with web's User model during unification
-  // user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  token       String?   @unique // legacy/raw token column (may be null per security migration)
-  hashedToken String    @map("hashed_token")
-
-  scope       TokenScope @default(full)
-  expiresAt   DateTime?
-  revokedAt   DateTime?
-  lastUsedAt  DateTime?
-  createdAt   DateTime   @default(now())
-
-  @@index([userId])
-  @@index([token])
-}
 
 // User-connected LLM providers (encrypted API keys)
 model LLMProvider {

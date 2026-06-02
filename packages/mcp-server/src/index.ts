@@ -8,9 +8,9 @@
  *
  * Required environment variables:
  *   UNIMATRIX_API_KEY  — API key generated from your Unimatrix dashboard (web or MCP tokens)
- *   UNIMATRIX_API_URL  — Base API URL (default for Render: https://<your-mcp-service>.onrender.com or your web /api if using the embedded route)
+ *   UNIMATRIX_API_URL  — Base API URL (default: http://localhost:3000/api ; for Render MCP: https://<your-unimatrix-mcp>.onrender.com or the web's /api if proxying)
  *
- * After Vercel -> Render migration, set UNIMATRIX_API_URL to your Render service URL (e.g. the unimatrix-mcp service).
+ * Set UNIMATRIX_API_URL to your Render unimatrix-mcp service (e.g. https://unimatrix-mcp.onrender.com) or web URL.
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";

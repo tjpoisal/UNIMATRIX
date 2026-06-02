@@ -1,10 +1,10 @@
 /**
  * src/index.ts
  *
- * Local dev + Railway entry point.
- * Imports the configured Fastify app from src/app.ts and calls listen().
+ * Local dev + Render (or Railway/Fly) entry point.
+ * Imports the configured Fastify app from src/app.ts and calls listen() on 0.0.0.0:PORT.
  *
- * For Vercel serverless, see api/index.ts instead.
+ * Legacy: For old Vercel serverless, see packages/server/api/index.ts (marked deprecated with Render migration).
  */
 
 import { buildApp }  from './app.js';
