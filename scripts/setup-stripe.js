@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
  * Unimatrix Stripe Setup
- * Creates all products and prices, then patches Vercel env vars automatically.
+ * Creates all products and prices (Pro/Enterprise monthly+yearly).
+ * Prints the 4 STRIPE_PRICE_* IDs for you to set via `fly secrets set` (or any platform).
  *
  * Usage:
- *   STRIPE_SECRET_KEY=sk_live_xxx VERCEL_TOKEN=xxx VERCEL_PROJECT_ID=prj_xxx VERCEL_TEAM_ID=team_xxx \
- *   node scripts/setup-stripe.js
+ *   STRIPE_SECRET_KEY=sk_live_... node scripts/setup-stripe.js
  *
- * Or just STRIPE_SECRET_KEY — will print price IDs for manual Vercel entry.
+ * (The VERCEL_* bits are legacy and optional — if absent it just prints the IDs for manual entry on Fly/Render/etc.)
  */
 
 const https = require('https');

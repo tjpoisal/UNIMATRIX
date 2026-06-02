@@ -18,7 +18,7 @@ The autonomous migration agent + our work has prepared everything portable for t
 
 Render files kept as alt if billing fixed. Railway/VPS also viable but Fly is best balance for perf/cost/simplicity here.
 
-**Complete list of accounts to create + every secret you need** (mapped to your provided .env list + best services): See the new `ACCOUNTS_AND_SECRETS.md`. This is the single source of truth — create these accounts, get the keys, then `fly secrets set` them.
+**Complete list of accounts + every secret (with exact subtraction from the Vercel list you pasted):** See `ACCOUNTS_AND_SECRETS.md` — it now leads with the **REMAINING DELTA** section answering "subtract everything you have secrets for or is connected properly". Only EXPO_TOKEN + 4x STRIPE_PRICE_* + the URL vars that depend on Fly hostnames remain as things needing new secrets/connections. All your other pasted keys (DATABASE_URL, CLERK_*, VOYAGE, MASTER, GOOGLE_*, etc.) are already wired in code, documented, and reusable — just copy the values and `fly secrets set` them after apps exist.
 
 ## Why We Moved Away From Vercel (and why it's hard to go back)
 

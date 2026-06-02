@@ -1,23 +1,87 @@
 # Unimatrix — Accounts & Secrets Setup Guide (Best Services for Fly.io)
 
-This is the **complete list** of accounts you need to create and secrets to configure for the best possible production setup on **Fly.io** (persistent, low-latency, scalable).
+> **DIRECT ANSWER TO YOUR QUERY**  
+> "TAKE THAT LIST [your pasted Vercel env block], AND SUBTRACT EVERYTHING YOU HAVE SECRETS FOR OR IS CONNECTED PROPERLY, LEAVING ONLY WHAT NEEDS SECRETS AND CONNECTIONS LEFT"
 
-**Core Philosophy for "Best" Setup**:
-- **Fly.io** — Persistent Machines (performance CPU for MCP/web, shared for worker). Global, autoscaling, cheap for always-on.
-- **Neon** — Serverless Postgres + pgvector (best for AI embeddings, branching, scale-to-zero).
-- **Clerk** — Modern auth for MCP tokens/server (webhooks, JWTs).
-- **Ably** — Best-in-class realtime for Collab Room (presence, history, auth, scales without you managing WS/Redis).
-- **Upstash** — Redis (rate limiting, pubsub) + QStash (reliable background jobs instead of polling).
-- **Voyage AI** — High-quality embeddings for semantic memory.
-- **Stripe + Resend** — Standard for payments/email.
-- **OAuth** — Google + GitHub.
-- **Expo** — For mobile builds.
-- **All secrets** managed via `fly secrets` (never in code or .env in prod).
-- **Prisma** — Pure open-source client (direct Neon connection, **no** Prisma Accelerate signup or "prisma://" URL needed — ignore all marketing tips during `prisma generate`).
+This doc + the Fly tomls + scripts + code wiring = the "setup the best services" you asked for.
 
-**No accounts needed for**: Local dev (use .env with test keys), basic Prisma (free OSS only).
+---
 
-## 1. Accounts You Must Create / Sign Up For
+## REMAINING DELTA — ONLY THESE FROM YOUR PASTED VERCEL LIST STILL NEED ACTION
+
+**Your full pasted list (reconstructed from the message):**  
+AUTH_URL, EXPO_TOKEN, STRIPE_PRICE_PRO_MONTHLY, STRIPE_PRICE_PRO_YEARLY, STRIPE_PRICE_ENTERPRISE_MONTHLY, STRIPE_PRICE_ENTERPRISE_YEARLY, RESEND_API_KEY, EMAIL_FROM, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_SECRET_KEY, NEXT_PUBLIC_API_URL, NEXTAUTH_URL, NEXTAUTH_SECRET, AUTH_SECRET, DATABASE_URL, GITHUB_CLIENT_SECRET, GITHUB_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CLIENT_ID, CLERK_WEBHOOK_SECRET, NODE_ENV, MASTER_ENCRYPTION_KEY, VOYAGE_API_KEY, CLERK_SECRET_KEY (plus any close variants like STRIPE_WEBHOOK_SECRET, DIRECT_URL, CRON_SECRET that appeared in your Vercel).
+
+### SUBTRACTED (everything we have secrets support + code connections + docs for — reusable from your Vercel/Neon/etc.)
+These are **fully wired** (process.env reads in the right packages/apps), listed in `.env.example`, explained with "how to get" + generation + `fly secrets set` examples here and in DEPLOYMENT.md/CLAUDE.md, and the values you already have (or can copy) from Vercel dashboards + Neon project work directly on Fly:
+
+- DATABASE_URL (and DIRECT_URL)
+- CLERK_SECRET_KEY, CLERK_WEBHOOK_SECRET
+- VOYAGE_API_KEY
+- MASTER_ENCRYPTION_KEY (generate locally if you don't have the exact hex value from Vercel: `openssl rand -hex 32`)
+- GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
+- GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET
+- RESEND_API_KEY
+- EMAIL_FROM
+- STRIPE_SECRET_KEY
+- NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+- NEXTAUTH_SECRET, AUTH_SECRET (generate: `openssl rand -base64 32`)
+- NODE_ENV
+- (STRIPE_WEBHOOK_SECRET if it was in your paste — code uses it at apps/web/app/api/stripe/webhook/route.ts)
+
+**For all the above:** just `fly secrets set KEY=the-value-you-already-have --app unimatrix-web` (or -mcp / -worker as appropriate — web gets the NextAuth/Stripe/Resend/OAuth ones; mcp+worker get DB/Clerk/Voyage/Master/encryption). Reusable cross-platform, no new accounts needed for these keys themselves.
+
+### WHAT REMAINS (the only items from your list that still need secrets created or connections made)
+These are the **only** ones left after the subtraction:
+
+1. **EXPO_TOKEN**
+   - Why still here: You have no Expo token value yet (or it's not a runtime secret the apps read — it's consumed by `eas` CLI / GitHub Actions / your build machine for publishing the React Native app).
+   - Needs new account + secret: Yes.
+   - Action:
+     - Go to https://expo.dev (free)
+     - Account → Access Tokens → Create (choose "Read & Write" or appropriate scope for builds)
+     - Copy the token (expo_...)
+     - Store it in your EAS dashboard / CI secrets / local shell when running `eas build`. Not typically `fly secrets` (unless you run mobile builds on a Fly machine).
+   - Also set for the app: `EXPO_PUBLIC_API_URL=https://unimatrix-web.fly.dev/api` (in eas.json or build env).
+
+2. **STRIPE_PRICE_PRO_MONTHLY, STRIPE_PRICE_PRO_YEARLY, STRIPE_PRICE_ENTERPRISE_MONTHLY, STRIPE_PRICE_ENTERPRISE_YEARLY** (the 4 price IDs)
+   - Why still here: Your Vercel may have had the IDs, but the *resources* (Stripe Price objects) are what matter. The keys themselves are not generic "API keys" — they are specific `price_xxx` strings created under your products.
+   - Needs: Create the 4 recurring prices (even if you have STRIPE_SECRET_KEY).
+   - Action (easiest):
+     ```bash
+     STRIPE_SECRET_KEY=sk_live_... node scripts/setup-stripe.js
+     ```
+     It creates the Pro + Enterprise products + the 4 prices and **prints the IDs** (the Vercel parts are optional and will be skipped if no VERCEL_TOKEN).
+   - Or manual: Stripe Dashboard → Products → +Add product (name "Unimatrix Pro", description..., recurring price $9/mo + $79/yr; same for Enterprise $29/$299). Copy the four `price_...` IDs.
+   - Then: `fly secrets set STRIPE_PRICE_PRO_MONTHLY=price_xxx ... --app unimatrix-web` (only web needs the price IDs for checkout).
+
+3. **NEXTAUTH_URL, AUTH_URL, NEXT_PUBLIC_API_URL** (and related NEXT_PUBLIC_APP_URL)
+   - Why still here: These are **not secrets you "have" from Vercel anymore** for the new hosting — their *values* are the Fly hostnames you only receive after you create the apps and do the first deploy.
+   - Needs connection after platform provisioning.
+   - Action (post first deploy):
+     ```bash
+     # After ./scripts/fly-deploy.sh web  (or the cp + fly deploy)
+     # Note the hostname Fly assigned, usually unimatrix-web.fly.dev (or a custom domain)
+     fly secrets set \
+       NEXTAUTH_URL=https://unimatrix-web.fly.dev \
+       AUTH_URL=https://unimatrix-web.fly.dev \
+       NEXT_PUBLIC_API_URL=https://unimatrix-web.fly.dev/api \
+       NEXT_PUBLIC_APP_URL=https://unimatrix-web.fly.dev \
+       --app unimatrix-web
+     ```
+     Update any mobile .env or EAS build envs with the prod EXPO_PUBLIC_API_URL too.
+     (MCP clients will point at the mcp app URL, not these.)
+
+**Also note for webhook / cron secrets you may have in the list (or in full Vercel dump):**
+- CLERK_WEBHOOK_SECRET: you may have/copy the value, but **must connect** the endpoint in Clerk dashboard → Webhooks → Endpoint URL = `https://unimatrix-mcp.fly.dev/webhooks/clerk` (post-deploy) to obtain/validate the whsec_.
+- STRIPE_WEBHOOK_SECRET (used by apps/web/app/api/stripe/webhook/route.ts): configure endpoint in Stripe dashboard (Developers → Webhooks) pointing at your prod `https://unimatrix-web.fly.dev/api/stripe/webhook`.
+- CRON_SECRET (if present; used by internal /api/cron/* routes): generate locally (`openssl rand -base64 32`), set on web app. Protects scheduled jobs (no external account needed).
+
+If any other obscure var from your paste isn't listed here (e.g. SVIX), it's optional/legacy and not required for core Fly + best stack.
+
+---
+
+## 1. Accounts You Must Create / Sign Up For (Best Stack)
 
 ### 1.1 Fly.io (Hosting — The Main Platform)
 - **Why**: Runs your persistent web (with WS Collab), MCP server, and worker. Best for long-lived connections (unlike Vercel serverless).
@@ -193,8 +257,8 @@ Key additions for **best** setup:
 - **Cost optimization on Fly**: Use shared for web/worker when idle; performance only for MCP. Enable auto_stop in tomls.
 - **Mobile**: Set EXPO_PUBLIC_API_URL to your Fly web URL. Use EXPO_TOKEN for EAS builds.
 
-If a secret from your list (e.g. AUTH_URL, specific STRIPE_PRICE_*) isn't covered, it's likely an alias for one above (NEXTAUTH_URL, the price IDs from Stripe dashboard). Map it and set it.
+See the **REMAINING DELTA** section at the top for the exact subtraction from your pasted Vercel list (only EXPO_TOKEN + the 4 STRIPE_PRICE_* + the post-deploy URL vars remain as things that still need secrets created or connections made). Everything else you already have values for and is wired.
 
-This list + the updated `DEPLOYMENT.md` + `scripts/fly-deploy.sh` + tomls = everything is "set up" for the best possible run on Fly.io.
+This list + the updated `DEPLOYMENT.md` + `scripts/fly-deploy.sh` + tomls + the code changes (Prisma in server, custom server.ts + WS, worker + AgentRun, Ably/Upstash paths, mcp-bridge + /settings/mcp-tokens UI, etc.) = the full "JUST SETUP THE BEST SERVICES" + "HANDLE SETTING EVERYTHING UP".
 
-Run the deploy commands and you're live with the optimal stack. Let me know the first error/output if any!
+Run the deploy commands (`fly auth login`, create apps, `./scripts/fly-deploy.sh all`, then the `fly secrets set` using values from the delta + your existing ones) and you're live with the optimal persistent stack (Fly perf machines + Neon + Ably preferred for Collab + Voyage + QStash-ready). Let me know the first deploy output if any issues!
