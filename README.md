@@ -26,7 +26,7 @@ unimatrix/
 │   ├── ui/           # Shared React components
 │   └── api/          # REST client helpers
 ├── infrastructure/
-│   └── aws-cdk/      # Legacy AWS CDK (archived — migrated to Vercel + Neon)
+│   └── aws-cdk/      # Legacy AWS CDK (archived — migrated to Render + Neon)
 ├── ARCHITECTURE.md
 ├── MVP_Scope.md
 ├── IMPLEMENTATION_STATUS.md
@@ -38,7 +38,7 @@ unimatrix/
 ## What's Built
 
 ### `packages/server` — Fastify Backend
-The core API that stores and retrieves memories. Deployed to Vercel serverless.
+The core API that stores and retrieves memories. Deployed to Render (Fastify MCP service + custom Next.js server for WS).
 
 - **Auth**: Clerk
 - **Database**: PostgreSQL + pgvector (Neon) — migrations in `migrations/`
@@ -73,7 +73,7 @@ Next.js 16 dashboard for managing memory palaces.
 - **API**: REST endpoints — palaces, locations, memories, search, export, sync
 - **Offline sync**: Batch sync with conflict resolution for mobile
 - **Tiers enforced**: Free (3 palaces), Pro (unlimited)
-- **Deployment**: Vercel
+- **Deployment**: Render (primary, see render.yaml + RENDER.md); Vercel legacy
 
 ---
 
@@ -199,7 +199,7 @@ recall_context: "Where were we on auth?"
 - [`MVP_Scope.md`](./MVP_Scope.md) — 10-week build plan and scope decisions
 - [`IMPLEMENTATION_STATUS.md`](./IMPLEMENTATION_STATUS.md) — What's done, what's next
 - [`LLM_ARCHITECTURE.md`](./LLM_ARCHITECTURE.md) — Multi-LLM routing system
-- [`NEON_VERCEL_MIGRATION.md`](./NEON_VERCEL_MIGRATION.md) — AWS → Neon + Vercel migration guide
+- [`NEON_VERCEL_MIGRATION.md`](./NEON_VERCEL_MIGRATION.md) — Historical AWS → Neon + Vercel (now Render primary, see RENDER.md)
 - [`UNIMATRIX_QUICKSTART.md`](./UNIMATRIX_QUICKSTART.md) — Step-by-step local setup
 
 ---
