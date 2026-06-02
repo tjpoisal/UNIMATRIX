@@ -2,6 +2,38 @@
 
 **Note:** If you currently can't use Render (e.g. billing/owe money issues), use this guide instead. The architecture (custom Next.js server for persistent WebSockets + Collab Room, separate Fastify MCP server from `packages/server`, background worker for librarian/AgentRun jobs, Docker support) is fully portable.
 
+## Why We Moved Away From Vercel (and why it's hard to go back)
+
+Vercel was the original home, and parts of the app still work there:
+
+- The web dashboard, auth, REST APIs, and the **HTTP-based MCP endpoint** (`/api/mcp` route handler) can run on Vercel. This is a serverless-friendly JSON-RPC implementation of the MCP protocol.
+- For realtime on Vercel, we have the **Ably adapter** (`lib/realtime/ably.ts` + collab system) as the recommended path (no long-lived connections needed in functions).
+
+**The reasons we can't easily use Vercel for the full product:**
+
+1. **Long-lived WebSocket connections for Collab Room**  
+   The real-time multi-LLM collaboration room requires persistent WebSocket connections (`/ws/collab` with room-based broadcasting, using the custom `server.ts` + `ws` library + optional Redis pub/sub for scaling).  
+   Vercel's serverless/Edge Functions have strict timeouts and do not support raw HTTP upgrade for WebSockets in the same process as a long-running Node server. Connections get dropped.
+
+2. **Custom server architecture**  
+   We use `apps/web/server.ts` (creates an `http.Server`, attaches Next.js request handler + WebSocketServer for upgrade handling). Production start is `node dist/server.js`.  
+   Vercel does not run custom servers this way in production. Their platform expects standard `next build` + their managed serverless runtime.
+
+3. **Persistent / always-on MCP server + background jobs**  
+   The core product is the dedicated MCP server (`packages/server` — Fastify) that LLMs connect to for `remember`/`recall` etc.  
+   The background **worker** processes heavy work (Voyage embeddings, summarization, space classification, AgentRun tracking).  
+   Serverless functions are ephemeral and have duration limits. True persistent processes + background workers are a poor fit (you'd need external queues like Inngest + Vercel Cron, losing simplicity).
+
+4. **Separate services + persistent memory vision**  
+   The goal is a reliable "memory layer" that LLMs can connect to from anywhere, with real-time collab across devices/LLMs. This requires long-lived containers, not functions that spin up/down.
+
+**Bottom line:**  
+If your main need is just the dashboard + the HTTP `/api/mcp` for occasional tool calls, Vercel still works fine (and the old `vercel.json` + `/api/mcp` route are there).  
+
+For the full vision (persistent MCP, real WebSocket Collab Room, background processing, dedicated always-on services), we need platforms that run traditional Node processes: Render, Railway, Fly.io, or a VPS with Docker.
+
+This is exactly why the custom server, Dockerfiles, and worker were built, and why we have `DEPLOYMENT.md` with alternatives.
+
 **Strongly recommended DB:** Keep using your existing **Neon Postgres** (with pgvector). It works from anywhere and you don't need to migrate the database when switching hosts.
 
 ## Recommended Platforms (in order of ease for this stack)

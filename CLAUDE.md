@@ -146,7 +146,7 @@ git push origin main
 - **GitHub repo:** `https://github.com/tjpoisal/UNIMATRIX`
 - **Primary deploy options:** See `DEPLOYMENT.md` (Railway recommended if Render billing is an issue, Fly.io, self-hosted VPS + Docker Compose, etc.).
 - The repo has `Dockerfile.server`, `Dockerfile.web`, `docker-compose.yml`, `fly.*.toml`, `railway.toml`, `docker-compose.prod.yml`, custom `server.ts`, worker, etc. ready.
-- **Legacy:** Vercel (vercel.json marked as legacy) and old Render notes in `RENDER.md` (use if you resolve billing).
+- **Vercel note:** The web dashboard + HTTP `/api/mcp` route can still run on Vercel (serverless-friendly). However the full product (real WS Collab Room via custom server, persistent MCP, background worker) cannot — see "Why not Vercel?" in DEPLOYMENT.md. vercel.json is legacy.
 - git push to main triggers deploys on your chosen platform.
 
 ---

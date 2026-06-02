@@ -1,7 +1,11 @@
 /**
- * Unimatrix MCP HTTP Endpoint
+ * Unimatrix MCP HTTP Endpoint (serverless-friendly)
  * POST /api/mcp  — handles all MCP tool calls over HTTP+JSON
  * GET  /api/mcp  — returns server info (for discovery)
+ *
+ * This route handler version runs on Vercel (or any Next.js deployment).
+ * For the full persistent dedicated MCP server, see packages/server (Fastify)
+ * and the custom server.ts + worker setup (recommended for Collab Room + always-on).
  *
  * Authentication: Bearer <umx_...> API key in Authorization header
  * Used by Claude Desktop, Claude Code, Cursor, and any MCP client
@@ -23,7 +27,7 @@ async function resolveUser(req: NextRequest): Promise<string | null> {
   const prefix = raw.slice(0, 12);
   const keys = await prisma.apiKey.findMany({
     where: { keyPrefix: prefix, revokedAt: null },
-    select: { id: true, userId: true, keyHash: true },
+    select: { id: true, userId: true, keyHash: true, organizationId: true },
   });
 
   for (const k of keys) {
@@ -31,6 +35,8 @@ async function resolveUser(req: NextRequest): Promise<string | null> {
     if (match) {
       // Update last-used timestamp async (don't await)
       prisma.apiKey.update({ where: { id: k.id }, data: { lastUsed: new Date() } }).catch(() => {});
+      // Attach org to request for downstream (tools/call path)
+      (req as any)._unimatrixOrgId = k.organizationId;
       return k.userId;
     }
   }
@@ -432,7 +438,7 @@ export async function POST(req: NextRequest) {
 
     // Extract agent context (used for telemetry + HITL)
     const agentName = (args.agent_name || args.sender_name || 'unknown-agent') as string;
-    const organizationId = null; // TODO: resolve from auth context when available
+    const organizationId = (req as any)._unimatrixOrgId || null;
 
     try {
       // === NEW: Spend Limit Check + Pre-execution Cost Estimation ===

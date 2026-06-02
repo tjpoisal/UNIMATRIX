@@ -73,7 +73,7 @@ Next.js 16 dashboard for managing memory palaces.
 - **API**: REST endpoints — palaces, locations, memories, search, export, sync
 - **Offline sync**: Batch sync with conflict resolution for mobile
 - **Tiers enforced**: Free (3 palaces), Pro (unlimited)
-- **Deployment**: See `DEPLOYMENT.md` (Railway, Fly.io, VPS + Docker Compose, etc. — especially useful if Render billing is blocked). Dockerfiles, fly.toml examples, railway.toml, and custom server are ready. Vercel legacy.
+- **Deployment**: See `DEPLOYMENT.md` (Railway, Fly.io, VPS + Docker Compose, etc.). The full product needs persistent long-lived processes (custom server for WS Collab + dedicated MCP + worker). The web UI + `/api/mcp` HTTP route can still run on Vercel, but the complete vision cannot. Dockerfiles ready for persistent platforms.
 
 ---
 

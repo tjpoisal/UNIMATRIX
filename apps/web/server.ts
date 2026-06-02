@@ -2,9 +2,11 @@
  * Custom Next.js + WebSocket server for Unimatrix on Render (and other PaaS).
  *
  * Why this exists:
- * - Long-lived WebSocket connections for the multi-LLM Collab Room on Render / self-hosted
- * - Alternative managed path: Ably (see apps/web/lib/realtime/ably.ts + lib/collab/)
+ * - Long-lived WebSocket connections for the multi-LLM Collab Room (requires persistent Node process)
+ * - Works on Render, Railway, Fly.io, VPS, etc.
+ * - Alternative for pure Vercel/serverless: use the managed Ably adapter (lib/realtime/ably.ts + collab system)
  * - Same HTTP server handles both Next.js pages/API routes + raw WS upgrades
+ * - Note: The /api/mcp route (apps/web/app/api/mcp/route.ts) is the serverless-friendly MCP implementation that *does* work on Vercel.
  *
  * Usage:
  *   pnpm --filter web build
@@ -59,6 +61,13 @@ app.prepare().then(() => {
 
   wss.on('connection', (ws: WebSocket, _request: any, roomId: string) => {
     console.log(`[WS] Client connected → room: ${roomId}`);
+    // SECURITY NOTE (self-hosted / Railway / Fly):
+    // The in-process WS has no authentication or org validation in this basic impl.
+    // Production self-hosted deployments MUST:
+    //   1. Validate a Bearer token or signed ticket on the upgrade request before accept.
+    //   2. Resolve organization from the token (reuse api-auth logic or shared package).
+    //   3. Enforce that the connecting identity has access to the requested roomId's org.
+    // For Vercel SaaS, use the managed Ably adapter instead (no long-lived connections in functions).
 
     if (!rooms.has(roomId)) {
       rooms.set(roomId, new Set());
