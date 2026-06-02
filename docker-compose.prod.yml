@@ -1,0 +1,23 @@
+# Production override for VPS / self-hosted
+# Usage:
+#   cp .env.example .env
+#   # edit .env with real production secrets (Neon URLs, etc.)
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+services:
+  mcp-server:
+    restart: unless-stopped
+    # Use a reverse proxy (Caddy/Nginx) in front on the host
+    # Expose only internally if possible
+    ports:
+      - "127.0.0.1:3001:3000"
+
+  web:
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  # Local Postgres is usually not needed in prod — use Neon instead.
+  # Uncomment only for fully offline/self-contained setups.
+  # db:
+  #   restart: unless-stopped

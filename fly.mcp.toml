@@ -1,0 +1,38 @@
+# Fly.io config for the core MCP server (Fastify)
+app = "unimatrix-mcp"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile.server"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  ports = [
+    { port = 80, handlers = ["http"] },
+    { port = 443, handlers = ["tls", "http"] }
+  ]
+
+[services.concurrency]
+  type = "connections"
+  hard_limit = 500
+  soft_limit = 300
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 1024   # MCP + potential worker work
+
+[checks]
+  [checks.mcp]
+    port = 8080
+    type = "http"
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "get"
+    path = "/health"

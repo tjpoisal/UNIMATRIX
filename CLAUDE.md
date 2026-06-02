@@ -144,9 +144,10 @@ git push origin main
 
 - **Only branch:** `main`
 - **GitHub repo:** `https://github.com/tjpoisal/UNIMATRIX`
-- **Primary deploy:** Render via render.yaml Blueprint (Postgres + unimatrix-mcp Fastify + unimatrix-web custom server + optional worker). See RENDER.md
-- **Legacy:** Vercel (vercel.json marked as legacy; old project unimatrix-flax)
-- git push to main triggers Render Blueprint deploys (and legacy Vercel if still connected)
+- **Primary deploy options:** See `DEPLOYMENT.md` (Railway recommended if Render billing is an issue, Fly.io, self-hosted VPS + Docker Compose, etc.).
+- The repo has `Dockerfile.server`, `Dockerfile.web`, `docker-compose.yml`, `fly.*.toml`, `railway.toml`, `docker-compose.prod.yml`, custom `server.ts`, worker, etc. ready.
+- **Legacy:** Vercel (vercel.json marked as legacy) and old Render notes in `RENDER.md` (use if you resolve billing).
+- git push to main triggers deploys on your chosen platform.
 
 ---
 

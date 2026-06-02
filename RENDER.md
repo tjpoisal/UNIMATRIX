@@ -1,6 +1,8 @@
-# Unimatrix — Render Deployment Guide
+# Unimatrix — Render Deployment Guide (Legacy)
 
-This document is the source of truth for deploying Unimatrix to Render.
+> **If you can't use Render right now** (e.g. billing hold / owe money), see the new general `DEPLOYMENT.md` instead. It covers Railway (easiest switch), Fly.io, self-hosted VPS + Docker Compose, etc. All the Docker + custom server + worker work is reusable.
+
+This document is kept for when you resolve the Render billing. The architecture (custom server, Dockerfiles, worker, etc.) remains the same.
 
 ## Architecture on Render
 

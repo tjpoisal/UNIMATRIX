@@ -1,0 +1,17 @@
+# Example railway.toml for reference.
+# Railway is mostly configured via the dashboard when connecting the repo.
+# You will typically create two separate services from this repo.
+
+# For the web service (point it at Dockerfile.web in the dashboard)
+[build]
+dockerfile = "Dockerfile.web"
+
+# For the MCP service (point a second service at Dockerfile.server)
+# [build]
+# dockerfile = "Dockerfile.server"
+
+# Worker example (third service)
+# [build]
+# dockerfile = "Dockerfile.server"
+# [deploy]
+# startCommand = "node dist/worker.js"
