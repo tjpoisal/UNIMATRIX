@@ -25,8 +25,7 @@
     "mobile:build:android": "pnpm --filter mobile run build:android",
     "mobile:build:preview": "pnpm --filter mobile run build:preview"
   },
-  "_eas_mobile_note": "Use these for the React Native / Expo app (apps/mobile). They guarantee the correct working directory. See apps/mobile/README.md and ACCOUNTS_AND_SECRETS.md for details. Direct npx eas-cli from here is the #1 cause of 'expo-modules-autolinking' errors and huge uploads."
-
+  "_eas_mobile_note": "Use these for the React Native / Expo app (apps/mobile). They guarantee the correct working directory. See apps/mobile/README.md and ACCOUNTS_AND_SECRETS.md for details. Direct npx eas-cli from here is the #1 cause of 'expo-modules-autolinking' errors and huge uploads.",
   "dependencies": {
     "next": "16.2.6"
   },
