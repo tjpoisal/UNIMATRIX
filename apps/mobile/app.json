@@ -3,24 +3,20 @@
     "name": "Unimatrix",
     "slug": "unimatrix",
     "version": "1.0.0",
+    "owner": "tjpoisal",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0A0F1C"
     },
     "assetBundlePatterns": ["**/*"],
+    "scheme": "unimatrix",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.unimatrix.app"
-    },
-    "android": {
-      "package": "app.unimatrix.app",
-      "supportsTabletMode": true,
-      "bundleIdentifier": "com.getstackmax.unimatrix",
-      "buildNumber": "1"
     },
     "android": {
       "package": "com.getstackmax.unimatrix",
@@ -33,7 +29,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-secure-store",
@@ -41,27 +37,18 @@
         "expo-build-properties",
         {
           "android": {
-            "enableProguardAtBack": true
+            "enableProguard": true
           }
         }
       ]
     ],
-    "schemes": ["myapp"],
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "c3f8a2b1-9d4e-4f5a-b6c7-d8e9f0a1b2c3"
+        "projectId": "a93ce64a-bd02-4777-a432-35f72349253d"
       }
     }
-    "plugins": [],
-    "scheme": "unimatrix",
-    "extra": {
-      "router": { "origin": false },
-      "eas": { "projectId": "your-eas-project-id" },
-      "apiUrl": "https://deployunimatrix.com"
-    },
-    "owner": "tjpoisal"
   }
 }
