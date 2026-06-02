@@ -4,11 +4,16 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "dev": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "eas:login": "npx eas-cli@latest login",
+    "eas:init": "npx eas-cli@latest init --id a93ce64a-bd02-4777-a432-35f72349253d",
+    "build:preview": "npx eas-cli@latest build --profile preview",
+    "build:prod": "npx eas-cli@latest build --profile production"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
