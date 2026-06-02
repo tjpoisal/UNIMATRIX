@@ -23,7 +23,6 @@
     },
     "android": {
       "package": "com.tjpoisal.unimatrix",
-      "versionCode": 2,
       "adaptiveIcon": {
         "foreground": "./assets/images/android-icon-foreground.png",
         "background": "./assets/images/android-icon-background.png"
