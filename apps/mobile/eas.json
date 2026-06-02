@@ -1,19 +1,31 @@
 {
   "cli": {
-    "version": ">= 16.0.0",
+    "version": ">= 20.0.0",
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "ios": {
+        "bundleIdentifier": "com.tjpoisal.unimatrix"
+      },
+      "android": {
+        "applicationId": "com.tjpoisal.unimatrix"
+      },
       "env": {
         "EXPO_PUBLIC_API_URL": "http://localhost:3000/api"
       }
     },
     "preview": {
       "distribution": "internal",
-      "ios": { "simulator": true },
+      "ios": {
+        "bundleIdentifier": "com.tjpoisal.unimatrix",
+        "simulator": true
+      },
+      "android": {
+        "applicationId": "com.tjpoisal.unimatrix"
+      },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://unimatrix-web.fly.dev/api"
       }
@@ -21,10 +33,12 @@
     "production": {
       "autoIncrement": true,
       "ios": {
+        "bundleIdentifier": "com.tjpoisal.unimatrix",
         "buildConfiguration": "Release",
         "credentialsSource": "remote"
       },
       "android": {
+        "applicationId": "com.tjpoisal.unimatrix",
         "buildType": "app-bundle",
         "credentialsSource": "remote"
       },

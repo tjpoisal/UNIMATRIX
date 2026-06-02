@@ -16,11 +16,14 @@
     "scheme": "unimatrix",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.unimatrix.app"
+      "bundleIdentifier": "com.tjpoisal.unimatrix",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
-      "package": "com.getstackmax.unimatrix",
-      "versionCode": 1,
+      "package": "com.tjpoisal.unimatrix",
+      "versionCode": 2,
       "adaptiveIcon": {
         "foreground": "./assets/images/android-icon-foreground.png",
         "background": "./assets/images/android-icon-background.png"

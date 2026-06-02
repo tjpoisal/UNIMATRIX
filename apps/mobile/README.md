@@ -47,4 +47,37 @@ To learn more about developing your project with Expo, look at the following res
 Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+
+## Building production apps with EAS (monorepo notes)
+
+This is part of the Unimatrix pnpm monorepo. **Never run `npx eas-cli` or `eas` directly from the monorepo root** (`Unimatrix/`). It will generate wrong `eas.json`/`app.json` at root and upload a massive incorrect archive.
+
+**Correct ways (from monorepo root):**
+
+```bash
+pnpm mobile:eas:login
+pnpm mobile:eas:init
+pnpm mobile:build:all          # both platforms, production profile
+pnpm mobile:build:ios
+pnpm mobile:build:android
+pnpm mobile:build:preview
+```
+
+These use `pnpm --filter mobile` which sets the working directory correctly to `apps/mobile` so the right `app.json`, `eas.json`, `.easignore`, and `node_modules` are used.
+
+Current production identifiers (after last interactive EAS run):
+- iOS bundle: `com.tjpoisal.unimatrix`
+- Android package: `com.tjpoisal.unimatrix`
+
+`EXPO_PUBLIC_API_URL` is automatically set per profile in `eas.json` (points at the Fly web backend for preview/production).
+
+For one-off with a token (the EXPO_TOKEN secret):
+
+```bash
+EXPO_TOKEN=your_token pnpm mobile:build:all
+```
+
+See also `../ACCOUNTS_AND_SECRETS.md` (the "REMAINING DELTA" Expo section) and `eas.json`.
+
+The `.easignore` in this directory keeps the upload to EAS small.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

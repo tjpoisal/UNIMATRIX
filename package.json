@@ -16,7 +16,14 @@
     "docker:build": "docker-compose -f infrastructure/docker-compose.yml build",
     "docker:up": "docker-compose -f infrastructure/docker-compose.yml up -d",
     "docker:down": "docker-compose -f infrastructure/docker-compose.yml down",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "mobile:eas:login": "pnpm --filter mobile run eas:login",
+    "mobile:eas:init": "pnpm --filter mobile run eas:init",
+    "mobile:build": "pnpm --filter mobile run build:prod",
+    "mobile:build:all": "pnpm --filter mobile run build:all",
+    "mobile:build:ios": "pnpm --filter mobile run build:ios",
+    "mobile:build:android": "pnpm --filter mobile run build:android",
+    "mobile:build:preview": "pnpm --filter mobile run build:preview"
   },
   "dependencies": {
     "next": "16.2.6"

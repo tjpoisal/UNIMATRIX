@@ -1,0 +1,33 @@
+# Ignore for EAS builds when CWD is apps/mobile
+# Keep the archive small and focused on the Expo app only
+
+# Common
+node_modules
+.expo
+.expo-shared
+dist
+web-build
+*.log
+.DS_Store
+.git
+.gitignore
+
+# Monorepo bloat (in case build context leaks)
+../**
+!../packages/**/dist/**
+!../packages/**/src/**
+
+# Heavy or irrelevant
+android
+ios
+*.pem
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# Dev only
+__tests__
+coverage
+*.md
+!README.md

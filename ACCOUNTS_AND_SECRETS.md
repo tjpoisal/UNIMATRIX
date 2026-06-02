@@ -169,19 +169,21 @@ If any other obscure var from your paste isn't listed here (e.g. SVIX), it's opt
 - **Sign up**: https://expo.dev (free) under the same account that owns the project (tjpoisal).
 - **Existing EAS project**: We are using ID `a93ce64a-bd02-4777-a432-35f72349253d` (the one in your command).
 - **What you get**: `EXPO_TOKEN` (long-lived token for non-interactive `eas build` in CI or local scripts).
-- **How to link + build (IMPORTANT: do NOT run create-expo-app again — the app already exists at apps/mobile)**:
-  1. From monorepo root: `cd apps/mobile`
-  2. `eas login` (log in with the Expo account that owns the project)
-  3. `eas init --id a93ce64a-bd02-4777-a432-35f72349253d`   ← this links the local `apps/mobile` to the EAS project and updates config.
-  4. (I already pre-cleaned `app.json` and `eas.json` in the repo: removed duplicate keys, set the projectId, and configured `EXPO_PUBLIC_API_URL` per profile pointing at the Fly target for preview/production.)
-  5. Create token: In Expo dashboard → your account → Access Tokens (or project settings) → Create new token. Copy it.
-  6. Use it: `EXPO_TOKEN=xxx eas build --platform ios --profile production` (or android, or --profile preview).
+- **How to link + build (CRITICAL: EAS must see the correct project dir — apps/mobile — or you get wrong bundle IDs, missing autolinking errors, and 30MB+ wrong uploads of the whole monorepo)**:
+  1. From monorepo root use the convenience scripts (they delegate with correct CWD via pnpm filter):
+     - `pnpm mobile:eas:login`
+     - `pnpm mobile:eas:init`   (uses --id a93ce64a-bd02-4777-a432-35f72349253d)
+     - `pnpm mobile:build:all`   (or mobile:build:ios / mobile:build:android / mobile:build:prod / mobile:build:preview)
+  2. Or manually: `cd apps/mobile && npx eas-cli@latest login` then `npx eas-cli@latest build --platform all --profile production`
+  3. (Configs were pre-cleaned + updated after your last run: bundleIdentifier + package now `com.tjpoisal.unimatrix` to match the IDs you chose in the prompts, versionCode bumped, EXPO_PUBLIC_API_URL injected per profile for the Fly backend, .easignore added.)
+  4. Create / use `EXPO_TOKEN`: Expo dashboard → Access Tokens for the @tjpoisal/unimatrix project. Then `EXPO_TOKEN=xxx pnpm mobile:build:all`.
+- **What happened in your last `npx ... build --platform all` run (from root)**: It created root eas.json + app.json, detected the old ./unimatrix/ skeleton (from prior create-expo-app), started an Android build with the new package + cloud keystore, asked for iOS bundle (you picked com.tjpoisal.unimatrix), then failed on iOS with "Cannot find 'expo-modules-autolinking'" because the build context/CWD was wrong (no proper expo in the tarball). We cleaned the root junk and ./unimatrix/ dir.
 - **API URL**: 
-  - Local dev: `EXPO_PUBLIC_API_URL=http://YOUR_LAN_IP:3000/api pnpm --filter mobile start` (or npx expo start from apps/mobile).
-  - EAS builds: already wired in `eas.json` under each profile (production/preview → Fly URL once deployed).
-- **Set EXPO_TOKEN**: In your CI (GitHub Actions secrets), or pass on command line as shown. Not usually a Fly secret.
+  - Local dev: `EXPO_PUBLIC_API_URL=http://YOUR_LAN_IP:3000/api pnpm --filter mobile start`
+  - EAS builds: wired in apps/mobile/eas.json (production/preview point to Fly once web is live).
+- **Set EXPO_TOKEN** for CI or one-off: as above. Also set in GitHub repo secrets if using the .eas/workflows you started.
 
-The other remaining delta items (STRIPE_PRICE_* and the post-deploy NEXTAUTH_URL etc.) are independent of this.
+The other remaining delta items (STRIPE_PRICE_* and the post-deploy NEXTAUTH_URL etc.) are independent of this. Check the dashboard at https://expo.dev for the status of the Android build that was queued.
 
 ### 1.10 Ably (Best Realtime for Collab Room)
 - **Why (best services)**: Managed WebSockets with presence, history, auth, fan-out. Far superior to raw WS + Redis for multi-LLM collab rooms. Scales without ops.

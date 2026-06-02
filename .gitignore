@@ -59,3 +59,8 @@ package-lock.json
 .env*.local
 
 /generated/prisma
+
+# Prevent accidental root-level Expo/EAS config (the real mobile app lives in apps/mobile/)
+# Running eas-cli from monorepo root instead of apps/mobile creates these and causes wrong huge uploads + wrong bundle IDs.
+eas.json
+app.json
