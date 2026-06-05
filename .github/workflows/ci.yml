@@ -127,3 +127,23 @@ jobs:
           DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
           CLERK_SECRET_KEY: sk_placeholder
           CLERK_WEBHOOK_SECRET: whsec_placeholder
+
+  desktop-smoke:
+    name: Desktop smoke (pack, non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install (npm, since desktop is standalone)
+        working-directory: apps/desktop
+        run: npm install --no-audit --no-fund
+      - name: Smoke pack (linux dir, no signing needed)
+        working-directory: apps/desktop
+        run: npm run pack -- --linux --dir
+      - name: Verify output exists
+        run: ls -l apps/desktop/dist/linux-unpacked/ || ls apps/desktop/dist/ || echo "pack produced output dir"

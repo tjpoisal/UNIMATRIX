@@ -47,7 +47,7 @@
   "author": "Unimatrix",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.6.1",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "axios": "^1.7.9",
     "zod": "^3.23.8"
   },
