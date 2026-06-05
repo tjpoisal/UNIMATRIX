@@ -129,6 +129,7 @@ export interface GetTimelineOutput {
 export const RememberInputSchema = z.object({
   content:  z.string().min(1).max(50_000),
   context:  z.string().max(500).optional(),  // maps to hint
+  tags:     z.array(z.string()).optional(),
 });
 
 export type RememberInput = z.infer<typeof RememberInputSchema>;

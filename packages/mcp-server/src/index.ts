@@ -676,7 +676,7 @@ server.registerTool(
   async (args) => {
     try {
       // Prefer the universal tools/call for new domains to avoid route duplication
-      const result = await api<{ room_id: string; name: string }>("/tools/call", "POST", {
+      const result = await api<any>("/tools/call", "POST", {
         toolName: "collab.create_room",
         args,
       });

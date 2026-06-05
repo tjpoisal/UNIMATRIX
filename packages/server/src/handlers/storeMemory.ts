@@ -15,7 +15,7 @@
  * Verbatim is only decrypted by get_timeline when explicitly requested.
  */
 
-import { withUserContext } from '../db/client.js';
+import { withUserContext, withUserContextRaw } from '../db/client.js';
 import { withAudit }                              from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';
@@ -102,7 +102,7 @@ export const storeMemoryHandler = withAudit(
     // This allows organizing memories based on which LLM logged the memory.
     if (input.tags && input.tags.length > 0) {
       try {
-        await withUserContext(userId, async (client) => {
+        await withUserContextRaw(userId, async (client) => {
           for (const tag of input.tags!) {
             await client.query(
               `INSERT INTO memory_tags (memory_id, user_id, tag) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
