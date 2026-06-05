@@ -67,3 +67,4 @@ package-lock.json
 # Running eas-cli from monorepo root instead of apps/mobile creates these and causes wrong huge uploads + wrong bundle IDs.
 eas.json
 app.json
+.env*

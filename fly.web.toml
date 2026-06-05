@@ -26,7 +26,7 @@ primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "
 [[vm]]
   cpu_kind = "performance"  # Better for WebSocket Collab Room low latency
   cpus = 1
-  memory_mb = 1024
+  memory_mb = 2048  # Fly minimum for performance VMs in some cases; was 1024
 
 [checks]
   [checks.web]
