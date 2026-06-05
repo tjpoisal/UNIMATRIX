@@ -103,15 +103,15 @@ export const TOOLS = [
   },
   {
     name: "unimatrix_store_memory",
-    description: "Store a new memory in a specific location.",
+    description: "Store a new memory in a specific location (or auto-resolve per-LLM history loc).\n\nCRITICAL — NON-MCP LLMs (Gemini, ChatGPT, Grok, custom agents, any LLM using POST /api/tools or POST /api/tools/call REST surface instead of native MCP):\n- Pass sourceLlm at the TOP LEVEL of your /api/tools/call request body (sibling to \"toolName\" and \"args\"), e.g. { \"toolName\": \"unimatrix_store_memory\", \"args\": { \"content\": \"...\" }, \"sourceLlm\": \"gemini\" }\n- Do NOT put sourceLlm inside args.\n- This auto-tags the memory with 'llm-source:gemini' and (when location_id omitted) auto-files it into the 'Gemini History' location under your 'LLM Histories' palace.\n- The palace + per-LLM locations are auto-provisioned the moment you connect the provider key in Unimatrix onboarding/web settings.\n- To discover: first call unimatrix_list_palaces (or get_palace on 'LLM Histories').\n\nCopy-paste this as a system instruction to your LLM:\n'You are Gemini (or the current model). Unimatrix provides long-term memory via tools. For ANY call you make to unimatrix_store_memory (or remember) using the REST endpoint POST /api/tools/call, you MUST include at the ROOT of the JSON body (NOT inside the args object): \"sourceLlm\": \"gemini\". Example payload: {\"toolName\":\"unimatrix_store_memory\",\"args\":{\"content\":\"key fact here\"},\"sourceLlm\":\"gemini\"}. This ensures every conversation turn with me is automatically organized into my Gemini History bucket for perfect recall. Always do this for store/remember calls. Use search_memories with good queries to recall.'\n\nFor standard MCP clients the location_id is usually provided explicitly after listing palaces.",
     inputSchema: {
       type: "object",
       properties: {
-        location_id: { type: "string", description: "Location ID" },
+        location_id: { type: "string", description: "Location ID. Optional for non-MCP: if omitted and sourceLlm provided at the top level of the /api/tools/call body, server auto-resolves to the matching per-LLM 'XXX History' location (recommended for Gemini/ChatGPT/etc)." },
         content: { type: "string", description: "Memory content (markdown supported)" },
         tags: { type: "array", items: { type: "string" }, description: "Optional tags" },
       },
-      required: ["location_id", "content"],
+      required: ["content"],
     },
   },
   {
@@ -267,9 +267,55 @@ export async function handleTool(
 
     // ── store_memory ─────────────────────────────────────────────────────────
     case "unimatrix_store_memory": {
-      const locationId = args.location_id as string;
+      let locationId = args.location_id as string | undefined;
       const content = args.content as string;
-      const tags = (args.tags as string[]) ?? [];
+      let tags = (args.tags as string[]) ?? [];
+
+      // Support sourceLlm at args root (injected by /api/tools/call for non-MCP LLMs, or passed in MCP args)
+      const sourceLlm = (args.sourceLlm as string) || (args.source_llm as string) || (args["sourceLlm"] as string);
+      if (sourceLlm && typeof sourceLlm === "string") {
+        const llmTag = `llm-source:${sourceLlm}`;
+        if (!tags.includes(llmTag)) tags = [...tags, llmTag];
+      }
+
+      // Auto-resolve to per-LLM history location if location_id omitted but sourceLlm present.
+      // This makes non-MCP LLMs (after connecting in onboarding) "just work" for auto-organized history
+      // without needing to discover + specify the exact location ID every time.
+      if (!locationId && sourceLlm && typeof sourceLlm === "string") {
+        try {
+          const cap = sourceLlm.charAt(0).toUpperCase() + sourceLlm.slice(1);
+          const locName = `${cap} History`;
+          const historiesPalace = await prisma.palace.findFirst({
+            where: { userId, name: "LLM Histories", deletedAt: null },
+          });
+          if (historiesPalace) {
+            const histLoc = await prisma.location.findFirst({
+              where: { palaceId: historiesPalace.id, name: locName, deletedAt: null },
+            });
+            if (histLoc) {
+              locationId = histLoc.id;
+            }
+          }
+          // Also check inside "Mobile" palace (created by mobile installer auto-magic) for device context
+          if (!locationId) {
+            const mobilePalace = await prisma.palace.findFirst({
+              where: { userId, name: "Mobile", deletedAt: null },
+            });
+            if (mobilePalace) {
+              const mobileHist = await prisma.location.findFirst({
+                where: { palaceId: mobilePalace.id, name: locName, deletedAt: null },
+              });
+              if (mobileHist) locationId = mobileHist.id;
+            }
+          }
+        } catch (e) {
+          console.warn("[store_memory] auto-resolve history loc failed:", e);
+        }
+      }
+
+      if (!locationId) {
+        return "location_id is required (or pass sourceLlm at call root for auto-resolve to your per-LLM History location). Get IDs via unimatrix_list_palaces + unimatrix_get_palace.";
+      }
 
       // Verify location belongs to user
       const location = await prisma.location.findFirst({
@@ -281,7 +327,7 @@ export async function handleTool(
       const memory = await prisma.memory.create({
         data: { locationId, content, tags },
       });
-      return `Memory stored. ID: \`${memory.id}\`\n\nContent: ${memory.content}`;
+      return `Memory stored. ID: \`${memory.id}\`\n\nContent: ${memory.content}${sourceLlm ? ` (auto-filed for ${sourceLlm})` : ""}`;
     }
 
     // ── list_memories ─────────────────────────────────────────────────────────

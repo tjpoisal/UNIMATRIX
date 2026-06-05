@@ -437,5 +437,50 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
     memoryId = memory.id;
   }
 
+  // Auto-magic: also store each individual LLM's response into its dedicated History location
+  // This organizes memories automatically based on which LLM produced the output.
+  // The "LLM Histories" palace + per-LLM locations are auto-provisioned when you connect the provider.
+  if (saveToMemory) {
+    for (const resp of responses) {
+      if (resp.error || !resp.response) continue;
+
+      try {
+        // Find the user's "LLM Histories" palace
+        const historyPalace = await prisma.palace.findFirst({
+          where: { userId, name: 'LLM Histories', deletedAt: null },
+        });
+
+        if (historyPalace) {
+          const historyLocName = `${resp.provider.charAt(0).toUpperCase() + resp.provider.slice(1)} History`;
+          let histLoc = await prisma.location.findFirst({
+            where: { palaceId: historyPalace.id, name: historyLocName },
+          });
+
+          if (!histLoc) {
+            // Create on the fly if the provision hook didn't run yet
+            histLoc = await prisma.location.create({
+              data: {
+                palaceId: historyPalace.id,
+                name: historyLocName,
+                description: `Auto-stored history from ${resp.provider}`,
+              },
+            });
+          }
+
+          await prisma.memory.create({
+            data: {
+              locationId: histLoc.id,
+              content: `**Task:** ${task}\n**Provider:** ${resp.provider} (${resp.model})\n\n${resp.response}`,
+              tags: ['llm-history', resp.provider, 'agent', mode],
+            },
+          });
+        }
+      } catch (e) {
+        // non-fatal
+        console.warn('Failed to auto-store per-LLM history:', e);
+      }
+    }
+  }
+
   return { task, mode, responses, synthesis, memoryId };
 }

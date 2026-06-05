@@ -10,48 +10,54 @@ jobs:
     name: iOS (.ipa via EAS)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      - name: Install dependencies
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Install dependencies (workspace)
         run: pnpm install --frozen-lockfile
 
-      - name: Build iOS (EAS via pnpm alias for correct CWD + bins)
+      - name: Build iOS (EAS)
+        working-directory: apps/mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EAS_BUILD_NO_EXPO_GO_WARNING: 'true'
-          EXPO_NO_TELEMETRY: '1'
-        run: pnpm mobile:build:ios
+        run: eas build --platform ios --profile production --non-interactive
 
   build-android:
     name: Android (.aab via EAS)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      - name: Install dependencies
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: Install dependencies (workspace)
         run: pnpm install --frozen-lockfile
 
-      - name: Build Android (EAS via pnpm alias for correct CWD + bins)
+      - name: Build Android (EAS)
+        working-directory: apps/mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EAS_BUILD_NO_EXPO_GO_WARNING: 'true'
-          EXPO_NO_TELEMETRY: '1'
-        run: pnpm mobile:build:android
+        run: eas build --platform android --profile production --non-interactive

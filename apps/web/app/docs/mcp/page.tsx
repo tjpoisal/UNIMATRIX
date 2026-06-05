@@ -21,8 +21,13 @@ export default function MCPReferencePage() {
           <Link href="/" className="text-sm text-accent hover:text-accent/80">← Back to Unimatrix</Link>
           <h1 className="text-4xl font-black tracking-tight mt-4">MCP Reference</h1>
           <p className="text-xl text-text-secondary mt-3">
-            Unimatrix exposes persistent, structured memory through the Model Context Protocol.
+            Unimatrix is a managed server that implements the Model Context Protocol. All tool calls are explicit. There is no automatic background loading.
           </p>
+          <div className="mt-4 text-sm flex flex-wrap gap-x-4 gap-y-1">
+            <Link href="/quickstart" className="text-accent hover:underline">MCP Quickstart →</Link>
+            <Link href="/security" className="text-accent hover:underline">Security &amp; Architecture →</Link>
+            <Link href="/onboarding" className="text-accent hover:underline">Get your exact client config →</Link>
+          </div>
         </div>
 
         {/* Authentication */}

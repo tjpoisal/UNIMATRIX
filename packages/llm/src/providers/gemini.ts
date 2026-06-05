@@ -68,7 +68,7 @@ export class GeminiProvider extends BaseLLMProvider {
 
     const cost = this.calculateCost(inputTokens, outputTokens);
 
-    return {
+    const result = {
       content: text,
       tokensUsed: Math.ceil(inputTokens + outputTokens),
       latencyMs: latency,
@@ -76,6 +76,9 @@ export class GeminiProvider extends BaseLLMProvider {
       model: this.model.getModelName(),
       provider: this.name,
     };
+
+    await this.maybeAutoLog(messages, result);
+    return result;
   }
 
   async *stream(

@@ -1,6 +1,8 @@
 # Unimatrix MCP Reference
 
-Unimatrix provides a Model Context Protocol (MCP) server that gives AI clients structured, persistent, hierarchical memory.
+Unimatrix is a managed server implementing the Model Context Protocol (MCP). It provides AI clients with durable, user-controlled, hierarchical memory (Palaces → Locations → Memories).
+
+All tool calls are explicit. There is no automatic background loading or "magic" context injection.
 
 **Base URL (HTTP transport):** `https://deployunimatrix.com/api/mcp`
 

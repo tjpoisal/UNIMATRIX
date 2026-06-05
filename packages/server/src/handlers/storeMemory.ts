@@ -98,6 +98,23 @@ export const storeMemoryHandler = withAudit(
       return memory.id;
     });
 
+    // Auto-tag with source LLM if provided in the store call (from MCP client or wrapper)
+    // This allows organizing memories based on which LLM logged the memory.
+    if (input.tags && input.tags.length > 0) {
+      try {
+        await withUserContext(userId, async (client) => {
+          for (const tag of input.tags!) {
+            await client.query(
+              `INSERT INTO memory_tags (memory_id, user_id, tag) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
+              [memoryId, userId, tag]
+            );
+          }
+        });
+      } catch (e) {
+        console.warn('Failed to insert auto-tags:', e);
+      }
+    }
+
     // ------------------------------------------------------------------
     // 5. Enqueue Librarian via AgentRun (real background processing)
     //    The worker (packages/server/src/worker.ts) will pick this up.

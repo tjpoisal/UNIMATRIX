@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export const metadata = {
   title: 'Downloads - Unimatrix',
-  description: 'Download Unimatrix for macOS, Windows, Linux, iOS, and Android',
+  description: 'Companion apps for managing your Unimatrix memory palaces. The primary interface for AI clients is the MCP protocol.',
 };
 
 export default function DownloadsPage() {
@@ -26,8 +26,13 @@ export default function DownloadsPage() {
           <h1 className="text-3xl font-black">Downloads</h1>
         </div>
 
+        <div className="mb-8 p-4 bg-[#111827] border border-[#334155]/30 rounded-2xl text-sm text-[#94A3B8]">
+          These desktop and mobile apps are <strong className="text-[#F1F5F9]">companion management tools</strong>. They let you browse and edit palaces from your phone or desktop outside of an AI session.
+          <br />The primary way AI clients (Claude Desktop, Cursor, etc.) access memory is through the <strong className="text-[#F1F5F9]">MCP protocol</strong> — see the <Link href="/onboarding" className="text-[#00F5FF] underline">Onboarding page</Link> for the current config.
+        </div>
+
         <section className="mb-12">
-          <h2 className="text-xl font-semibold mb-4">Desktop</h2>
+          <h2 className="text-xl font-semibold mb-4">Desktop Companions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {desktop.map((d) => (
               <div key={d.os} className="bg-[#111827] border border-[#334155]/30 rounded-2xl p-4 text-center">
@@ -40,7 +45,7 @@ export default function DownloadsPage() {
               </div>
             ))}
           </div>
-          <p className="text-sm text-[#94A3B8] mt-4">If you prefer a packaged installer, check the GitHub Releases page for signed artifacts and checksums.</p>
+          <p className="text-sm text-[#94A3B8] mt-4">Signed artifacts and checksums are published on the GitHub Releases page.</p>
         </section>
 
         <section className="mb-12">
@@ -57,9 +62,17 @@ export default function DownloadsPage() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-4">Web App</h2>
-          <p className="text-sm text-[#94A3B8] mb-4">Use the web app without installing: <Link href="/auth/login" className="text-[#00F5FF]">Open Web App</Link></p>
+          <h2 className="text-xl font-semibold mb-4">Web App (Primary Management)</h2>
+          <p className="text-sm text-[#94A3B8] mb-4">
+            Use the web dashboard (no install) to browse palaces, edit memories, and manage API keys.
+          </p>
+          <Link href="/auth/login" className="inline-block px-4 py-2 text-sm bg-[#00F5FF] text-[#0A0F1C] font-semibold rounded-lg">Open Web App →</Link>
         </section>
+
+        <div className="mt-10 p-4 border border-[#334155]/30 rounded-2xl text-xs text-[#64748B]">
+          The real power is the <strong className="text-[#F1F5F9]">MCP protocol</strong>. The apps above are just convenient companions.
+          To connect AI clients, go to <Link href="/onboarding" className="text-[#00F5FF] underline">Onboarding</Link> after signing up.
+        </div>
       </div>
     </div>
   );

@@ -13,15 +13,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
@@ -36,15 +38,25 @@ jobs:
         env:
           DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
 
-      - name: Typecheck
+      - name: Typecheck (web + root monorepo)
         working-directory: apps/web
-        run: pnpm exec tsc --noEmit
+        run: pnpm exec tsc --noEmit --skipLibCheck
         env:
           DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
           NEXTAUTH_SECRET: ci-secret-32-chars-minimum-length-x
           NEXTAUTH_URL: http://localhost:3000
 
-      - name: Build
+      - name: Lint (turbo monorepo)
+        run: pnpm lint
+
+      - name: Typecheck (root)
+        run: pnpm type-check
+        env:
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
+          NEXTAUTH_SECRET: ci-secret-32-chars-minimum-length-x
+          NEXTAUTH_URL: http://localhost:3000
+
+      - name: Build (web)
         working-directory: apps/web
         run: pnpm build
         env:
@@ -64,15 +76,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
@@ -88,15 +102,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies

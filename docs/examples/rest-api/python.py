@@ -34,12 +34,11 @@ class UnimatrixClient:
         return self._request("GET", f"/palaces/{palace_id}")
 
     # Memories
-    def store_memory(self, location_id: str, content: str, tags: List[str] = None) -> Dict:
-        return self._request("POST", "/memories", json={
-            "locationId": location_id,
-            "content": content,
-            "tags": tags or []
-        })
+    def store_memory(self, location_id: str, content: str, tags: List[str] = None, source_llm: Optional[str] = None) -> Dict:
+        payload = {"locationId": location_id, "content": content, "tags": tags or []}
+        if source_llm:
+            payload["sourceLlm"] = source_llm
+        return self._request("POST", "/memories", json=payload)
 
     def search_memories(self, query: str, palace_id: Optional[str] = None, limit: int = 20) -> Dict:
         params = {"q": query, "limit": limit}
@@ -124,12 +123,16 @@ class UnimatrixToolsClient:
         qs = f"?format={format}" if format != "openai" else ""
         return self._request("GET", f"/tools{qs}")
 
-    def call_tool(self, tool_name: str, args: Optional[Dict] = None) -> Dict:
+    def call_tool(self, tool_name: str, args: Optional[Dict] = None, source_llm: Optional[str] = None) -> Dict:
         """
         Execute any tool returned by list_tools().
         This is the method your agent loop should call when the LLM requests a tool.
+        Pass source_llm (e.g. "gemini") at top level for non-MCP LLMs so history auto-organizes into the per-LLM bucket.
+        Hosts: equivalent to prepareUnimatrixToolCall from the @unimatrix/llm package.
         """
-        payload = {"toolName": tool_name, "args": args or {}}
+        payload: Dict[str, Any] = {"toolName": tool_name, "args": args or {}}
+        if source_llm:
+            payload["sourceLlm"] = source_llm
         return self._request("POST", "/tools/call", json=payload)
 
     # Convenience wrappers for the most common operations
@@ -141,11 +144,12 @@ class UnimatrixToolsClient:
             "limit": limit,
         })
 
-    def store_memory(self, content: str, tags: Optional[List[str]] = None, location_id: Optional[str] = None) -> Dict:
+    def store_memory(self, content: str, tags: Optional[List[str]] = None, location_id: Optional[str] = None, source_llm: Optional[str] = None) -> Dict:
+        """Convenience wrapper. Pass source_llm for auto per-LLM history filing (non-MCP path)."""
         args: Dict[str, Any] = {"content": content, "tags": tags or []}
         if location_id:
             args["location_id"] = location_id
-        return self.call_tool("unimatrix_store_memory", args)
+        return self.call_tool("unimatrix_store_memory", args, source_llm=source_llm)
 
     def get_recent(self, limit: int = 10) -> Dict:
         return self.call_tool("unimatrix_get_recent", {"limit": limit})

@@ -14,13 +14,13 @@ const FEATURES_FREE = [
 ];
 
 const FEATURES_PRO = [
-  'Unlimited memory workspaces',
-  'Unlimited memories',
-  'Friends & palace sharing',
-  '20 API keys',
+  'Unlimited memory workspaces & memories',
+  'Unlimited devices & API keys',
   'Connect all AIs via MCP',
+  'Full per-account audit logs',
   'Priority support',
   'Early access to new features',
+  // Governance (spend caps, HITL) and team sharing are on the roadmap
 ];
 
 export default function PricingPage() {

@@ -34,3 +34,20 @@ Set these secrets in GitHub repo settings:
 ## Code Signing (Windows)
 - `WIN_CSC_LINK` — base64-encoded .pfx certificate
 - `WIN_CSC_KEY_PASSWORD` — certificate password
+
+## Easy Onboarding + Auto Installer (new)
+The desktop app is the recommended way to get started.
+
+When you launch the built Unimatrix Desktop:
+- It loads the web onboarding at deployunimatrix.com/onboarding (or your self-host).
+- The onboarding now collects both your Unimatrix client API key(s) **and** your LLM provider logins (Claude, OpenAI, Gemini, Groq, Ollama) in one flow.
+- "Auto-configure Claude Desktop" button (and future ones) will use native Electron access to find your `claude_desktop_config.json` and automatically merge the Unimatrix MCP bridge entry using the key you just created. No copy-paste.
+- Self-host flow can write a ready-to-use `.env.unimatrix` pre-populated with the LLM keys you entered.
+
+Build the installer after changes:
+```bash
+cd apps/desktop
+npm run dist:mac   # or dist:win / dist:linux
+```
+
+The resulting .dmg / .exe / AppImage is what end users download for the "super easy" experience.

@@ -22,12 +22,14 @@ Claude Desktop requires a **local stdio process**. You cannot point it directly 
 
 **Correct configuration:**
 
+Preferred (after package is published on npm):
+
 ```json
 {
   "mcpServers": {
     "unimatrix": {
       "command": "npx",
-      "args": ["-y", "@unimatrix/mcp-server@latest"],
+      "args": ["-y", "@unimatrix/mcp-server"],
       "env": {
         "UNIMATRIX_API_KEY": "umx_your_key_here",
         "UNIMATRIX_API_URL": "https://deployunimatrix.com/api"
@@ -37,8 +39,27 @@ Claude Desktop requires a **local stdio process**. You cannot point it directly 
 }
 ```
 
+Fallback (always works):
+
+```json
+{
+  "mcpServers": {
+    "unimatrix": {
+      "command": "npx",
+      "args": ["-y", "tsx", "github:tjpoisal/UNIMATRIX#packages/mcp-server/src/index.ts"],
+      "env": {
+        "UNIMATRIX_API_KEY": "umx_your_key_here",
+        "UNIMATRIX_API_URL": "https://deployunimatrix.com/api"
+      }
+    }
+  }
+}
+```
+
+The exact command for you is always shown in your personalized onboarding page after you create an API key.
+
 **How it actually works:**
-- The `@unimatrix/mcp-server` package runs locally as a bridge.
+- The bridge (published as `@unimatrix/mcp-server` on npm, or run via tsx + GitHub in the meantime) runs locally as a thin proxy for stdio-only clients like Claude Desktop.
 - It securely forwards requests to your Unimatrix account using your API key.
 - No data is stored on your machine.
 

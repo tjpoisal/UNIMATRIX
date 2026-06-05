@@ -77,7 +77,7 @@ export class OllamaProvider extends BaseLLMProvider {
     const inputTokens = prompt.length / 4;
     const outputTokens = content.length / 4;
 
-    return {
+    const result = {
       content,
       tokensUsed: Math.ceil(inputTokens + outputTokens),
       latencyMs: latency,
@@ -85,6 +85,9 @@ export class OllamaProvider extends BaseLLMProvider {
       model: this.model,
       provider: this.name,
     };
+
+    await this.maybeAutoLog(messages, result);
+    return result;
   }
 
   async *stream(

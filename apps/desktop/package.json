@@ -19,7 +19,7 @@
     "files": ["src/**/*", "assets/**/*"],
     "mac": {
       "category": "public.app-category.productivity",
-      "icon": "assets/icon.icns",
+      "icon": "assets/icon.png",
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "assets/entitlements.mac.plist",
@@ -30,7 +30,7 @@
       ]
     },
     "win": {
-      "icon": "assets/icon.ico",
+      "icon": "assets/icon.png",
       "target": [{ "target": "nsis", "arch": ["x64"] }]
     },
     "linux": {

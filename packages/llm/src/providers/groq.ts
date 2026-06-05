@@ -62,7 +62,7 @@ export class GroqProvider extends BaseLLMProvider {
     const content = response.choices[0]?.message?.content || '';
     const cost = this.calculateCost(usage.input, usage.output);
 
-    return {
+    const result = {
       content,
       tokensUsed: usage.input + usage.output,
       latencyMs: latency,
@@ -70,6 +70,9 @@ export class GroqProvider extends BaseLLMProvider {
       model: this.model,
       provider: this.name,
     };
+
+    await this.maybeAutoLog(messages, result);
+    return result;
   }
 
   async *stream(

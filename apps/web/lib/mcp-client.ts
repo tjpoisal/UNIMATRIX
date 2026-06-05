@@ -48,6 +48,8 @@ export interface OpenAITool {
 export interface ToolCallRequest {
   toolName: string;
   args: Record<string, unknown>;
+  /** Optional: for non-MCP LLMs, specify the LLM source (e.g. "gemini", "chatgpt") so memories are auto-tagged/organized by LLM. */
+  sourceLlm?: string;
 }
 
 /** Standardized success response from /api/tools/call */
@@ -105,6 +107,33 @@ export async function callMcpTool(
 
   // New registry-based execution (supports collab tools + legacy)
   return executeTool(name, args ?? {}, context);
+}
+
+/**
+ * Helper for non-MCP LLMs / agents using the REST /api/tools/call.
+ * Prepares the payload and auto-injects sourceLlm if provided.
+ * Use this instead of raw JSON to ensure correct tagging for per-LLM auto-organization.
+ *
+ * Prefer the portable version from @unimatrix/llm when building host/agent code:
+ *   import { prepareUnimatrixToolCall } from '@unimatrix/llm';
+ *
+ * Example:
+ *   const payload = prepareToolCall('unimatrix_store_memory', { content: '...' }, 'gemini');
+ *   await fetch('/api/tools/call', { method: 'POST', headers: { Authorization: 'Bearer YOUR_UMX_KEY' }, body: JSON.stringify(payload) });
+ */
+export function prepareToolCall(
+  toolName: string,
+  args: Record<string, unknown>,
+  sourceLlm?: string,
+): ToolCallRequest & { sourceLlm?: string } {
+  const payload: ToolCallRequest & { sourceLlm?: string } = {
+    toolName,
+    args,
+  };
+  if (sourceLlm) {
+    payload.sourceLlm = sourceLlm;
+  }
+  return payload;
 }
 
 /**

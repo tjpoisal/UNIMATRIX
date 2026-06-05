@@ -127,7 +127,7 @@ export async function POST(
       );
     }
 
-    const { toolName, args } = body as Partial<ToolCallRequest>;
+    const { toolName, args, sourceLlm } = body as Partial<ToolCallRequest> & { sourceLlm?: string };
 
     if (!toolName || typeof toolName !== "string") {
       return NextResponse.json<ErrorResponseBody>(
@@ -141,8 +141,15 @@ export async function POST(
     }
 
     // args is optional in the payload; default to empty object
-    const safeArgs: Record<string, unknown> =
-      args && typeof args === "object" && !Array.isArray(args) ? args : {};
+    let safeArgs: Record<string, unknown> =
+      args && typeof args === "object" && !Array.isArray(args) ? { ...args } : {};
+
+    // Support top-level sourceLlm for non-MCP LLMs (e.g. Gemini, ChatGPT via REST tools)
+    // This allows automatic tagging/organization of memories by the specific LLM source,
+    // even for LLMs that don't speak MCP.
+    if (sourceLlm && typeof sourceLlm === 'string') {
+      safeArgs.sourceLlm = sourceLlm;
+    }
 
     // ─── 3. Execute via internal MCP client (translates to tools/call) ──────
     // The MCP layer now handles HITL + telemetry internally

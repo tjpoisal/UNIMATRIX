@@ -179,10 +179,14 @@ export class UnimatrixToolsClient {
    * Execute a tool by name (the universal REST fallback to MCP).
    * This is what your agent framework calls when the LLM decides to use a tool.
    */
-  async callTool(toolName: string, args: Record<string, unknown> = {}): Promise<ToolCallResult> {
+  async callTool(toolName: string, args: Record<string, unknown> = {}, sourceLlm?: string): Promise<ToolCallResult> {
+    const payload: any = { toolName, args };
+    if (sourceLlm) payload.sourceLlm = sourceLlm;
+    // For portable auto-injection in host code that knows the LLM, prefer:
+    // import { prepareUnimatrixToolCall } from '@unimatrix/llm'; then use the returned object as body.
     return this.request('/tools/call', {
       method: 'POST',
-      body: JSON.stringify({ toolName, args }),
+      body: JSON.stringify(payload),
     });
   }
 
@@ -195,10 +199,11 @@ export class UnimatrixToolsClient {
     });
   }
 
-  async storeMemory(content: string, tags: string[] = [], locationId?: string) {
+  async storeMemory(content: string, tags: string[] = [], locationId?: string, sourceLlm?: string) {
     // Note: For full power use callTool directly with a real location_id.
     // This helper is mostly for quick "remember this" flows.
-    return this.callTool('unimatrix_store_memory', { content, tags, ...(locationId ? { location_id: locationId } : {}) });
+    // Pass sourceLlm (e.g. the current LLM name) for automatic per-LLM history organization (works for non-MCP).
+    return this.callTool('unimatrix_store_memory', { content, tags, ...(locationId ? { location_id: locationId } : {}) }, sourceLlm);
   }
 
   async getRecent(limit = 10) {

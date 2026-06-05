@@ -1,10 +1,17 @@
 # Unimatrix
 
-**Persistent memory infrastructure for AI — across every client, device, and session.**
+**A managed MCP server for persistent, hierarchical memory.**
 
-> Close your laptop after 3 days of deep work with Claude. Open Claude on your phone and ask *"Where were we?"* — it instantly knows everything. Zero re-explaining. Zero copy-paste. That's the RTX moment.
+Unimatrix gives MCP-compatible clients (Claude Desktop, Cursor, Windsurf, custom agents, etc.) access to the same durable, user-controlled memory through standard protocol tools.
 
-Unimatrix is **memory as infrastructure**. It gives any LLM client (Claude Desktop, Claude Code, Cursor, Ollama) a persistent, searchable, structured memory layer via the **Model Context Protocol (MCP)**.
+**Key characteristics:**
+- Explicit tool calls only — no automatic background loading or "magic" sync
+- Hierarchical organization (Palaces → nested Locations → Memories)
+- Works across different AI tools and machines via the Model Context Protocol
+- AES-256-GCM encryption at rest, full per-account audit logs
+- Cloud hosted or self-hostable (Docker + Postgres + pgvector)
+
+See [deployunimatrix.com](https://deployunimatrix.com) for the current public site, onboarding, and security details.
 
 ---
 

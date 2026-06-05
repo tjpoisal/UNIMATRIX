@@ -142,6 +142,23 @@ class ApiClient {
     });
     return response.data;
   }
+
+  // Locations (for auto-magic setup)
+  async createLocation(palaceId: string, name: string, description?: string, parentId?: string) {
+    const response = await this.client.post('/locations', {
+      palaceId,
+      name,
+      description,
+      parentId,
+    });
+    return response.data;
+  }
+
+  // LLM Providers (for personalized auto-magic)
+  async getLLMProviders() {
+    const response = await this.client.get('/llm-providers');
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();

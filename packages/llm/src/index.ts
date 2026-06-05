@@ -27,6 +27,10 @@ export { IntelligentLLMRouter, LLMLoadBalancer } from './routing.js';
 export { initializeLLMSystem, initializeLLMSystemFromConfig, parseEnvConfig, getProviderStats, resetProviderStats } from './config.js';
 export type { LLMConfig } from './config.js';
 
+// Automatic memory logging (auto-stores and organizes interactions by LLM source)
+export { autoLogInteraction, withAutoLog, importRecentHistory, prepareUnimatrixToolCall } from './memory.js';
+export type { UnimatrixMemoryConfig } from './memory.js';
+
 /**
  * Quick setup: Create all providers and return registry + router
  * @deprecated Use initializeLLMSystem() instead

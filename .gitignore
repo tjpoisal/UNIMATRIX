@@ -10,6 +10,9 @@ build/
 .turbo/
 out/
 
+# Expo EAS local artifacts / caches (mobile)
+.eas/
+
 # Environment
 .env
 .env.local

@@ -29,6 +29,7 @@ export type ClientProfile = 'desktop' | 'mobile';
 export const StoreMemoryInputSchema = z.object({
   content: z.string().min(1).max(50_000),
   hint:    z.string().max(500).optional(),
+  tags:    z.array(z.string()).optional(), // e.g. ['llm-source:claude'] for auto organization by LLM
 });
 
 export type StoreMemoryInput = z.infer<typeof StoreMemoryInputSchema>;

@@ -13,12 +13,9 @@ jobs:
     name: macOS (universal)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v5
-
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
@@ -50,8 +47,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:mac
 
-      - name: Rename artifacts
+      - name: List and rename artifacts (mac)
         run: |
+          ls -la apps/desktop/dist/ || true
           mv apps/desktop/dist/*.dmg apps/desktop/dist/Unimatrix-mac.dmg 2>/dev/null || true
           mv apps/desktop/dist/*-mac.zip apps/desktop/dist/Unimatrix-mac.zip 2>/dev/null || true
 
@@ -66,12 +64,9 @@ jobs:
     name: Windows (x64)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v5
-
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
@@ -88,9 +83,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:win
 
-      - name: Rename artifact
+      - name: List and rename artifact (win)
         shell: powershell
         run: |
+          Get-ChildItem apps/desktop/dist/ | Select-Object Name
           $exe = Get-ChildItem apps/desktop/dist/*.exe | Select-Object -First 1
           if ($exe) { Rename-Item $exe.FullName "Unimatrix-Setup-win.exe" }
 
@@ -103,12 +99,9 @@ jobs:
     name: Linux (x64)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v5
-
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
@@ -123,8 +116,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:linux
 
-      - name: Rename artifacts
+      - name: List and rename artifacts (linux)
         run: |
+          ls -la apps/desktop/dist/ || true
           mv apps/desktop/dist/*.AppImage apps/desktop/dist/Unimatrix-linux.AppImage 2>/dev/null || true
           mv apps/desktop/dist/*.deb apps/desktop/dist/Unimatrix-linux.deb 2>/dev/null || true
 

@@ -70,4 +70,30 @@ export abstract class BaseLLMProvider implements ILLMProvider {
     // Default implementation - override in subclasses
     return { input: 0, output: 0 };
   }
+
+  // Optional: Unimatrix memory config for auto-logging interactions per LLM source
+  protected unimatrixMemoryConfig?: import('../memory.js').UnimatrixMemoryConfig;
+
+  /**
+   * Enable automatic memory logging for this provider.
+   * When set, every complete() will auto-store the interaction into the
+   * per-LLM history location (e.g. "Claude History") under the user's "LLM Histories" palace.
+   * This is wired up automatically by the installer/onboarding when you connect providers.
+   */
+  setUnimatrixMemoryConfig(config: import('../memory.js').UnimatrixMemoryConfig | undefined) {
+    this.unimatrixMemoryConfig = config;
+  }
+
+  protected async maybeAutoLog(messages: Message[], result: CompletionResult) {
+    if (this.unimatrixMemoryConfig) {
+      try {
+        const { autoLogInteraction } = await import('../memory.js');
+        // Fire-and-forget to not block the LLM response
+        autoLogInteraction(this.name.toLowerCase(), messages, result, this.unimatrixMemoryConfig).catch(() => {});
+      } catch (e) {
+        // non-fatal
+        console.warn('[Unimatrix] Auto memory log failed for', this.name, e);
+      }
+    }
+  }
 }

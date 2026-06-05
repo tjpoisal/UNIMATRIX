@@ -7,6 +7,7 @@ import { ILLMProvider } from '@unimatrix/types';
 import { LLMProviderFactory } from './factory.js';
 import { LLMProviderRegistry } from './registry.js';
 import { IntelligentLLMRouter, LLMLoadBalancer } from './routing.js';
+import type { UnimatrixMemoryConfig } from './memory.js';
 
 /**
  * LLM Provider configuration from environment
@@ -42,8 +43,9 @@ export interface LLMConfig {
 /**
  * Initialize LLM system from environment variables
  * Creates providers, registry, router, and load balancer
+ * Pass optional unimatrixMemory to auto-log every completion to per-LLM history spaces.
  */
-export function initializeLLMSystem(): {
+export function initializeLLMSystem(unimatrixMemory?: UnimatrixMemoryConfig): {
   registry: LLMProviderRegistry;
   router: IntelligentLLMRouter;
   loadBalancer: LLMLoadBalancer;
@@ -58,6 +60,7 @@ export function initializeLLMSystem(): {
       const claude = LLMProviderFactory.createProvider('claude', {
         apiKey: process.env.ANTHROPIC_API_KEY,
         model: process.env.CLAUDE_MODEL,
+        unimatrixMemory,
       });
       registry.register(claude);
       providers.push(claude);
@@ -73,6 +76,7 @@ export function initializeLLMSystem(): {
       const openai = LLMProviderFactory.createProvider('openai', {
         apiKey: process.env.OPENAI_API_KEY,
         model: process.env.OPENAI_MODEL,
+        unimatrixMemory,
       });
       registry.register(openai);
       providers.push(openai);
@@ -88,6 +92,7 @@ export function initializeLLMSystem(): {
       const gemini = LLMProviderFactory.createProvider('gemini', {
         apiKey: process.env.GOOGLE_API_KEY,
         model: process.env.GEMINI_MODEL,
+        unimatrixMemory,
       });
       registry.register(gemini);
       providers.push(gemini);
@@ -103,6 +108,7 @@ export function initializeLLMSystem(): {
       const groq = LLMProviderFactory.createProvider('groq', {
         apiKey: process.env.GROQ_API_KEY,
         model: process.env.GROQ_MODEL,
+        unimatrixMemory,
       });
       registry.register(groq);
       providers.push(groq);
@@ -117,6 +123,7 @@ export function initializeLLMSystem(): {
     const ollama = LLMProviderFactory.createProvider('ollama', {
       model: process.env.OLLAMA_MODEL,
       endpoint: process.env.OLLAMA_ENDPOINT,
+      unimatrixMemory,
     });
     registry.register(ollama);
     providers.push(ollama);
@@ -143,8 +150,12 @@ export function initializeLLMSystem(): {
 
 /**
  * Initialize LLM system from configuration object
+ * Pass optional unimatrixMemory to enable automatic per-LLM history logging.
  */
-export function initializeLLMSystemFromConfig(config: LLMConfig): {
+export function initializeLLMSystemFromConfig(
+  config: LLMConfig,
+  unimatrixMemory?: UnimatrixMemoryConfig
+): {
   registry: LLMProviderRegistry;
   router: IntelligentLLMRouter;
   loadBalancer: LLMLoadBalancer;
@@ -158,6 +169,7 @@ export function initializeLLMSystemFromConfig(config: LLMConfig): {
       const claude = LLMProviderFactory.createProvider('claude', {
         apiKey: config.anthropic.apiKey,
         model: config.anthropic.model,
+        unimatrixMemory,
       });
       registry.register(claude);
       providers.push(claude);
@@ -171,6 +183,7 @@ export function initializeLLMSystemFromConfig(config: LLMConfig): {
       const openai = LLMProviderFactory.createProvider('openai', {
         apiKey: config.openai.apiKey,
         model: config.openai.model,
+        unimatrixMemory,
       });
       registry.register(openai);
       providers.push(openai);
@@ -184,6 +197,7 @@ export function initializeLLMSystemFromConfig(config: LLMConfig): {
       const gemini = LLMProviderFactory.createProvider('gemini', {
         apiKey: config.gemini.apiKey,
         model: config.gemini.model,
+        unimatrixMemory,
       });
       registry.register(gemini);
       providers.push(gemini);
@@ -197,6 +211,7 @@ export function initializeLLMSystemFromConfig(config: LLMConfig): {
       const groq = LLMProviderFactory.createProvider('groq', {
         apiKey: config.groq.apiKey,
         model: config.groq.model,
+        unimatrixMemory,
       });
       registry.register(groq);
       providers.push(groq);
@@ -210,6 +225,7 @@ export function initializeLLMSystemFromConfig(config: LLMConfig): {
       const ollama = LLMProviderFactory.createProvider('ollama', {
         model: config.ollama?.model,
         endpoint: config.ollama?.endpoint,
+        unimatrixMemory,
       });
       registry.register(ollama);
       providers.push(ollama);

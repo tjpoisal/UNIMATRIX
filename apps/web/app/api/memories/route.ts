@@ -10,18 +10,50 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { locationId, content, tags } = await request.json();
+    const { locationId, content, tags, sourceLlm } = await request.json();
 
-    if (!locationId || !content) {
+    if (!content) {
       return NextResponse.json(
-        { error: "Location ID and content are required" },
+        { error: "content is required" },
         { status: 400 }
       );
     }
 
+    let finalTags = tags || [];
+    if (sourceLlm && typeof sourceLlm === "string") {
+      const t = `llm-source:${sourceLlm}`;
+      if (!finalTags.includes(t)) finalTags = [...finalTags, t];
+    }
+
+    let finalLocationId = locationId;
+
+    // Auto-resolve like the tools path: if sourceLlm but no explicit locationId, use per-LLM history
+    if (!finalLocationId && sourceLlm && typeof sourceLlm === "string") {
+      try {
+        const cap = sourceLlm.charAt(0).toUpperCase() + sourceLlm.slice(1);
+        const locName = `${cap} History`;
+        const hp = await prisma.palace.findFirst({ where: { userId, name: "LLM Histories", deletedAt: null } });
+        if (hp) {
+          const hl = await prisma.location.findFirst({ where: { palaceId: hp.id, name: locName, deletedAt: null } });
+          if (hl) finalLocationId = hl.id;
+        }
+        if (!finalLocationId) {
+          const mp = await prisma.palace.findFirst({ where: { userId, name: "Mobile", deletedAt: null } });
+          if (mp) {
+            const ml = await prisma.location.findFirst({ where: { palaceId: mp.id, name: locName, deletedAt: null } });
+            if (ml) finalLocationId = ml.id;
+          }
+        }
+      } catch {}
+    }
+
+    if (!finalLocationId) {
+      return NextResponse.json({ error: "locationId is required (or provide sourceLlm for auto-resolve to per-LLM history)" }, { status: 400 });
+    }
+
     // Verify location belongs to user's palace
     const location = await prisma.location.findUnique({
-      where: { id: locationId },
+      where: { id: finalLocationId },
       include: { palace: { select: { userId: true } } },
     });
 
@@ -31,9 +63,9 @@ export async function POST(request: NextRequest) {
 
     const memory = await prisma.memory.create({
       data: {
-        locationId,
+        locationId: finalLocationId,
         content,
-        tags: tags || [],
+        tags: finalTags,
       },
     });
 

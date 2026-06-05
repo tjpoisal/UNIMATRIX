@@ -103,6 +103,10 @@ export async function GET() {
               description: "Arguments matching the tool's parameters schema",
               additionalProperties: true,
             },
+            sourceLlm: {
+              type: "string",
+              description: "REQUIRED FOR NON-MCP AUTO-ORGANIZATION: the LLM name e.g. 'gemini', 'openai', 'claude'. Place at TOP LEVEL of /api/tools/call body (NOT inside args). Auto-tags stored memories 'llm-source:xxx' and auto-resolves to the correct 'XXX History' location (provisioned on connect in onboarding). See full contract + copy-paste system prompt in the unimatrix_store_memory description returned by GET /api/tools (or in docs/examples/llm-tools/non-mcp-tool-definitions.md).",
+            },
           },
         },
         ToolCallSuccessResponse: {
@@ -403,7 +407,7 @@ export async function GET() {
         post: {
           operationId: "callTool",
           summary: "Execute a Unimatrix tool (MCP REST fallback)",
-          description: "Translates a simple {toolName, args} payload into an internal MCP tools/call invocation. Use the exact tool names returned by GET /api/tools. Requires a valid Unimatrix API key.",
+          description: "Translates a simple {toolName, args} payload into an internal MCP tools/call invocation. Use the exact tool names returned by GET /api/tools. Requires a valid Unimatrix API key. FOR NON-MCP LLMs: ALWAYS pass top-level 'sourceLlm' (e.g. 'gemini', 'chatgpt') in the body root so conversations auto-file into the per-LLM history location auto-created when you connected the provider during onboarding. The store_memory tool description (from /api/tools) contains the full system-prompt text to paste into your LLM.",
           security: [{ bearerAuth: [] }],
           requestBody: {
             required: true,

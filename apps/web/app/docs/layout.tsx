@@ -27,8 +27,10 @@ export default function DocsLayout({
           </div>
 
           <nav className="flex items-center gap-6 text-sm">
+            <Link href="/quickstart" className="hover:text-accent transition-colors">Quickstart</Link>
             <Link href="/docs/mcp" className="hover:text-accent transition-colors">MCP Reference</Link>
-            <Link href="/" className="text-text-muted hover:text-text transition-colors">Back to Home</Link>
+            <Link href="/status" className="text-text-muted hover:text-text transition-colors">Status</Link>
+            <Link href="/" className="text-text-muted hover:text-text transition-colors">Home</Link>
             <Link 
               href="/auth/login" 
               className="text-accent hover:text-accent/80 transition-colors font-medium"
