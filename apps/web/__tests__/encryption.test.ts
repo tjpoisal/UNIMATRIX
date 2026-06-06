@@ -1,111 +1,90 @@
-import { deriveKey, encryptMemory, decryptMemory } from '@/lib/encryption';
-
 /**
- * E2E Encryption Test Suite
- * Tests the PBKDF2 + AES-256-GCM encryption implementation
+ * encryption.test.ts
  *
- * Run with: npm test -- encryption.test.ts
+ * E2E Encryption Test Suite
+ * Validates PBKDF2 + AES-256-GCM implementation
+ *
+ * To run these tests:
+ * 1. npm install --save-dev vitest (or jest)
+ * 2. npm test -- encryption.test.ts
  */
 
-async function assert(condition: boolean, message: string) {
-  if (!condition) {
-    throw new Error(`Assertion failed: ${message}`);
-  }
-}
+import { describe, it, expect } from 'vitest';
+import { deriveKey, encryptMemory, decryptMemory } from '@/lib/encryption';
 
-async function assertEqual(actual: any, expected: any, message: string) {
-  if (actual !== expected) {
-    throw new Error(`Expected ${expected}, got ${actual}: ${message}`);
-  }
-}
+describe('E2E Encryption (PBKDF2 + AES-256-GCM)', () => {
+  it('should derive a key from password', async () => {
+    const password = 'test-password-123';
+    const key = await deriveKey(password);
+    expect(key).toBeDefined();
+    expect(key.type).toBe('secret');
+  });
 
-export async function runEncryptionTests() {
-  console.log('🧪 Running E2E Encryption Tests...\n');
-
-  // Test 1: Encrypt/Decrypt Roundtrip
-  {
-    console.log('Test 1: Encrypt/decrypt roundtrip');
-    const password = 'test-secure-password-123';
-    const originalContent = 'This is a secret memory about cross-LLM continuity';
+  it('should encrypt and decrypt memory content', async () => {
+    const password = 'test-password';
+    const content = 'Secret memory about cross-LLM continuity';
 
     const key = await deriveKey(password);
-    await assert(key !== null, 'Key derivation should succeed');
+    const encrypted = await encryptMemory(content, key);
 
-    const encrypted = await encryptMemory(originalContent, key);
-    await assert(encrypted.ciphertext, 'Ciphertext should exist');
-    await assert(encrypted.nonce, 'Nonce should exist');
+    expect(encrypted.ciphertext).toBeDefined();
+    expect(encrypted.nonce).toBeDefined();
 
     const decrypted = await decryptMemory(encrypted, key);
-    await assertEqual(decrypted, originalContent, 'Decrypted content should match original');
-    console.log('✅ PASS\n');
-  }
+    expect(decrypted).toBe(content);
+  });
 
-  // Test 2: Different Passwords
-  {
-    console.log('Test 2: Different passwords produce different keys');
-    const key1 = await deriveKey('password-1');
-    const key2 = await deriveKey('password-2');
+  it('should produce different ciphertexts for same content (random nonce)', async () => {
+    const password = 'test-password';
+    const content = 'Test message';
 
-    await assert(key1 !== key2, 'Different passwords should produce different keys');
-    console.log('✅ PASS\n');
-  }
+    const key = await deriveKey(password);
+    const enc1 = await encryptMemory(content, key);
+    const enc2 = await encryptMemory(content, key);
 
-  // Test 3: Tampering Detection
-  {
-    console.log('Test 3: Tampering with ciphertext fails decryption');
+    // Nonces should be different (random)
+    expect(enc1.nonce).not.toBe(enc2.nonce);
+    // Ciphertexts should be different
+    expect(enc1.ciphertext).not.toBe(enc2.ciphertext);
+    // But both should decrypt to same content
+    expect(await decryptMemory(enc1, key)).toBe(content);
+    expect(await decryptMemory(enc2, key)).toBe(content);
+  });
+
+  it('should reject tampering attempts', async () => {
     const password = 'test-password';
     const content = 'Secret message';
 
     const key = await deriveKey(password);
     const encrypted = await encryptMemory(content, key);
 
-    // Tamper with ciphertext
+    // Tamper with the ciphertext
     const tampered = {
       ...encrypted,
-      ciphertext: encrypted.ciphertext.slice(0, -10) + 'DEADBEEF00',
+      ciphertext: encrypted.ciphertext.slice(0, -5) + 'XXXXX',
     };
 
-    try {
-      await decryptMemory(tampered, key);
-      throw new Error('Decryption of tampered data should fail');
-    } catch (e) {
-      // Expected: decryption should fail
-      console.log('✅ PASS (correctly rejected tampered data)\n');
-    }
-  }
+    // Decryption should fail
+    await expect(decryptMemory(tampered, key)).rejects.toThrow();
+  });
 
-  // Test 4: Multiple Memories
-  {
-    console.log('Test 4: Multiple memories with same password');
-    const password = 'shared-password';
-    const key = await deriveKey(password);
+  it('should use different keys for different passwords', async () => {
+    const key1 = await deriveKey('password-1');
+    const key2 = await deriveKey('password-2');
 
-    const memories = [
-      'Memory 1: Learned about React hooks',
-      'Memory 2: Debugging async/await',
-      'Memory 3: Cross-LLM continuity patterns',
-    ];
+    // Keys should be different objects (different key material)
+    expect(key1).not.toBe(key2);
+  });
 
-    const encrypted = await Promise.all(
-      memories.map(m => encryptMemory(m, key)),
-    );
+  it('should fail to decrypt with wrong password', async () => {
+    const password1 = 'password-1';
+    const password2 = 'password-2';
+    const content = 'Secret message';
 
-    // Each should have unique nonce (random)
-    const nonces = encrypted.map(e => e.nonce);
-    const uniqueNonces = new Set(nonces);
-    await assertEqual(uniqueNonces.size, memories.length, 'All nonces should be unique');
+    const key1 = await deriveKey(password1);
+    const encrypted = await encryptMemory(content, key1);
 
-    // All should decrypt correctly with same key
-    const decrypted = await Promise.all(
-      encrypted.map(e => decryptMemory(e, key)),
-    );
-
-    for (let i = 0; i < memories.length; i++) {
-      await assertEqual(decrypted[i], memories[i], `Memory ${i} should decrypt correctly`);
-    }
-
-    console.log('✅ PASS\n');
-  }
-
-  console.log('✨ All encryption tests passed!\n');
-}
+    const key2 = await deriveKey(password2);
+    await expect(decryptMemory(encrypted, key2)).rejects.toThrow();
+  });
+});

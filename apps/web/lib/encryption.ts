@@ -18,7 +18,7 @@
 const ALGORITHM = 'AES-GCM';
 const KEY_LENGTH = 256; // bits
 const NONCE_LENGTH = 12; // bytes (96 bits for AES-GCM)
-const AUTH_TAG_LENGTH = 128; // bits (16 bytes)
+// const AUTH_TAG_LENGTH = 128; // bits (16 bytes) - AES-GCM uses 128-bit tag automatically
 
 interface EncryptedMemory {
   ciphertext: string; // Base64-encoded
