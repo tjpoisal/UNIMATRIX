@@ -24,19 +24,16 @@ unimatrix/
 ├── apps/
 │   ├── web/          # Next.js 16 web dashboard (Neon + Prisma + NextAuth)
 │   ├── mobile/       # Expo (React Native) — iOS & Android
-│   └── desktop/      # Electron — wraps web app
+│   └── desktop/      # Electron — multi-LLM collaborative UI
 ├── packages/
 │   ├── server/       # Fastify backend — MCP API, embeddings, Librarian agent
-│   ├── mcp-server/   # MCP client — connects Claude/Ollama to Unimatrix API
+│   ├── db/           # Prisma schema and migrations
 │   ├── llm/          # Multi-LLM abstraction (Claude, GPT-4, Gemini, Groq, Ollama)
 │   ├── types/        # Shared TypeScript interfaces
 │   ├── ui/           # Shared React components
-│   └── api/          # REST client helpers
-├── infrastructure/
-│   └── aws-cdk/      # Legacy AWS CDK (archived — migrated to Render + Neon)
+│   └── server/       # Fastify MCP server
 ├── ARCHITECTURE.md
-├── MVP_Scope.md
-├── IMPLEMENTATION_STATUS.md
+├── DEPLOYMENT.md
 └── LLM_ARCHITECTURE.md
 ```
 
@@ -45,7 +42,7 @@ unimatrix/
 ## What's Built
 
 ### `packages/server` — Fastify Backend
-The core API that stores and retrieves memories. Deployed to Render (Fastify MCP service + custom Next.js server for WS).
+The core API that stores and retrieves memories. Deployed to Fly.io (MCP service + embeddings + Librarian agent).
 
 - **Auth**: Clerk
 - **Database**: PostgreSQL + pgvector (Neon) — migrations in `migrations/`
@@ -58,13 +55,6 @@ The core API that stores and retrieves memories. Deployed to Render (Fastify MCP
   - `search_memories` — full-text + semantic fallback
   - `get_timeline` — temporal replay of memory history
   - `supersede_memory` — version/correct existing memories
-
-### `packages/mcp-server` — MCP Client
-Stdio MCP server that any Claude Desktop / Claude Code / Ollama user installs. Calls the backend via REST.
-
-- **Tools**: `list_palaces`, `get_palace`, `search_memories`, `store_memory`, `list_memories`, `create_palace`, `create_location`, `update_memory`
-- **Publishable** as an npm package (`unimatrix-mcp-server` binary)
-- **Live API**: `https://deployunimatrix.com/api`
 
 ### `packages/llm` — Multi-LLM Abstraction
 Unified interface for 5 LLM providers with intelligent routing.

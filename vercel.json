@@ -1,7 +1,0 @@
-{
-  "_comment": "LEGACY - The full product (persistent WebSockets for Collab Room, dedicated MCP server, background worker) requires long-lived Node processes and does not fit Vercel serverless well. See DEPLOYMENT.md 'Why not Vercel?' section. This file is kept only if you want to run just the web dashboard + the serverless-friendly /api/mcp HTTP route on Vercel.",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "pnpm turbo run build --filter=web",
-  "outputDirectory": "apps/web/.next",
-  "framework": "nextjs"
-}
