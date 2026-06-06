@@ -17,9 +17,8 @@ COPY packages/types/package.json ./packages/types/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/api/package.json ./packages/api/
 
-# Copy Prisma schemas
+# Copy Prisma schema (only @unimatrix/db has the schema; server imports from it)
 COPY packages/db/prisma ./packages/db/prisma
-COPY packages/server/prisma ./packages/server/prisma
 
 # Install dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --ignore-scripts
@@ -39,7 +38,7 @@ WORKDIR /app/packages/db
 RUN pnpm run build
 
 WORKDIR /app/packages/server
-RUN pnpm prisma generate && pnpm run build
+RUN pnpm run build
 
 # --- Production image ---
 FROM node:20-slim AS production
@@ -53,7 +52,6 @@ RUN apt-get update && apt-get install -y postgresql-client openssl curl && rm -r
 # Copy everything needed from builder
 COPY --from=base /app/packages/server/dist ./dist
 COPY --from=base /app/packages/server/package.json ./
-COPY --from=base /app/packages/server/prisma ./prisma
 COPY --from=base /app/node_modules ./node_modules
 
 # Health check
