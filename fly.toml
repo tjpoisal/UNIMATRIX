@@ -1,14 +1,14 @@
-# Fly.io config for the web service (Next.js custom server + Collab WS)
-# Usage: cp fly.web.toml fly.toml && fly deploy --config fly.toml --app your-app-name
-app = "unimatrix-web"
-primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "fra", "lhr")
+# Fly.io config for the core MCP server (Fastify) - what LLMs connect to
+# Usage: cp fly.mcp.toml fly.toml && fly deploy --config fly.toml --app your-mcp-app-name
+app = "unimatrix-mcp"
+primary_region = "iad"
 
 [build]
-  dockerfile = "Dockerfile.web"
+  dockerfile = "Dockerfile.server"
 
 [env]
   NODE_ENV = "production"
-  PORT = "8080"   # Fly routes to 8080 internally; our server.ts respects process.env.PORT
+  PORT = "8080"
 
 [[services]]
   protocol = "tcp"
@@ -20,20 +20,20 @@ primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "
 
 [services.concurrency]
   type = "connections"
-  hard_limit = 1000
-  soft_limit = 500
+  hard_limit = 500
+  soft_limit = 300
 
 [[vm]]
-  cpu_kind = "performance"  # Better for WebSocket Collab Room low latency
-  cpus = 1
-  memory_mb = 2048  # Fly minimum for performance VMs in some cases; was 1024
+  cpu_kind = "performance"  # Best for low-latency MCP calls from LLMs
+  cpus = 2
+  memory_mb = 2048  # More for embeddings/processing if needed
 
 [checks]
-  [checks.web]
+  [checks.mcp]
     port = 8080
     type = "http"
     interval = "15s"
     timeout = "5s"
     grace_period = "10s"
     method = "get"
-    path = "/api/health"
+    path = "/health"
