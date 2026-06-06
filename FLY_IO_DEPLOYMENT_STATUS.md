@@ -23,10 +23,10 @@
 ### MCP Server (unimatrix-mcp)
 - **App Created**: ✅ yes
 - **Secrets**: ✅ Queued to deploy
-- **Build Status**: ⚠️ Prisma schema path issue in Dockerfile.server
-  - **Issue**: Dockerfile expects packages/server/schema.prisma or packages/db/prisma/schema.prisma
-  - **Fix**: Confirm Prisma schema location and update Dockerfile.server path if needed
-  - **Command**: `grep -r "schema.prisma" ~/UNIMATRIX/packages/`
+- **Build Status**: ✅ FIXED - Redundant Prisma schema removed
+  - **Resolution**: Removed unused packages/server/prisma (was importing from @unimatrix/db)
+  - **Fix applied**: Simplified build script, updated Dockerfile
+  - **Verified**: Local build pipeline now works (db → server)
 
 ### Worker (unimatrix-worker)
 - **App Created**: ✅ yes
@@ -37,20 +37,16 @@
 
 ## 🔄 NEXT STEPS (In Order)
 
-### 1. Fix MCP Build (5 min)
-```bash
-# Check Prisma schema location
-find ~/UNIMATRIX/packages -name "schema.prisma" -o -name "*schema*" | grep prisma
-
-# Update Dockerfile.server if path is wrong
-# Then retry: ./scripts/fly-deploy.sh mcp
-```
-
-### 2. Deploy MCP + Worker (10 min)
+### 1. Deploy MCP Server to Fly.io (5 min)
 ```bash
 cd ~/UNIMATRIX
-./scripts/fly-deploy.sh mcp
-./scripts/fly-deploy.sh worker
+git push origin main  # Triggers CI deploy, or manually:
+fly deploy --config fly.mcp.toml --app unimatrix-mcp
+```
+
+### 2. Deploy Worker (5 min)
+```bash
+fly deploy --config fly.worker.toml --app unimatrix-worker
 ```
 
 ### 3. Update DNS (2 min)
