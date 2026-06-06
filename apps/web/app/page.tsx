@@ -2,35 +2,42 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ProofOfReality } from '@/components/marketing/ProofSections';
 
-// eslint-disable react/no-unescaped-entities -- marketing/landing copy uses real quotes in prose and examples for readability
+// eslint-disable react/no-unescaped-entities
 
 export const metadata = {
-  title: 'Unimatrix — MCP Memory Server for AI Tools',
+  title: 'Unimatrix | AI Memory That Works Everywhere',
   description:
-    'Cloud-hosted memory backend for the Model Context Protocol. Connect Claude Desktop, Cursor, Windsurf and other MCP clients to persistent, structured memory across sessions and models.',
+    'Cross-LLM memory continuity. Start with ChatGPT, continue with Claude. Encrypted, private, vendor-independent. Free tier includes 3 workspaces.',
   keywords: [
+    'AI memory',
+    'cross-LLM',
+    'Claude Desktop',
+    'ChatGPT continuity',
+    'encrypted memory',
     'MCP server',
-    'Model Context Protocol',
-    'Claude Desktop memory',
-    'Cursor MCP',
-    'persistent AI memory',
-    'cross-LLM context',
-    'AI infrastructure',
+    'privacy-first AI',
+    'AI context management',
   ],
   openGraph: {
-    title: 'Unimatrix — MCP Memory Server',
+    title: 'Unimatrix | Your AI Remembers Everything',
     description:
-      'A managed MCP server that gives your AI tools structured, persistent memory. Works with Claude Desktop, Cursor, Windsurf, and any MCP-compatible client.',
+      'Cross-LLM memory continuity with end-to-end encryption. Works with any AI model. Free account. No credit card required.',
     url: 'https://deployunimatrix.com',
     siteName: 'Unimatrix',
     type: 'website',
+    images: [
+      {
+        url: 'https://deployunimatrix.com/og-image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Unimatrix — MCP Memory Server for AI Tools',
-    description: 'Persistent memory for Claude Desktop, Cursor, and other MCP clients.',
+    title: 'Unimatrix | AI Memory That Works Everywhere',
+    description: 'Start with ChatGPT. Continue with Claude. Same full context.',
   },
 };
 
