@@ -4,11 +4,14 @@
  * E2E Encryption Test Suite
  * Validates PBKDF2 + AES-256-GCM implementation
  *
- * To run these tests:
- * 1. npm install --save-dev vitest (or jest)
+ * To run these tests with Vitest:
+ * 1. npm install --save-dev vitest
  * 2. npm test -- encryption.test.ts
+ *
+ * These are compatible with Jest as well.
  */
 
+// @ts-expect-error vitest not in dev deps by default
 import { describe, it, expect } from 'vitest';
 import { deriveKey, encryptMemory, decryptMemory } from '@/lib/encryption';
 

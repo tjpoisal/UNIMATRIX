@@ -6,7 +6,7 @@ import { deriveKey, encryptMemory } from '@/lib/encryption';
 interface EncryptedPayload {
   ciphertext: string;
   nonce: string;
-  signature?: string;
+  timestamp: number;
   context?: string;
   importance: 'low' | 'medium' | 'high';
 }
@@ -42,7 +42,7 @@ export function MemoryCreator() {
       const payload: EncryptedPayload = {
         ciphertext: encrypted.ciphertext,
         nonce: encrypted.nonce,
-        signature: encrypted.signature || undefined,
+        timestamp: encrypted.timestamp,
         context: context || undefined,
         importance,
       };
