@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { deriveKey, encryptMemory } from '@/lib/encryption';
 
-interface EncryptedMemory {
+interface EncryptedPayload {
   ciphertext: string;
   nonce: string;
-  signature: string;
+  signature?: string;
   context?: string;
   importance: 'low' | 'medium' | 'high';
 }
@@ -39,10 +39,10 @@ export function MemoryCreator() {
       const encrypted = await encryptMemory(content, key);
 
       // Step 3: Prepare payload (server never sees plaintext)
-      const payload: EncryptedMemory = {
+      const payload: EncryptedPayload = {
         ciphertext: encrypted.ciphertext,
         nonce: encrypted.nonce,
-        signature: encrypted.signature,
+        signature: encrypted.signature || undefined,
         context: context || undefined,
         importance,
       };
