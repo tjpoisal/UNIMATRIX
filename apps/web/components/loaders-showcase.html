@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unimatrix Blob Loaders</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0e1030;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
+      margin-bottom: 40px;
+    }
+
+    .loader-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .loader-cell {
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loader-cell:hover {
+      border-color: #ff7a00;
+    }
+
+    /* Loader 1: Rotating Morphing Blob */
+    .loader-1 {
+      width: 60px;
+      height: 60px;
+      background: #ff7a00;
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+      animation: morph1 3s ease-in-out infinite, spin 4s linear infinite;
+      filter: drop-shadow(0 0 10px rgba(255, 122, 0, 0.6));
+    }
+
+    @keyframes morph1 {
+      0%, 100% { border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
+      50% { border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%; }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Loader 2: Pulsing Double Blob */
+    .loader-2 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .loader-2::before,
+    .loader-2::after {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: #ff7a00;
+      border-radius: 40% 60% 50% 50%;
+      filter: drop-shadow(0 0 8px rgba(255, 122, 0, 0.5));
+    }
+
+    .loader-2::before {
+      top: 0;
+      left: 0;
+      animation: pulse-blob 1.5s ease-in-out infinite;
+    }
+
+    .loader-2::after {
+      bottom: 0;
+      right: 0;
+      animation: pulse-blob 1.5s ease-in-out infinite 0.3s;
+    }
+
+    @keyframes pulse-blob {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* Loader 3: Orbiting Blobs */
+    .loader-3 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .loader-3::before,
+    .loader-3::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #ff7a00;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 6px rgba(255, 122, 0, 0.8));
+    }
+
+    .loader-3::before {
+      animation: orbit 2s linear infinite;
+    }
+
+    .loader-3::after {
+      animation: orbit 2s linear infinite 1s reverse;
+    }
+
+    @keyframes orbit {
+      0% { transform: translate(20px, 0) scale(1); opacity: 1; }
+      50% { transform: translate(0, 20px) scale(0.7); opacity: 0.6; }
+      100% { transform: translate(-20px, 0) scale(1); opacity: 1; }
+    }
+
+    /* Loader 4: Expanding Ring */
+    .loader-4 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .loader-4::before,
+    .loader-4::after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border: 8px solid;
+      border-color: #ff7a00 transparent #ff7a00 transparent;
+      border-radius: 50%;
+      top: 0;
+      left: 0;
+      filter: drop-shadow(0 0 8px rgba(255, 122, 0, 0.4));
+    }
+
+    .loader-4::before {
+      animation: expand-ring 1.5s ease-out infinite;
+    }
+
+    .loader-4::after {
+      animation: expand-ring 1.5s ease-out infinite 0.5s;
+    }
+
+    @keyframes expand-ring {
+      0% { transform: scale(0.3); opacity: 1; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+
+    /* Loader 5: Bouncing Blobs */
+    .loader-5 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .blob {
+      width: 12px;
+      height: 30px;
+      background: #ff7a00;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 8px rgba(255, 122, 0, 0.6));
+    }
+
+    .blob:nth-child(1) { animation: bounce 1.2s ease-in-out infinite; }
+    .blob:nth-child(2) { animation: bounce 1.2s ease-in-out infinite 0.2s; }
+    .blob:nth-child(3) { animation: bounce 1.2s ease-in-out infinite 0.4s; }
+
+    @keyframes bounce {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(1.8); }
+    }
+
+    /* Loader 6: Swirling Spiral */
+    .loader-6 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .loader-6::before {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: conic-gradient(from 0deg, #ff7a00, transparent);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 10px rgba(255, 122, 0, 0.5));
+      animation: rotate-spiral 2s linear infinite;
+    }
+
+    @keyframes rotate-spiral {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Loader 7: Morphing Circle */
+    .loader-7 {
+      width: 60px;
+      height: 60px;
+      background: #ff7a00;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      animation: morph-random 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(255, 122, 0, 0.7));
+    }
+
+    @keyframes morph-random {
+      0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+      25% { border-radius: 30% 60% 70% 40% / 40% 70% 30% 60%; }
+      50% { border-radius: 70% 30% 40% 60% / 30% 40% 60% 70%; }
+      75% { border-radius: 40% 70% 60% 30% / 70% 60% 40% 30%; }
+      100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    }
+
+    /* Loader 8: Floating Particles */
+    .loader-8 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: #ff7a00;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 6px rgba(255, 122, 0, 0.8));
+    }
+
+    .particle:nth-child(1) { animation: float-particle 3s ease-in-out infinite; top: 10%; left: 50%; }
+    .particle:nth-child(2) { animation: float-particle 3.5s ease-in-out infinite 0.3s; top: 30%; left: 80%; }
+    .particle:nth-child(3) { animation: float-particle 2.8s ease-in-out infinite 0.6s; top: 60%; left: 70%; }
+    .particle:nth-child(4) { animation: float-particle 3.2s ease-in-out infinite 0.9s; top: 70%; left: 30%; }
+    .particle:nth-child(5) { animation: float-particle 2.9s ease-in-out infinite 1.2s; top: 40%; left: 10%; }
+
+    @keyframes float-particle {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+      50% { transform: translate(var(--x), var(--y)) scale(1.2); opacity: 1; }
+    }
+
+    /* Loader 9: Rotating Glowing Ring */
+    .loader-9 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .loader-9::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 4px solid transparent;
+      border-top-color: #ff7a00;
+      border-right-color: #ff7a00;
+      border-radius: 50%;
+      animation: rotate-ring 1.5s linear infinite;
+      filter: drop-shadow(0 0 10px rgba(255, 122, 0, 0.6));
+    }
+
+    @keyframes rotate-ring {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Loader 10: Pulsing Center */
+    .loader-10 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .loader-10::before {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: #ff7a00;
+      border-radius: 40% 60% 50% 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 0 12px rgba(255, 122, 0, 0.8));
+      animation: pulse-glow 1.5s ease-in-out infinite;
+    }
+
+    .loader-10::after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border: 2px solid #ff7a00;
+      border-radius: 50%;
+      top: 0;
+      left: 0;
+      opacity: 0.3;
+      animation: pulse-ring 1.5s ease-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.4); }
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    /* Loader 11: Twisting Ribbon */
+    .loader-11 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .loader-11::before {
+      content: '';
+      position: absolute;
+      width: 50px;
+      height: 20px;
+      background: linear-gradient(90deg, transparent, #ff7a00, transparent);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      filter: drop-shadow(0 0 8px rgba(255, 122, 0, 0.6));
+      animation: twist 1.8s ease-in-out infinite;
+    }
+
+    @keyframes twist {
+      0%, 100% { transform: translate(-50%, -50%) rotateY(0deg) rotateX(0deg); }
+      50% { transform: translate(-50%, -50%) rotateY(180deg) rotateX(20deg); }
+    }
+
+    /* Loader 12: Breathing Blob */
+    .loader-12 {
+      width: 60px;
+      height: 60px;
+      background: #ff7a00;
+      border-radius: 45% 55% 52% 48% / 48% 45% 55% 52%;
+      animation: breathe 2.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 14px rgba(255, 122, 0, 0.7));
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+
+    /* Loader 13: Orbiting Ring */
+    .loader-13 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .orbit-item {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #ff7a00;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 6px rgba(255, 122, 0, 0.8));
+    }
+
+    .orbit-item:nth-child(1) { animation: rotate-around 2s linear infinite; }
+    .orbit-item:nth-child(2) { animation: rotate-around 2s linear infinite 0.66s; }
+    .orbit-item:nth-child(3) { animation: rotate-around 2s linear infinite 1.32s; }
+
+    @keyframes rotate-around {
+      0% { transform: translate(24px, 0) rotate(0deg); }
+      100% { transform: translate(24px, 0) rotate(360deg); }
+    }
+
+    /* Loader 14: Wave Motion */
+    .loader-14 {
+      position: relative;
+      width: 60px;
+      height: 20px;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wave-bar {
+      width: 8px;
+      height: 100%;
+      background: #ff7a00;
+      border-radius: 4px;
+      filter: drop-shadow(0 0 6px rgba(255, 122, 0, 0.6));
+    }
+
+    .wave-bar:nth-child(1) { animation: wave 1.2s ease-in-out infinite; }
+    .wave-bar:nth-child(2) { animation: wave 1.2s ease-in-out infinite 0.1s; }
+    .wave-bar:nth-child(3) { animation: wave 1.2s ease-in-out infinite 0.2s; }
+    .wave-bar:nth-child(4) { animation: wave 1.2s ease-in-out infinite 0.3s; }
+    .wave-bar:nth-child(5) { animation: wave 1.2s ease-in-out infinite 0.4s; }
+
+    @keyframes wave {
+      0%, 100% { transform: scaleY(0.5); }
+      50% { transform: scaleY(2); }
+    }
+
+    /* Loader 15: Liquid Blob */
+    .loader-15 {
+      width: 60px;
+      height: 60px;
+      background: #ff7a00;
+      border-radius: 36% 64% 64% 36% / 64% 36% 64% 36%;
+      animation: liquid 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(255, 122, 0, 0.6));
+    }
+
+    @keyframes liquid {
+      0%, 100% { border-radius: 36% 64% 64% 36% / 64% 36% 64% 36%; }
+      25% { border-radius: 64% 36% 36% 64% / 36% 64% 36% 64%; }
+      50% { border-radius: 36% 64% 64% 36% / 36% 64% 36% 64%; }
+      75% { border-radius: 64% 36% 36% 64% / 64% 36% 64% 36%; }
+    }
+
+    /* Loader 16: Pulsing Rings */
+    .loader-16 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 3px solid #ff7a00;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 6px rgba(255, 122, 0, 0.4));
+    }
+
+    .pulse-ring:nth-child(1) { animation: pulse-scale 1.5s ease-out infinite; }
+    .pulse-ring:nth-child(2) { animation: pulse-scale 1.5s ease-out infinite 0.5s; }
+    .pulse-ring:nth-child(3) { animation: pulse-scale 1.5s ease-out infinite 1s; }
+
+    @keyframes pulse-scale {
+      0% { transform: scale(0.3); opacity: 1; }
+      100% { transform: scale(1); opacity: 0; }
+    }
+
+    /* Loader 17: Rotating Segments */
+    .loader-17 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .segment {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #ff7a00;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 6px rgba(255, 122, 0, 0.7));
+    }
+
+    .segment:nth-child(1) { animation: rotate-segment 2s linear infinite; top: 0; left: 50%; margin-left: -6px; }
+    .segment:nth-child(2) { animation: rotate-segment 2s linear infinite 0.25s; top: 12px; right: 12px; }
+    .segment:nth-child(3) { animation: rotate-segment 2s linear infinite 0.5s; bottom: 0; right: 50%; margin-right: -6px; }
+    .segment:nth-child(4) { animation: rotate-segment 2s linear infinite 0.75s; bottom: 12px; left: 12px; }
+
+    @keyframes rotate-segment {
+      0% { opacity: 0.3; transform: scale(0.7); }
+      50% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0.3; transform: scale(0.7); }
+    }
+
+    /* Loader 18: Morphing Double Circle */
+    .loader-18 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .morph-circle {
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      background: #ff7a00;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      filter: drop-shadow(0 0 8px rgba(255, 122, 0, 0.6));
+    }
+
+    .morph-circle:nth-child(1) {
+      top: 0;
+      left: 0;
+      animation: morph-move 3s ease-in-out infinite;
+    }
+
+    .morph-circle:nth-child(2) {
+      bottom: 0;
+      right: 0;
+      animation: morph-move 3s ease-in-out infinite 1.5s reverse;
+    }
+
+    @keyframes morph-move {
+      0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; transform: translate(0, 0); }
+      50% { border-radius: 30% 60% 70% 40% / 40% 70% 30% 60%; transform: translate(10px, 10px); }
+    }
+
+    /* Loader 19: Spinning Gradient */
+    .loader-19 {
+      width: 60px;
+      height: 60px;
+      background: conic-gradient(from 45deg, #ff7a00, #ff7a00 45deg, transparent 45deg, transparent 90deg);
+      border-radius: 50%;
+      animation: spin-gradient 2s linear infinite;
+      filter: drop-shadow(0 0 10px rgba(255, 122, 0, 0.5));
+    }
+
+    @keyframes spin-gradient {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Loader 20: Blobby Infinity */
+    .loader-20 {
+      position: relative;
+      width: 60px;
+      height: 60px;
+    }
+
+    .infinity-blob {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: #ff7a00;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 8px rgba(255, 122, 0, 0.7));
+    }
+
+    .infinity-blob:nth-child(1) {
+      animation: infinity-move 3s ease-in-out infinite;
+    }
+
+    .infinity-blob:nth-child(2) {
+      animation: infinity-move 3s ease-in-out infinite 1.5s;
+    }
+
+    @keyframes infinity-move {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      25% { transform: translate(15px, -15px) scale(1.2); opacity: 0.8; }
+      50% { transform: translate(20px, 0) scale(0.8); opacity: 0.6; }
+      75% { transform: translate(15px, 15px) scale(1.2); opacity: 0.8; }
+      100% { transform: translate(0, 0) scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏛️ Unimatrix <span style="color: #ff7a00;">Blob Loaders</span></h1>
+    <p class="subtitle">20 indeterminate loading animations — organic, shiny, neon orange</p>
+
+    <div class="loader-grid">
+      <!-- Loader 1 -->
+      <div class="loader-cell">
+        <div class="loader-1"></div>
+      </div>
+
+      <!-- Loader 2 -->
+      <div class="loader-cell">
+        <div class="loader-2"></div>
+      </div>
+
+      <!-- Loader 3 -->
+      <div class="loader-cell">
+        <div class="loader-3"></div>
+      </div>
+
+      <!-- Loader 4 -->
+      <div class="loader-cell">
+        <div class="loader-4"></div>
+      </div>
+
+      <!-- Loader 5 -->
+      <div class="loader-cell">
+        <div class="loader-5">
+          <div class="blob"></div>
+          <div class="blob"></div>
+          <div class="blob"></div>
+        </div>
+      </div>
+
+      <!-- Loader 6 -->
+      <div class="loader-cell">
+        <div class="loader-6"></div>
+      </div>
+
+      <!-- Loader 7 -->
+      <div class="loader-cell">
+        <div class="loader-7"></div>
+      </div>
+
+      <!-- Loader 8 -->
+      <div class="loader-cell">
+        <div class="loader-8">
+          <div class="particle" style="--x: 20px; --y: -20px;"></div>
+          <div class="particle" style="--x: 15px; --y: 15px;"></div>
+          <div class="particle" style="--x: -15px; --y: 20px;"></div>
+          <div class="particle" style="--x: -20px; --y: -10px;"></div>
+          <div class="particle" style="--x: 10px; --y: -25px;"></div>
+        </div>
+      </div>
+
+      <!-- Loader 9 -->
+      <div class="loader-cell">
+        <div class="loader-9"></div>
+      </div>
+
+      <!-- Loader 10 -->
+      <div class="loader-cell">
+        <div class="loader-10"></div>
+      </div>
+
+      <!-- Loader 11 -->
+      <div class="loader-cell">
+        <div class="loader-11"></div>
+      </div>
+
+      <!-- Loader 12 -->
+      <div class="loader-cell">
+        <div class="loader-12"></div>
+      </div>
+
+      <!-- Loader 13 -->
+      <div class="loader-cell">
+        <div class="loader-13">
+          <div class="orbit-item"></div>
+          <div class="orbit-item"></div>
+          <div class="orbit-item"></div>
+        </div>
+      </div>
+
+      <!-- Loader 14 -->
+      <div class="loader-cell">
+        <div class="loader-14">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+      </div>
+
+      <!-- Loader 15 -->
+      <div class="loader-cell">
+        <div class="loader-15"></div>
+      </div>
+
+      <!-- Loader 16 -->
+      <div class="loader-cell">
+        <div class="loader-16">
+          <div class="pulse-ring"></div>
+          <div class="pulse-ring"></div>
+          <div class="pulse-ring"></div>
+        </div>
+      </div>
+
+      <!-- Loader 17 -->
+      <div class="loader-cell">
+        <div class="loader-17">
+          <div class="segment"></div>
+          <div class="segment"></div>
+          <div class="segment"></div>
+          <div class="segment"></div>
+        </div>
+      </div>
+
+      <!-- Loader 18 -->
+      <div class="loader-cell">
+        <div class="loader-18">
+          <div class="morph-circle"></div>
+          <div class="morph-circle"></div>
+        </div>
+      </div>
+
+      <!-- Loader 19 -->
+      <div class="loader-cell">
+        <div class="loader-19"></div>
+      </div>
+
+      <!-- Loader 20 -->
+      <div class="loader-cell">
+        <div class="loader-20">
+          <div class="infinity-blob"></div>
+          <div class="infinity-blob"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
