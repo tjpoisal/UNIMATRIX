@@ -154,7 +154,14 @@ export default async function Home() {
       </section>
 
       {/* ── Proof of Reality (New Trust Sections) ─────────────────────── */}
-      <ProofOfReality />
+      <section className="py-24 px-6 bg-[#080D19] border-t border-border/20">
+        <div className="max-w-5xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Trusted by Teams</h2>
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
+            Unimatrix is production-ready and trusted by developers worldwide.
+          </p>
+        </div>
+      </section>
 
       {/* ── Platform Downloads ─────────────────────────────────────────── */}
       <section id="platforms" className="py-24 px-6 bg-[#080D19] border-t border-border/20">

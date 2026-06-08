@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Shield, Zap, Cloud, Lock, Smartphone, Code2, Check } from 'lucide-react';
 
 export function MarketingPage() {
   return (

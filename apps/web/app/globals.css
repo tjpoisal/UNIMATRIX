@@ -7,30 +7,18 @@
    ========================================================================== */
 
 @theme {
-  /* =====================================================================
-     Unimatrix Design Tokens (Tailwind v4)
-     Branding: Navy blue + Orange + White (as requested)
-     ===================================================================== */
-  --color-bg: #0e1030;                  /* Navy blue - main background */
+  --color-bg: #0e1030;
   --color-surface: #111827;
   --color-surface-elevated: #1F2937;
   --color-border: #334155;
-
   --color-text: #F1F5F9;
   --color-text-secondary: #94A3B8;
   --color-text-muted: #64748B;
-
-  --color-accent: #ff7a00;              /* Orange - primary brand accent, CTAs, highlights */
-  --color-accent-secondary: #A855F7;    /* Keep purple as secondary for now */
-
+  --color-accent: #ff7a00;
+  --color-accent-secondary: #A855F7;
   --color-success: #22C55E;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
-
-  /* Explicit brand tokens */
-  --color-brand-navy: #0e1030;
-  --color-brand-orange: #ff7a00;
-  --color-brand-white: #ffffff;
 }
 
 :root {

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { HelpCircle, X } from 'lucide-react';
 
 interface TooltipProps {
   content: string;
@@ -34,7 +33,7 @@ export function Tooltip({ content, title, children, position = 'top' }: TooltipP
             onClick={() => setIsVisible(false)}
             className="absolute top-2 right-2 text-[#64748B] hover:text-[#F1F5F9]"
           >
-            <X className="w-4 h-4" />
+            ✕
           </button>
         </div>
       )}
@@ -44,7 +43,7 @@ export function Tooltip({ content, title, children, position = 'top' }: TooltipP
           onClick={() => setIsVisible(true)}
           className="ml-1 inline-flex text-[#64748B] hover:text-[#ff7a00] transition"
         >
-          <HelpCircle className="w-4 h-4" />
+          ?
         </button>
       )}
     </div>
@@ -111,7 +110,7 @@ export function OnboardingPrompt({
           Tip {step} of {totalSteps}
         </h3>
         <button onClick={onDismiss} className="text-[#64748B] hover:text-[#F1F5F9]">
-          <X className="w-4 h-4" />
+          ✕
         </button>
       </div>
 

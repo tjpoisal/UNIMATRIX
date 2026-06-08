@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Copy, Check } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ClaudeDesktopSetup() {
@@ -100,7 +99,7 @@ export default function ClaudeDesktopSetup() {
                     onClick={copyConfig}
                     className="absolute top-4 right-4 p-2 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded"
                   >
-                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copied ? '✓' : '📋'}
                   </button>
                 </div>
 

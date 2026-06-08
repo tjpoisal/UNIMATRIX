@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Lock, Sparkles, Check, Zap, Copy, AlertCircle } from 'lucide-react';
 
 type Step = 'welcome' | 'encryption' | 'first-memory' | 'context' | 'next-steps' | 'complete';
 
@@ -63,13 +62,13 @@ export function OnboardingFlow() {
 
             <div className="space-y-4 mb-8">
               {[
-                { icon: Sparkles, title: 'Encrypted by Default', desc: 'Your memories stay private—server never sees plaintext' },
-                { icon: Zap, title: 'Works Everywhere', desc: 'Phone, tablet, desktop, Claude, ChatGPT, or custom LLM' },
-                { icon: Lock, title: 'Cross-LLM Continuity', desc: 'Start on ChatGPT, continue on Claude—same full context' },
+                { emoji: '✨', title: 'Encrypted by Default', desc: 'Your memories stay private—server never sees plaintext' },
+                { emoji: '⚡', title: 'Works Everywhere', desc: 'Phone, tablet, desktop, Claude, ChatGPT, or custom LLM' },
+                { emoji: '🔐', title: 'Cross-LLM Continuity', desc: 'Start on ChatGPT, continue on Claude—same full context' },
               ].map((item, i) => (
                 <div key={i} className="bg-[#111827] border border-[#334155]/30 rounded-lg p-5 hover:border-[#ff7a00]/50 transition">
                   <div className="flex gap-4">
-                    <item.icon className="w-6 h-6 text-[#ff7a00] flex-shrink-0 mt-1" />
+                    <div className="text-2xl flex-shrink-0">{item.emoji}</div>
                     <div>
                       <h3 className="font-bold mb-1">{item.title}</h3>
                       <p className="text-[#94A3B8] text-sm">{item.desc}</p>
@@ -83,7 +82,7 @@ export function OnboardingFlow() {
               onClick={() => setStep('encryption')}
               className="w-full py-3 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded-lg font-bold transition"
             >
-              Set Up Your Palace <ArrowRight className="inline ml-2 w-5 h-5" />
+              Set Up Your Palace →
             </button>
 
             <p className="text-center text-[#64748B] text-sm mt-6">
@@ -102,7 +101,7 @@ export function OnboardingFlow() {
 
             <div className="bg-[#ff7a00]/10 border border-[#ff7a00]/30 rounded-lg p-4 mb-8">
               <p className="text-sm text-[#ff7a00] font-bold flex gap-2 mb-3">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <span>⚠️</span>
                 IMPORTANT: This is DIFFERENT from your account password
               </p>
               <ul className="text-[#94A3B8] text-sm space-y-1">
@@ -161,7 +160,7 @@ export function OnboardingFlow() {
                 disabled={!passwordsMatch}
                 className="w-full py-3 bg-[#ff7a00] hover:bg-[#ff8a1a] disabled:bg-[#64748B] text-[#0e1030] rounded-lg font-bold transition"
               >
-                Continue <ArrowRight className="inline ml-2 w-5 h-5" />
+                Continue →
               </button>
             </form>
 
@@ -214,7 +213,7 @@ export function OnboardingFlow() {
                 disabled={!memoryContent.trim()}
                 className="w-full py-3 bg-[#ff7a00] hover:bg-[#ff8a1a] disabled:bg-[#64748B] text-[#0e1030] rounded-lg font-bold transition"
               >
-                Save Memory <Check className="inline ml-2 w-5 h-5" />
+                Save Memory ✓
               </button>
             </form>
 
@@ -277,7 +276,7 @@ export function OnboardingFlow() {
                 type="submit"
                 className="w-full py-3 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded-lg font-bold transition"
               >
-                Create Context <ArrowRight className="inline ml-2 w-5 h-5" />
+                Create Context →
               </button>
             </form>
 
@@ -299,7 +298,6 @@ export function OnboardingFlow() {
             </p>
 
             <div className="space-y-4 mb-8">
-              {/* Browser Extension */}
               <div className="bg-[#111827] border border-[#334155]/30 rounded-lg p-6">
                 <h3 className="font-bold text-lg mb-3">🌐 Browser Extension</h3>
                 <p className="text-[#94A3B8] text-sm mb-4">
@@ -309,11 +307,10 @@ export function OnboardingFlow() {
                   href="https://chrome.google.com/webstore"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded-lg font-bold transition"
                 >
-                  Add to Chrome <ArrowRight className="w-4 h-4" />
+                  Add to Chrome →
                 </a>
               </div>
 
-              {/* MCP Setup */}
               <div className="bg-[#111827] border border-[#334155]/30 rounded-lg p-6">
                 <h3 className="font-bold text-lg mb-3">🤖 Connect to Claude Desktop</h3>
                 <p className="text-[#94A3B8] text-sm mb-4">
@@ -323,11 +320,10 @@ export function OnboardingFlow() {
                   onClick={() => setStep('complete')}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-[#1F2937] hover:bg-[#252a45] text-[#F1F5F9] rounded-lg font-bold border border-[#334155]/30 transition"
                 >
-                  Get Config <ArrowRight className="w-4 h-4" />
+                  Get Config →
                 </button>
               </div>
 
-              {/* Ollama */}
               <div className="bg-[#111827] border border-[#334155]/30 rounded-lg p-6">
                 <h3 className="font-bold text-lg mb-3">💻 Run Locally with Ollama</h3>
                 <p className="text-[#94A3B8] text-sm mb-4">
@@ -337,7 +333,7 @@ export function OnboardingFlow() {
                   href="/setup/ollama"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-[#1F2937] hover:bg-[#252a45] text-[#F1F5F9] rounded-lg font-bold border border-[#334155]/30 transition"
                 >
-                  Ollama Setup <ArrowRight className="w-4 h-4" />
+                  Ollama Setup →
                 </Link>
               </div>
             </div>
@@ -346,7 +342,7 @@ export function OnboardingFlow() {
               onClick={() => setStep('complete')}
               className="w-full py-3 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded-lg font-bold transition"
             >
-              Continue to Dashboard <ArrowRight className="inline ml-2 w-5 h-5" />
+              Continue to Dashboard →
             </button>
 
             <button
@@ -380,7 +376,7 @@ export function OnboardingFlow() {
                   onClick={() => copyToClipboard(apiKey)}
                   className="px-3 py-2 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded font-bold transition"
                 >
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copied ? '✓' : '📋'}
                 </button>
               </div>
               <p className="text-xs text-[#64748B] mt-2">You'll need this to set up MCP and integrations</p>

@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Shield, Zap, Cloud, Lock, Smartphone, Code2, Check, Building2, Map, Sparkles, Brain } from 'lucide-react';
 
 export function MarketingPagePalace() {
   return (
@@ -65,7 +64,7 @@ export function MarketingPagePalace() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/auth/register" className="px-8 py-4 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded-lg font-bold text-lg transition shadow-lg shadow-[#ff7a00]/40">
-                Get Started Free <ArrowRight className="inline ml-2 w-5 h-5" />
+                Get Started Free →
               </Link>
               <a href="#how" className="px-8 py-4 border border-[#334155]/30 hover:border-[#ff7a00]/50 text-[#F1F5F9] rounded-lg font-bold transition">
                 Watch Demo
@@ -100,7 +99,7 @@ export function MarketingPagePalace() {
             {/* Private & Secure */}
             <div className="bg-[#111827] border border-[#334155]/30 rounded-lg p-8 hover:border-[#ff7a00]/50 transition">
               <div className="w-12 h-12 bg-[#ff7a00]/10 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-[#ff7a00]" />
+                🛡️
               </div>
               <h3 className="text-xl font-bold mb-3">Private & Secure</h3>
               <p className="text-[#94A3B8]">
@@ -111,7 +110,7 @@ export function MarketingPagePalace() {
             {/* Cross-Device Sync */}
             <div className="bg-[#111827] border border-[#334155]/30 rounded-lg p-8 hover:border-[#ff7a00]/50 transition">
               <div className="w-12 h-12 bg-[#ff7a00]/10 rounded-lg flex items-center justify-center mb-4">
-                <Smartphone className="w-6 h-6 text-[#ff7a00]" />
+                📱
               </div>
               <h3 className="text-xl font-bold mb-3">Cross-Device Sync</h3>
               <p className="text-[#94A3B8]">
@@ -122,7 +121,7 @@ export function MarketingPagePalace() {
             {/* AI-Powered */}
             <div className="bg-[#111827] border border-[#334155]/30 rounded-lg p-8 hover:border-[#ff7a00]/50 transition">
               <div className="w-12 h-12 bg-[#ff7a00]/10 rounded-lg flex items-center justify-center mb-4">
-                <Brain className="w-6 h-6 text-[#ff7a00]" />
+                🧠
               </div>
               <h3 className="text-xl font-bold mb-3">AI-Powered</h3>
               <p className="text-[#94A3B8]">
@@ -194,11 +193,11 @@ export function MarketingPagePalace() {
               <h3 className="text-2xl font-bold mb-2">Free</h3>
               <div className="text-[#ff7a00] text-4xl font-bold mb-6">$0<span className="text-base text-[#94A3B8]">/mo</span></div>
               <ul className="text-[#94A3B8] space-y-3 mb-8 flex-grow">
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> 3 workspaces</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> 1,000 memories</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> 2 devices</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Any LLM</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Encrypted</li>
+                <li className="flex items-start">✓ 3 workspaces</li>
+                <li className="flex items-start">✓ 1,000 memories</li>
+                <li className="flex items-start">✓ 2 devices</li>
+                <li className="flex items-start">✓ Any LLM</li>
+                <li className="flex items-start">✓ Encrypted</li>
               </ul>
               <Link href="/auth/register" className="w-full py-3 bg-[#1F2937] hover:bg-[#374151] text-[#F1F5F9] rounded-lg font-bold transition border border-[#334155]/30">
                 Get Started
@@ -213,11 +212,11 @@ export function MarketingPagePalace() {
               <h3 className="text-2xl font-bold mb-2">Pro</h3>
               <div className="text-[#ff7a00] text-4xl font-bold mb-6">$9.99<span className="text-base text-[#94A3B8]">/mo</span></div>
               <ul className="text-[#94A3B8] space-y-3 mb-8 flex-grow">
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Unlimited workspaces</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Unlimited memories</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Unlimited devices</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Librarian AI (coming)</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Priority support</li>
+                <li className="flex items-start">✓ Unlimited workspaces</li>
+                <li className="flex items-start">✓ Unlimited memories</li>
+                <li className="flex items-start">✓ Unlimited devices</li>
+                <li className="flex items-start">✓ Librarian AI (coming)</li>
+                <li className="flex items-start">✓ Priority support</li>
               </ul>
               <Link href="/auth/register" className="w-full py-3 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded-lg font-bold transition">
                 Start Free Trial
@@ -229,11 +228,11 @@ export function MarketingPagePalace() {
               <h3 className="text-2xl font-bold mb-2">Enterprise</h3>
               <div className="text-[#ff7a00] text-4xl font-bold mb-6">Custom</div>
               <ul className="text-[#94A3B8] space-y-3 mb-8 flex-grow">
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Self-hosted</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Team management</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> SLA guarantee</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Custom integrations</li>
-                <li className="flex items-start"><Check className="w-5 h-5 text-[#ff7a00] mr-3 flex-shrink-0 mt-0.5" /> Audit logs</li>
+                <li className="flex items-start">✓ Self-hosted</li>
+                <li className="flex items-start">✓ Team management</li>
+                <li className="flex items-start">✓ SLA guarantee</li>
+                <li className="flex items-start">✓ Custom integrations</li>
+                <li className="flex items-start">✓ Audit logs</li>
               </ul>
               <a href="mailto:hello@deployunimatrix.com" className="w-full py-3 bg-[#1F2937] hover:bg-[#374151] text-[#F1F5F9] rounded-lg font-bold transition border border-[#334155]/30 text-center">
                 Contact Sales
@@ -251,7 +250,7 @@ export function MarketingPagePalace() {
             Join thousands building the future of AI memory.
           </p>
           <Link href="/auth/register" className="inline-block px-8 py-4 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded-lg font-bold text-lg transition shadow-lg shadow-[#ff7a00]/40">
-            Create Free Account <ArrowRight className="inline ml-2 w-5 h-5" />
+            Create Free Account →
           </Link>
         </div>
       </section>

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Search, ChevronRight, MessageCircle } from 'lucide-react';
 
 const helpCategories = [
   {
@@ -59,36 +58,36 @@ const helpCategories = [
 
 const faqItems = [
   {
-    q: 'Can I decrypt my memories if I forget my password?',
-    a: 'No. Your password is not stored anywhere—not even encrypted. If you forget it, your memories remain encrypted forever. Always save your password in a password manager.',
+    q: "Can I decrypt my memories if I forget my password?",
+    a: "No. Your password is not stored anywhere—not even encrypted. If you forget it, your memories remain encrypted forever. Always save your password in a password manager.",
   },
   {
-    q: 'Does Unimatrix collect my memory data?',
-    a: 'No. Your server stores ciphertext only. We can't read your memories even if we wanted to. Everything is encrypted client-side before transmission.',
+    q: "Does Unimatrix collect my memory data?",
+    a: "No. Your server stores ciphertext only. We cannot read your memories even if we wanted to. Everything is encrypted client-side before transmission.",
   },
   {
-    q: 'Can I use Unimatrix with local LLMs like Ollama?',
-    a: 'Yes! Ollama integration is available. Set it up in your dashboard settings. Memories are stored locally and synced to the cloud when online.',
+    q: "Can I use Unimatrix with local LLMs like Ollama?",
+    a: "Yes! Ollama integration is available. Set it up in your dashboard settings. Memories are stored locally and synced to the cloud when online.",
   },
   {
-    q: 'What happens if I want to switch LLMs?',
-    a: 'All your memories follow you. Switch from ChatGPT to Claude to Gemini anytime. Every AI has access to the same memory vault.',
+    q: "What happens if I want to switch LLMs?",
+    a: "All your memories follow you. Switch from ChatGPT to Claude to Gemini anytime. Every AI has access to the same memory vault.",
   },
   {
-    q: 'How many memories can I store?',
-    a: 'Free: 1,000. Pro: unlimited. Enterprise: custom limits. Each memory can be up to 50KB of encrypted text.',
+    q: "How many memories can I store?",
+    a: "Free: 1,000. Pro: unlimited. Enterprise: custom limits. Each memory can be up to 50KB of encrypted text.",
   },
   {
-    q: 'Is there a mobile app?',
-    a: 'Yes! Available on iOS and Android. You can save and access memories on the go, with full encryption.',
+    q: "Is there a mobile app?",
+    a: "Yes! Available on iOS and Android. You can save and access memories on the go, with full encryption.",
   },
   {
-    q: 'Can I export my memories?',
-    a: 'Yes. Go to Settings > Data Export and download your memories as encrypted JSON. You can re-import them anytime.',
+    q: "Can I export my memories?",
+    a: "Yes. Go to Settings > Data Export and download your memories as encrypted JSON. You can re-import them anytime.",
   },
   {
-    q: 'What if I have more than one device?',
-    a: 'Perfect. Memories sync instantly across all your devices via the cloud. Start on iPhone, continue on desktop.',
+    q: "What if I have more than one device?",
+    a: "Perfect. Memories sync instantly across all your devices via the cloud. Start on iPhone, continue on desktop.",
   },
 ];
 
@@ -123,7 +122,7 @@ export default function HelpPage() {
 
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-4 top-3 w-5 h-5 text-[#64748B]" />
+            <span className="absolute left-4 top-3 text-[#64748B]">🔍</span>
             <input
               type="text"
               placeholder="Search help articles..."
@@ -158,7 +157,7 @@ export default function HelpPage() {
                           <h3 className="font-bold mb-2">{article.title}</h3>
                           <p className="text-xs text-[#64748B]">{article.views.toLocaleString()} views</p>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-[#ff7a00] flex-shrink-0 mt-1" />
+                        <span className="text-[#ff7a00] flex-shrink-0 mt-1">→</span>
                       </div>
                     </Link>
                   ))}
@@ -213,7 +212,7 @@ export default function HelpPage() {
 
         {/* Still need help */}
         <div className="mt-16 bg-[#ff7a00]/10 border border-[#ff7a00]/30 rounded-lg p-8 text-center">
-          <MessageCircle className="w-12 h-12 text-[#ff7a00] mx-auto mb-4" />
+          <div className="text-4xl text-[#ff7a00] mx-auto mb-4">💬</div>
           <h3 className="text-2xl font-bold mb-2">Still have questions?</h3>
           <p className="text-[#94A3B8] mb-6">Our support team is here to help</p>
           <a
