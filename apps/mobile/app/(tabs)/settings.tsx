@@ -1,109 +1,146 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
-import { router } from 'expo-router';
+/**
+ * Settings Tab
+ */
+import React, { useState, useEffect } from 'react';
+import {
+  View, Text, TextInput, Switch, TouchableOpacity, ScrollView,
+  StyleSheet, StatusBar, Alert,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface LLMProvider {
-  id: string;
-  provider: string;
-  model: string;
-  label: string | null;
-  keyPrefix: string;
-  createdAt: string;
-}
-
 export default function SettingsScreen() {
-  const [llmProviders, setLlmProviders] = useState<LLMProvider[]>([]);
-  const [loadingProviders, setLoadingProviders] = useState(false);
+  const [serverUrl, setServerUrl] = useState('https://deployunimatrix.com');
+  const [mcpToken,  setMcpToken]  = useState('');
+  const [bgSync,    setBgSync]    = useState(true);
+  const [saved,     setSaved]     = useState(false);
 
-  const handleLogout = async () => {
-    Alert.alert('Logout', 'Are you sure?', [
-      { text: 'Cancel', onPress: () => {} },
-      {
-        text: 'Logout',
-        onPress: async () => {
-          await AsyncStorage.removeItem('authToken');
-          await AsyncStorage.removeItem('userId');
-          router.replace('/(auth)/login');
-        },
-      },
+  useEffect(() => {
+    (async () => {
+      const url   = await AsyncStorage.getItem('unimatrix_server_url');
+      const token = await AsyncStorage.getItem('unimatrix_mcp_token');
+      const bg    = await AsyncStorage.getItem('unimatrix_bg_sync');
+      if (url)   setServerUrl(url);
+      if (token) setMcpToken(token);
+      if (bg !== null) setBgSync(bg === 'true');
+    })();
+  }, []);
+
+  const save = async () => {
+    await AsyncStorage.setItem('unimatrix_server_url', serverUrl.trim());
+    await AsyncStorage.setItem('unimatrix_mcp_token', mcpToken.trim());
+    await AsyncStorage.setItem('unimatrix_bg_sync', String(bgSync));
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const clearData = () => {
+    Alert.alert('Clear all data?', 'This removes your local settings. Your memories on the server are not affected.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Clear', style: 'destructive', onPress: async () => {
+        await AsyncStorage.multiRemove(['unimatrix_server_url','unimatrix_mcp_token','unimatrix_bg_sync']);
+        setServerUrl('https://deployunimatrix.com');
+        setMcpToken('');
+        setBgSync(true);
+      }},
     ]);
   };
 
-  const fetchProviders = async () => {
-    const token = await AsyncStorage.getItem('authToken');
-    if (!token) return;
-
-    setLoadingProviders(true);
-    try {
-      const apiBase = (process.env.EXPO_PUBLIC_API_URL || 'https://deployunimatrix.com') + '/api';
-      const res = await fetch(apiBase + '/llm-providers', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setLlmProviders(Array.isArray(data) ? data : []);
-      }
-    } catch (e) {
-      // ignore
-    } finally {
-      setLoadingProviders(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProviders();
-  }, []);
-
   return (
-    <ScrollView className="flex-1 bg-[#0A0F1C] px-4 py-4">
-      <View className="bg-[#1A1F35] border border-[#00F5FF]/10 rounded-lg p-4 mb-4">
-        <Text className="text-gray-400 text-sm">Version</Text>
-        <Text className="text-white text-lg font-semibold">1.0.0</Text>
-      </View>
+    <SafeAreaView style={styles.root} edges={['top']}>
+      <StatusBar barStyle="light-content" />
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <Text style={styles.title}>Settings</Text>
 
-      {/* Connected LLM providers (populated from web onboarding or desktop) */}
-      <View className="bg-[#1A1F35] border border-[#00F5FF]/10 rounded-lg p-4 mb-4">
-        <Text className="text-gray-400 text-sm mb-3">Connected LLMs (from your account)</Text>
-        {loadingProviders ? (
-          <ActivityIndicator color="#00F5FF" />
-        ) : llmProviders.length > 0 ? (
-          llmProviders.map((p) => (
-            <View key={p.id} className="mb-2 p-2 bg-[#0A0F1C] rounded">
-              <Text className="text-white text-sm font-medium capitalize">{p.provider} • {p.model}</Text>
-              <Text className="text-gray-500 text-xs font-mono">{p.keyPrefix}</Text>
-              {p.label && <Text className="text-gray-400 text-xs">{p.label}</Text>}
-            </View>
-          ))
-        ) : (
-          <Text className="text-gray-400 text-sm">No LLM providers connected yet. Set them up in the web onboarding (or Settings → Providers on web) for full agent and smart memory features. They will appear here automatically once connected on any device.</Text>
-        )}
-        <Text className="text-[10px] text-gray-500 mt-2">These are account-level. Connect once on web or desktop and they work everywhere (including here on mobile for any in-app AI features).</Text>
-      </View>
+        <Text style={styles.label}>Server URL</Text>
+        <TextInput
+          style={styles.input}
+          value={serverUrl}
+          onChangeText={setServerUrl}
+          placeholder="https://deployunimatrix.com"
+          placeholderTextColor="#475569"
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="url"
+          selectionColor="#00F5FF"
+        />
+        <Text style={styles.hint}>Use http://localhost:8765 for the desktop app's local proxy</Text>
 
-      <View className="bg-[#1A1F35] border border-[#00F5FF]/10 rounded-lg p-4 mb-6">
-        <Text className="text-gray-400 text-sm mb-4">Account</Text>
-        <TouchableOpacity
-          onPress={handleLogout}
-          className="bg-[#EF4444]/20 border border-[#EF4444]/30 rounded-lg py-3"
-        >
-          <Text className="text-[#EF4444] font-semibold text-center">Sign Out</Text>
-        </TouchableOpacity>
-      </View>
+        <Text style={styles.label}>MCP Token</Text>
+        <TextInput
+          style={styles.input}
+          value={mcpToken}
+          onChangeText={setMcpToken}
+          placeholder="umx_xxxxxxxx_..."
+          placeholderTextColor="#475569"
+          autoCapitalize="none"
+          autoCorrect={false}
+          secureTextEntry
+          selectionColor="#00F5FF"
+        />
+        <Text style={styles.hint}>Generate from the web dashboard → Settings → MCP Tokens</Text>
 
-      <View className="bg-[#1A1F35] border border-[#00F5FF]/10 rounded-lg p-4">
-        <Text className="text-gray-400 text-sm">Sync Status</Text>
-        <View className="flex-row items-center gap-2 mt-3">
-          <View className="w-3 h-3 rounded-full bg-[#10B981]" />
-          <Text className="text-white">All synced</Text>
+        <View style={styles.toggleRow}>
+          <View>
+            <Text style={styles.toggleLabel}>Background Sync</Text>
+            <Text style={styles.toggleSub}>Sync memories in background every 15 min</Text>
+          </View>
+          <Switch
+            value={bgSync}
+            onValueChange={setBgSync}
+            trackColor={{ false: '#1E293B', true: '#00F5FF44' }}
+            thumbColor={bgSync ? '#00F5FF' : '#475569'}
+          />
         </View>
-      </View>
 
-      <View className="mt-6 p-3 bg-[#111827] rounded-lg">
-        <Text className="text-gray-400 text-xs text-center">
-          Mobile "install" is simple: install the app, then use the API Key from your web/desktop onboarding (or same email/password). All LLM logins and memories are already set up on your account.
-        </Text>
-      </View>
-    </ScrollView>
+        <TouchableOpacity
+          style={[styles.saveBtn, saved && styles.saveBtnDone]}
+          onPress={save}
+        >
+          <Text style={styles.saveBtnText}>{saved ? '✓ Saved' : 'Save Settings'}</Text>
+        </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <Text style={styles.sectionTitle}>About</Text>
+        {[
+          ['Version',     '1.0.0'],
+          ['Encryption',  'AES-256-GCM (client-side)'],
+          ['Embeddings',  'BGE-small (on-device)'],
+          ['Protocol',    'MCP (Model Context Protocol)'],
+        ].map(([k, v]) => (
+          <View key={k} style={styles.infoRow}>
+            <Text style={styles.infoKey}>{k}</Text>
+            <Text style={styles.infoVal}>{v}</Text>
+          </View>
+        ))}
+
+        <TouchableOpacity style={styles.dangerBtn} onPress={clearData}>
+          <Text style={styles.dangerBtnText}>Clear Local Data</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  root:        { flex: 1, backgroundColor: '#0A0F1C' },
+  scroll:      { padding: 20, paddingBottom: 60 },
+  title:       { fontSize: 24, fontWeight: '700', color: '#F1F5F9', marginBottom: 24 },
+  label:       { color: '#94A3B8', fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8, marginTop: 20 },
+  input:       { backgroundColor: '#111827', borderWidth: 1, borderColor: '#1E293B', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, color: '#F1F5F9', fontSize: 14, fontFamily: 'monospace' },
+  hint:        { color: '#475569', fontSize: 12, marginTop: 6 },
+  toggleRow:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#111827', borderRadius: 12, padding: 16, marginTop: 20 },
+  toggleLabel: { color: '#F1F5F9', fontSize: 15, fontWeight: '600' },
+  toggleSub:   { color: '#64748B', fontSize: 12, marginTop: 2 },
+  saveBtn:     { backgroundColor: '#00F5FF22', borderWidth: 1, borderColor: '#00F5FF55', borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 24 },
+  saveBtnDone: { backgroundColor: '#22C55E22', borderColor: '#22C55E55' },
+  saveBtnText: { color: '#00F5FF', fontSize: 15, fontWeight: '700' },
+  divider:     { height: 1, backgroundColor: '#1E293B', marginVertical: 28 },
+  sectionTitle:{ color: '#64748B', fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 12 },
+  infoRow:     { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#1E293B' },
+  infoKey:     { color: '#94A3B8', fontSize: 14 },
+  infoVal:     { color: '#F1F5F9', fontSize: 14 },
+  dangerBtn:   { backgroundColor: '#EF444418', borderWidth: 1, borderColor: '#EF444433', borderRadius: 12, padding: 14, alignItems: 'center', marginTop: 28 },
+  dangerBtnText:{ color: '#EF4444', fontSize: 14, fontWeight: '600' },
+});

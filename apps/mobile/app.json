@@ -12,13 +12,19 @@
       "resizeMode": "contain",
       "backgroundColor": "#0A0F1C"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "scheme": "unimatrix",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tjpoisal.unimatrix",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": [
+          "background-fetch",
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -26,7 +32,13 @@
       "adaptiveIcon": {
         "foreground": "./assets/images/android-icon-foreground.png",
         "background": "./assets/images/android-icon-background.png"
-      }
+      },
+      "permissions": [
+        "RECEIVE_BOOT_COMPLETED",
+        "FOREGROUND_SERVICE",
+        "WAKE_LOCK",
+        "INTERNET"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -42,7 +54,9 @@
             "enableProguard": true
           }
         }
-      ]
+      ],
+      "expo-background-fetch",
+      "expo-task-manager"
     ],
     "extra": {
       "router": {

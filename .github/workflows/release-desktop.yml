@@ -10,21 +10,17 @@ permissions:
 
 jobs:
   build-mac:
-    name: macOS (universal)
+    name: macOS (universal — Intel + Apple Silicon)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
+        with: { node-version: 24 }
       - name: Install dependencies
         working-directory: apps/desktop
         run: npm install
-
       - name: Import Mac certificate
-        if: ${{ env.MAC_CERTS != '' }}
+        if: ${{ env.MAC_CERTS != \'\' }}
         env:
           MAC_CERTS: ${{ secrets.MAC_CERTS }}
           MAC_CERTS_PASSWORD: ${{ secrets.MAC_CERTS_PASSWORD }}
@@ -36,8 +32,7 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
-
-      - name: Build macOS (universal .dmg)
+      - name: Build macOS universal .dmg
         working-directory: apps/desktop
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -45,83 +40,69 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:mac
-
-      - name: List and rename artifacts (mac)
+      - name: Rename artifacts
         run: |
-          ls -la apps/desktop/dist/ || true
           mv apps/desktop/dist/*.dmg apps/desktop/dist/Unimatrix-mac.dmg 2>/dev/null || true
           mv apps/desktop/dist/*-mac.zip apps/desktop/dist/Unimatrix-mac.zip 2>/dev/null || true
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           files: |
             apps/desktop/dist/Unimatrix-mac.dmg
             apps/desktop/dist/Unimatrix-mac.zip
 
   build-win:
-    name: Windows (x64)
+    name: Windows (x64 installer)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
+        with: { node-version: 24 }
       - name: Install dependencies
         working-directory: apps/desktop
         run: npm install
-
-      - name: Build Windows (.exe)
+      - name: Build Windows .exe
         working-directory: apps/desktop
         env:
           WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:win
-
-      - name: List and rename artifact (win)
+      - name: Rename artifact
         shell: powershell
         run: |
-          Get-ChildItem apps/desktop/dist/ | Select-Object Name
           $exe = Get-ChildItem apps/desktop/dist/*.exe | Select-Object -First 1
           if ($exe) { Rename-Item $exe.FullName "Unimatrix-Setup-win.exe" }
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v2
         with:
           files: apps/desktop/dist/Unimatrix-Setup-win.exe
 
   build-linux:
-    name: Linux (x64)
+    name: Linux (x64 + arm64)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-
+        with: { node-version: 24 }
+      - name: Install system deps (for Electron Builder)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends snapd fuse libfuse2 rpm
       - name: Install dependencies
         working-directory: apps/desktop
         run: npm install
-
-      - name: Build Linux (.AppImage + .deb)
+      - name: Build Linux (AppImage + deb + snap)
         working-directory: apps/desktop
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run dist:linux
-
-      - name: List and rename artifacts (linux)
+      - name: Rename artifacts
         run: |
-          ls -la apps/desktop/dist/ || true
-          mv apps/desktop/dist/*.AppImage apps/desktop/dist/Unimatrix-linux.AppImage 2>/dev/null || true
+          mv apps/desktop/dist/*.AppImage apps/desktop/dist/Unimatrix-linux-x64.AppImage 2>/dev/null || true
           mv apps/desktop/dist/*.deb apps/desktop/dist/Unimatrix-linux.deb 2>/dev/null || true
-
-      - name: Upload to GitHub Release
-        uses: softprops/action-gh-release@v2
+          mv apps/desktop/dist/*.snap apps/desktop/dist/Unimatrix-linux.snap 2>/dev/null || true
+      - uses: softprops/action-gh-release@v2
         with:
           files: |
-            apps/desktop/dist/Unimatrix-linux.AppImage
+            apps/desktop/dist/Unimatrix-linux-x64.AppImage
             apps/desktop/dist/Unimatrix-linux.deb
+            apps/desktop/dist/Unimatrix-linux.snap

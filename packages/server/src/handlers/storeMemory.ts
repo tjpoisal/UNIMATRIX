@@ -7,21 +7,24 @@
  *   1. Injection check    → hard reject, never queued
  *   2. Sanitize           → redacted copy for Librarian + embedding
  *   3. Encrypt verbatim   → stored in memories.content (BYTEA)
- *   4. Insert to DB       → episodic layer row, indexed_at = NULL
- *   5. Queue Librarian    → fire-and-forget (does not block the response)
+ *   4. Insert to DB       → episodic layer row, indexed_at = NULL, spaceId = NULL (Librarian will set it)
+ *   5. Queue Librarian    → enqueue AgentRun (picked up by worker.ts)
  *   6. Audit log          → written automatically by withAudit wrapper
  *
  * The Librarian receives SANITIZED content, never the verbatim original.
  * Verbatim is only decrypted by get_timeline when explicitly requested.
+ *
+ * Phase 1D/E: Librarian uses local-model.ts (Ollama/mistral/rule-based).
+ * No external LLM API calls.
  */
 
 import { withUserContext, withUserContextRaw } from '../db/client.js';
-import { withAudit }                              from '../middleware/audit.js';
+import { withAudit }                           from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';
-import { processLibrarianJob }                    from '../librarian/processJob.js';
+import { processLibrarianJob }                 from '../librarian/processJob.js';
 import type { StoreMemoryInput, StoreMemoryOutput } from '../types/mcp.js';
-import type { LibrarianJob }                      from '../types/domain.js';
+import type { LibrarianJob }                   from '../types/domain.js';
 
 // ---------------------------------------------------------------------------
 // Handler
@@ -68,7 +71,6 @@ export const storeMemoryHandler = withAudit(
       console.warn(`[store_memory] PII detected in content for ${userId} — redacted`);
     }
 
-    // prepareForEmbedding sanitizes again — used by Librarian, not here directly
     const embeddingInput = prepareForEmbedding(sanitizedContent);
 
     // ------------------------------------------------------------------
@@ -77,47 +79,47 @@ export const storeMemoryHandler = withAudit(
     const { ciphertext, iv } = await encryptContent(input.content, userId);
 
     // ------------------------------------------------------------------
-    // 4. Insert episodic row — indexed_at is NULL until Librarian runs
-    //    Now using Prisma (with RLS via withUserContext transaction)
+    // 4. Insert episodic row
+    //    spaceId is intentionally NULL here — the Librarian worker will
+    //    classify and assign it after embedding + space similarity search.
+    //    This is the correct Phase 1D architecture: store first, classify async.
     // ------------------------------------------------------------------
     const memoryId = await withUserContext(userId, async (tx) => {
       const memory = await tx.memory.create({
         data: {
           userId,
-          // Note: spaceId may be set later by librarian; for initial insert we may need to resolve or allow null
-          // For now, to keep minimal change, we fall back to raw if spaceId required by FK.
-          // TODO: resolve a default space or make spaceId nullable in insert path.
-          content: ciphertext as any,
+          spaceId:   null,   // Librarian will assign after classification
+          content:   ciphertext as any,
           contentIv: iv as any,
-          source: 'mcp',
-          hint: input.hint ?? null,
-          status: 'active',
+          source:    'mcp',
+          hint:      input.hint ?? null,
+          status:    'active',
         },
         select: { id: true },
       });
       return memory.id;
     });
 
-    // Auto-tag with source LLM if provided in the store call (from MCP client or wrapper)
-    // This allows organizing memories based on which LLM logged the memory.
+    // Auto-tag with caller-provided tags (source LLM, device, etc.)
     if (input.tags && input.tags.length > 0) {
       try {
         await withUserContextRaw(userId, async (client) => {
           for (const tag of input.tags!) {
             await client.query(
               `INSERT INTO memory_tags (memory_id, user_id, tag) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING`,
-              [memoryId, userId, tag]
+              [memoryId, userId, tag],
             );
           }
         });
       } catch (e) {
-        console.warn('Failed to insert auto-tags:', e);
+        console.warn('[store_memory] Failed to insert caller-provided tags:', e);
       }
     }
 
     // ------------------------------------------------------------------
-    // 5. Enqueue Librarian via AgentRun (real background processing)
-    //    The worker (packages/server/src/worker.ts) will pick this up.
+    // 5. Enqueue Librarian via AgentRun
+    //    worker.ts polls this table every 15s and runs processLibrarianJob.
+    //    Falls back to direct (in-process) call if AgentRun insert fails.
     // ------------------------------------------------------------------
     const librarianJob: LibrarianJob = {
       memoryId,
@@ -132,18 +134,18 @@ export const storeMemoryHandler = withAudit(
         await tx.agentRun.create({
           data: {
             userId,
-            task: 'librarian',
-            status: 'pending',
-            result: { job: librarianJob } as any,
+            task:      'librarian',
+            status:    'pending',
+            result:    { job: librarianJob } as any,
             memoryIds: [memoryId],
           },
         });
       });
     } catch (e) {
-      // Fallback to direct if table not ready or error
-      console.warn('[StoreMemory] Could not enqueue via AgentRun, falling back to direct', e);
+      // Fallback: run in-process if AgentRun table unavailable
+      console.warn('[store_memory] Could not enqueue via AgentRun, running Librarian inline', e);
       processLibrarianJob(librarianJob).catch((err) => {
-        console.error(`[Librarian] Failed to process ${memoryId}:`, err);
+        console.error(`[Librarian] Inline processing failed for ${memoryId}:`, err);
       });
     }
 

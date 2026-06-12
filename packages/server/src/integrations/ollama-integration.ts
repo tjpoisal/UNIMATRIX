@@ -1,294 +1,177 @@
 /**
- * Ollama Integration - Local LLM Support
+ * src/integrations/ollama-integration.ts
  *
- * Captures memories from local Ollama instances
- * via webhook on model completion.
+ * Captures memories from local Ollama instances via webhook on model completion.
  *
- * Setup:
- * 1. User installs Ollama: https://ollama.ai
- * 2. Ollama listens on localhost:11434
- * 3. Configure Unimatrix URL: http://localhost:3000
- * 4. On each completion, Ollama POSTs to /api/integrations/ollama/webhook
- * 5. Memory encrypted + stored
+ * Flow:
+ *  1. User installs Ollama: https://ollama.ai
+ *  2. Configure Unimatrix MCP server URL as the webhook endpoint
+ *  3. On each Ollama completion, Ollama POSTs to /api/integrations/ollama/webhook
+ *  4. Memory is sanitized, encrypted, and stored
+ *
+ * Registration:
+ *   POST /api/integrations/ollama/register  { userId, mcpToken, ollamaUrl? }
+ *   → returns webhook URL + config snippet
  */
 
-import { prisma } from '@/lib/prisma';
-import { encryptMemory } from '@/lib/encryption';
+import { prisma, withUserContextRaw }  from '../db/client.js';
+import { encryptContent }              from '../security/encryption.js';
+import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
+import { validateMcpToken }            from '../auth/mcpToken.js';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 export interface OllamaWebhookPayload {
-  // Ollama API response structure
-  model: string;
-  created_at: string;
-  response: string;
-  context: number[];
-  done: boolean;
-  load_duration?: number;
+  model:              string;
+  created_at:         string;
+  response:           string;
+  context?:           number[];
+  done:               boolean;
+  load_duration?:     number;
   prompt_eval_count?: number;
-  prompt_eval_duration?: number;
-  eval_count?: number;
-  eval_duration?: number;
+  eval_count?:        number;
+  eval_duration?:     number;
 }
 
-export interface OllamaRequest {
-  userId: string;
-  encryptionPassword: string;
-  userContext?: string;
+export interface OllamaWebhookRequest {
+  /** Raw MCP token (umx_... format) — identifies + authenticates the user */
+  mcpToken:     string;
+  /** Optional hint for the memory (e.g. model context) */
+  hint?:        string;
 }
 
-/**
- * Handle webhook from Ollama after model completion
- * POST /api/integrations/ollama/webhook
- */
+// ---------------------------------------------------------------------------
+// Webhook handler (called by MCP server route)
+// ---------------------------------------------------------------------------
+
 export async function handleOllamaWebhook(
   payload: OllamaWebhookPayload,
-  request: OllamaRequest
-) {
+  request: OllamaWebhookRequest,
+): Promise<{ success: boolean; memoryId?: string; error?: string }> {
+  // 1. Auth
+  const auth = await validateMcpToken(request.mcpToken);
+  if (!auth) {
+    return { success: false, error: 'Invalid or expired MCP token' };
+  }
+  const { userId } = auth;
+
+  // 2. Validate payload
+  const content = payload.response?.trim();
+  if (!content || content.length < 10) {
+    return { success: false, error: 'Response too short to save' };
+  }
+
+  // 3. Injection check
+  const injectionCheck = checkForInjection(content);
+  if (!injectionCheck.safe) {
+    return { success: false, error: 'Content rejected: potential prompt injection' };
+  }
+
+  // 4. Sanitize + encrypt
+  const { redacted: sanitizedContent } = sanitizeForIndexing(content);
+  const { ciphertext, iv } = await encryptContent(content, userId);
+
+  // 5. Store encrypted memory
   try {
-    // 1. Extract response text
-    const memoryContent = payload.response.trim();
-
-    if (!memoryContent || memoryContent.length < 10) {
-      return { success: false, error: 'Response too short to save' };
-    }
-
-    // 2. Encrypt memory client-side
-    // (In production, user passes encrypted payload)
-    // This is simplified - actual implementation uses client-side crypto
-    const encrypted = await encryptMemory(memoryContent, request.encryptionPassword);
-
-    // 3. Determine context from model name
-    const modelContext = request.userContext || extractContext(payload.model);
-
-    // 4. Calculate importance based on response length + eval time
-    const importance = calculateImportance(payload);
-
-    // 5. Store encrypted memory
     const memory = await prisma.memory.create({
       data: {
-        userId: request.userId,
-        ciphertext: encrypted.ciphertext,
-        nonce: encrypted.nonce,
-        context: modelContext,
-        importance,
-        metadata: {
-          source: 'ollama',
-          model: payload.model,
-          generation_time_ms: payload.eval_duration || 0,
-          token_count: payload.eval_count || 0,
-          timestamp: new Date(payload.created_at).toISOString(),
-        },
+        userId,
+        content:   ciphertext as any,
+        contentIv: iv as any,
+        source:    'api',
+        hint:      request.hint ?? extractModelContext(payload.model),
+        status:    'active',
+        spaceId:   null, // Librarian will classify
       },
+      select: { id: true },
     });
 
-    // 6. Log integration event
-    await logIntegrationEvent({
-      userId: request.userId,
-      integration: 'ollama',
-      action: 'memory_saved',
-      model: payload.model,
-      memoryId: memory.id,
-    });
+    // Tag with Ollama source + model name
+    const modelTag = `ollama:${payload.model.replace(/:/g, '-').slice(0, 40)}`;
+    await withUserContextRaw(userId, async (client) => {
+      await client.query(
+        `INSERT INTO memory_tags (memory_id, user_id, tag)
+         VALUES ($1, $2, 'source:ollama'), ($1, $2, $3)
+         ON CONFLICT DO NOTHING`,
+        [memory.id, userId, modelTag],
+      );
+    }).catch((e) => console.warn('[Ollama] tag insert failed:', e));
 
-    return {
-      success: true,
-      memoryId: memory.id,
-      context: modelContext,
-      importance,
-    };
-  } catch (error) {
-    console.error('Ollama webhook error:', error);
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    // Enqueue Librarian
+    await prisma.agentRun.create({
+      data: {
+        userId,
+        task:      'librarian',
+        status:    'pending',
+        result:    { job: { memoryId: memory.id, userId, content: sanitizedContent, hint: null, createdAt: new Date() } } as any,
+        memoryIds: [memory.id],
+      },
+    }).catch((e) => console.warn('[Ollama] AgentRun enqueue failed:', e));
+
+    return { success: true, memoryId: memory.id };
+  } catch (err) {
+    console.error('[Ollama] webhook storage error:', err);
+    return { success: false, error: 'Storage failed' };
   }
 }
 
-/**
- * Extract context from Ollama model name
- * Examples:
- *   - "mistral" → "Development"
- *   - "neural-chat" → "Chat"
- *   - "llama2:7b" → "General"
- */
-function extractContext(modelName: string): string {
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function extractModelContext(modelName: string): string {
   const contextMap: Record<string, string> = {
-    mistral: 'Development',
+    mistral:      'Development',
     'neural-chat': 'Chat',
-    'orca-mini': 'Learning',
-    llama: 'General',
-    codellama: 'Development',
-    phind: 'Development',
-    'zephyr': 'Chat',
+    'orca-mini':  'Learning',
+    llama:        'General',
+    codellama:    'Development',
+    phind:        'Development',
+    zephyr:       'Chat',
+    dolphin:      'General',
   };
-
-  for (const [key, context] of Object.entries(contextMap)) {
-    if (modelName.toLowerCase().includes(key)) {
-      return context;
-    }
+  for (const [key, ctx] of Object.entries(contextMap)) {
+    if (modelName.toLowerCase().includes(key)) return ctx;
   }
-
   return 'Ollama';
 }
 
-/**
- * Calculate importance based on generation metrics
- */
-function calculateImportance(
-  payload: OllamaWebhookPayload
-): 'low' | 'medium' | 'high' {
-  const responseLength = payload.response.length;
-  const tokenCount = payload.eval_count || 0;
+// ---------------------------------------------------------------------------
+// Health check
+// ---------------------------------------------------------------------------
 
-  // Long, complex responses = high importance
-  if (responseLength > 500 && tokenCount > 100) {
-    return 'high';
-  }
-
-  // Medium responses = medium importance
-  if (responseLength > 200 && tokenCount > 30) {
-    return 'medium';
-  }
-
-  return 'low';
-}
-
-/**
- * Log integration event for analytics
- */
-async function logIntegrationEvent(event: {
-  userId: string;
-  integration: string;
-  action: string;
-  model?: string;
-  memoryId?: string;
-}) {
-  try {
-    await prisma.integrationLog.create({
-      data: {
-        userId: event.userId,
-        integration: event.integration,
-        action: event.action,
-        metadata: {
-          model: event.model,
-          memoryId: event.memoryId,
-        },
-        timestamp: new Date(),
-      },
-    });
-  } catch (e) {
-    // Don't fail if logging fails
-    console.warn('Failed to log integration event:', e);
-  }
-}
-
-/**
- * Configure Ollama to send webhooks to Unimatrix
- * Returns webhook configuration snippet
- */
-export function generateOllamaConfig(unimatrixUrl: string): string {
-  return `# Add to your Ollama integration config
-
-[webhooks]
-enabled = true
-url = "${unimatrixUrl}/api/integrations/ollama/webhook"
-events = ["response_complete"]
-timeout = 5000
-
-# For Docker:
-# docker run -e OLLAMA_WEBHOOK="${unimatrixUrl}/api/integrations/ollama/webhook" ...
-`;
-}
-
-/**
- * Get Ollama instance status/health
- */
 export async function checkOllamaHealth(ollamaUrl: string): Promise<boolean> {
   try {
-    const response = await fetch(`${ollamaUrl}/api/tags`, {
-      method: 'GET',
-      timeout: 5000,
+    const res = await fetch(`${ollamaUrl}/api/tags`, {
+      signal: AbortSignal.timeout(5000),
     });
-    return response.ok;
-  } catch (e) {
-    console.error('Ollama health check failed:', e);
+    return res.ok;
+  } catch {
     return false;
   }
 }
 
-/**
- * List available models on Ollama instance
- */
 export async function listOllamaModels(ollamaUrl: string): Promise<string[]> {
   try {
-    const response = await fetch(`${ollamaUrl}/api/tags`);
-    const data = await response.json();
-
-    if (data.models) {
-      return data.models.map((m: any) => m.name);
-    }
-
-    return [];
-  } catch (e) {
-    console.error('Failed to list Ollama models:', e);
+    const res  = await fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(5000) });
+    const data = await res.json();
+    return (data.models ?? []).map((m: any) => m.name as string);
+  } catch {
     return [];
   }
 }
 
-/**
- * Test webhook connection from Ollama
- */
-export async function testOllamaWebhook(
-  ollamaUrl: string,
-  unimatrixWebhookUrl: string
-): Promise<{ success: boolean; message: string }> {
-  try {
-    const testPayload: OllamaWebhookPayload = {
-      model: 'test-model',
-      created_at: new Date().toISOString(),
-      response: 'This is a test response from Ollama to verify webhook connectivity.',
-      context: [],
-      done: true,
-      eval_count: 10,
-      eval_duration: 1000,
-    };
+export function generateOllamaConfig(webhookUrl: string): string {
+  return `# Unimatrix Ollama Integration
+# Add to your environment or Docker run command:
 
-    // Send test webhook to Unimatrix
-    const response = await fetch(unimatrixWebhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(testPayload),
-      timeout: 5000,
-    });
+OLLAMA_WEBHOOK="${webhookUrl}"
 
-    if (response.ok) {
-      return { success: true, message: 'Webhook test successful' };
-    } else {
-      return { success: false, message: `Webhook returned ${response.status}` };
-    }
-  } catch (e) {
-    return { success: false, message: `Webhook test failed: ${e instanceof Error ? e.message : 'Unknown error'}` };
-  }
+# Test with:
+# curl -X POST ${webhookUrl} \\
+#   -H "Content-Type: application/json" \\
+#   -d '{"mcpToken":"umx_<your_token>","response":"Test memory from Ollama"}'
+`;
 }
-
-/**
- * Ollama integration database schema additions
- *
- * Run these migrations:
- *
- * CREATE TABLE integration_logs (
- *   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
- *   user_id UUID NOT NULL REFERENCES users(id),
- *   integration VARCHAR NOT NULL,
- *   action VARCHAR NOT NULL,
- *   metadata JSONB,
- *   timestamp TIMESTAMP DEFAULT NOW()
- * );
- *
- * CREATE TABLE ollama_configs (
- *   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
- *   user_id UUID NOT NULL REFERENCES users(id),
- *   ollama_url VARCHAR NOT NULL,
- *   webhook_url VARCHAR NOT NULL,
- *   enabled BOOLEAN DEFAULT true,
- *   last_connected TIMESTAMP,
- *   created_at TIMESTAMP DEFAULT NOW()
- * );
- */

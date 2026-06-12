@@ -1,24 +1,38 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronBridge', {
-  platform: process.platform,
-  version: process.versions.electron,
+  platform:  process.platform,
+  version:   process.versions.electron,
   isDesktop: true,
 
-  // Auto-configure Claude Desktop (or other clients) with Unimatrix MCP
+  // MCP client configuration (Claude Desktop, Cursor, Windsurf, etc.)
   configureClaudeDesktop: (apiKey, apiUrl) =>
     ipcRenderer.invoke('configure-claude-desktop', { apiKey, apiUrl }),
 
-  // Get detected paths and status
-  getClientConfigStatus: () => ipcRenderer.invoke('get-client-config-status'),
+  getClientConfigStatus: () =>
+    ipcRenderer.invoke('get-client-config-status'),
 
-  // For self-host installer flows (future)
-  runLocalSetup: (config) => ipcRenderer.invoke('run-local-setup', config),
+  // Auto-start on login
+  setAutostart: (enabled) =>
+    ipcRenderer.invoke('set-autostart', { enabled }),
 
-  // Write a pre-filled self-host .env using keys from onboarding
-  writeSelfhostEnv: (keys) => ipcRenderer.invoke('write-selfhost-env', keys),
+  // Local MCP proxy status
+  getMcpProxyStatus: () =>
+    ipcRenderer.invoke('get-mcp-proxy-status'),
 
-  // Open folder in finder/explorer
-  showItemInFolder: (p) => ipcRenderer.invoke('show-item-in-folder', p),
-});
+  // Trigger background sync now
+  triggerSync: () =>
+    ipcRenderer.invoke('trigger-sync'),
+
+  // Save config (API URL, API key, preferences)
+  saveConfig: (data) =>
+    ipcRenderer.invoke('save-config', data),
+
+  // Self-host env file writer
+  writeSelfhostEnv: (keys) =>
+    ipcRenderer.invoke('write-selfhost-env', keys),
+
+  // File system helpers
+  showItemInFolder: (p) =>
+    ipcRenderer.invoke('show-item-in-folder', p),
 });

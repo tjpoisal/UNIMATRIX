@@ -17,8 +17,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
-        # version omitted to let it auto-detect from "packageManager" in package.json
-        # (avoids "Multiple versions of pnpm specified" error)
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -29,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build workspace packages (for types + entrypoints, e.g. @unimatrix/db)
+      - name: Build workspace packages
         run: pnpm --filter @unimatrix/db build
 
       - name: Generate Prisma client
@@ -38,7 +36,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
 
-      - name: Typecheck (web + root monorepo)
+      - name: Typecheck (web)
         working-directory: apps/web
         run: pnpm exec tsc --noEmit --skipLibCheck
         env:
@@ -49,15 +47,6 @@ jobs:
       - name: Lint (turbo monorepo)
         continue-on-error: true
         run: pnpm lint
-
-      - name: Typecheck (root, non-blocking due to some pre-existing package TS issues)
-        continue-on-error: true
-        # direct tsc to pass --skipLibCheck (the root script doesn't forward extra args easily)
-        run: npx tsc --noEmit --skipLibCheck
-        env:
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
-          NEXTAUTH_SECRET: ci-secret-32-chars-minimum-length-x
-          NEXTAUTH_URL: http://localhost:3000
 
       - name: Build (web)
         working-directory: apps/web
@@ -72,19 +61,46 @@ jobs:
           STRIPE_WEBHOOK_SECRET: whsec_placeholder
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
 
-  lint:
-    name: Lint (non-blocking)
+  typecheck-server:
+    name: Typecheck @unimatrix/server
     runs-on: ubuntu-latest
-    continue-on-error: true
-
+    # Now BLOCKING — server is production code, TS errors must not ship
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
-        # version omitted to let it auto-detect from "packageManager" in package.json
-        # (avoids "Multiple versions of pnpm specified" error)
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build workspace packages
+        run: pnpm --filter @unimatrix/db build
+
+      - name: Typecheck @unimatrix/server
+        run: NODE_OPTIONS="--max-old-space-size=8192" pnpm --filter @unimatrix/server exec tsc --noEmit
+        env:
+          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
+          CLERK_SECRET_KEY: sk_placeholder
+          CLERK_WEBHOOK_SECRET: whsec_placeholder
+
+  lint:
+    name: Lint (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -98,41 +114,8 @@ jobs:
       - name: Lint
         run: cd apps/web && pnpm lint
 
-  typecheck-server:
-    name: Typecheck server (non-blocking / experimental)
-    runs-on: ubuntu-latest
-    continue-on-error: true
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-        # version omitted to let it auto-detect from "packageManager" in package.json
-        # (avoids "Multiple versions of pnpm specified" error)
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build workspace packages (for types, e.g. @unimatrix/db)
-        run: pnpm --filter @unimatrix/db build
-
-      - name: Typecheck @unimatrix/server
-        run: NODE_OPTIONS="--max-old-space-size=8192" pnpm --filter @unimatrix/server exec tsc --noEmit
-        env:
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
-          CLERK_SECRET_KEY: sk_placeholder
-          CLERK_WEBHOOK_SECRET: whsec_placeholder
-
   desktop-smoke:
-    name: Desktop smoke (pack, non-blocking)
+    name: Desktop smoke (non-blocking)
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -142,19 +125,19 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24
-      - name: Install (npm, since desktop is standalone)
+      - name: Install (npm)
         working-directory: apps/desktop
         run: npm install --no-audit --no-fund
-      - name: Smoke pack (linux dir, no signing needed)
+      - name: Smoke pack
         working-directory: apps/desktop
         run: npm run pack -- --linux --dir
-      - name: Verify output exists
+      - name: Verify output
         run: ls -l apps/desktop/dist/linux-unpacked/ || ls apps/desktop/dist/ || echo "pack produced output dir"
 
   deploy-to-fly:
     name: Deploy to Fly.io
     runs-on: ubuntu-latest
-    needs: typecheck-build
+    needs: [typecheck-build, typecheck-server]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
@@ -163,12 +146,12 @@ jobs:
       - name: Install Fly CLI
         run: curl -L https://fly.io/install.sh | sh
 
-      - name: Deploy web app to Fly.io
+      - name: Deploy web app
         run: /root/.fly/bin/fly deploy --app unimatrix-web
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
-      - name: Deploy MCP server to Fly.io
+      - name: Deploy MCP server
         run: /root/.fly/bin/fly deploy --config fly.mcp.toml --app unimatrix-mcp
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

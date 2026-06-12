@@ -36,7 +36,8 @@ import { recallHandler }        from './handlers/recall.js';
 import { getRecentHandler }     from './handlers/getRecent.js';
 import { continueFromHandler }  from './handlers/continueFrom.js';
 import { listContextsHandler }  from './handlers/listContexts.js';
-import { clerkWebhookHandler } from './webhooks/clerk.js';
+import { clerkWebhookHandler }   from './webhooks/clerk.js';
+import { handleOllamaWebhook }  from './integrations/ollama-integration.js';
 
 import {
   StoreMemoryInputSchema,
@@ -222,6 +223,30 @@ export function buildApp() {
   fastify.get('/spaces/:id',    getSpace);
   fastify.patch('/spaces/:id',  updateSpace);
   fastify.delete('/spaces/:id', deleteSpace);
+
+  // ── Ollama integration webhook ────────────────────────────────────────────
+  // POST /api/integrations/ollama/webhook
+  // Body: { mcpToken: string, response: string, model: string, ... }
+  // Authenticated via MCP token (umx_... format) in the JSON body.
+  fastify.post('/api/integrations/ollama/webhook', async (request, reply) => {
+    const body = request.body as any;
+    if (!body?.mcpToken) {
+      return reply.code(401).send({ error: 'mcpToken required' });
+    }
+    const payload = {
+      model:      body.model      ?? 'unknown',
+      created_at: body.created_at ?? new Date().toISOString(),
+      response:   body.response   ?? body.content ?? '',
+      done:       body.done       ?? true,
+      eval_count: body.eval_count,
+      eval_duration: body.eval_duration,
+    };
+    const result = await handleOllamaWebhook(payload, {
+      mcpToken: body.mcpToken,
+      hint:     body.hint,
+    });
+    return reply.code(result.success ? 200 : 400).send(result);
+  });
 
   return fastify;
 }
