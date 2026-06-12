@@ -40,7 +40,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F1C] text-[#F1F5F9]">
+    <div className="min-h-screen bg-[#0e1030] text-[#F1F5F9]">
       {/* Nav */}
       <nav className="border-b border-[#334155]/30 px-8 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
@@ -65,7 +65,7 @@ export default function PricingPage() {
               </Link>
               <Link
                 href="/auth/register"
-                className="px-4 py-2 text-sm bg-[#00F5FF] text-[#0A0F1C] font-semibold rounded-lg hover:bg-[#00D9FF] transition-colors"
+                className="px-4 py-2 text-sm bg-[#ff7a00] text-[#0e1030] font-semibold rounded-lg hover:bg-[#e86d00] transition-colors"
               >
                 Get started free
               </Link>
@@ -79,7 +79,7 @@ export default function PricingPage() {
         <div className="text-center mb-14">
           <h1 className="text-5xl font-black mb-4">
             Simple,{' '}
-            <span className="text-[#00F5FF]">transparent</span> pricing
+            <span className="text-[#ff7a00]">transparent</span> pricing
           </h1>
           <p className="text-xl text-[#94A3B8] max-w-xl mx-auto">
             Start free. Upgrade when you need more palaces, more power, and
@@ -92,7 +92,7 @@ export default function PricingPage() {
               onClick={() => setInterval('monthly')}
               className={`px-5 py-2 text-sm font-medium rounded-lg transition-all ${
                 interval === 'monthly'
-                  ? 'bg-[#00F5FF]/10 border border-[#00F5FF]/30 text-[#00F5FF]'
+                  ? 'bg-[#ff7a00]/10 border border-[#ff7a00]/30 text-[#ff7a00]'
                   : 'text-[#64748B] hover:text-[#94A3B8]'
               }`}
             >
@@ -102,7 +102,7 @@ export default function PricingPage() {
               onClick={() => setInterval('yearly')}
               className={`px-5 py-2 text-sm font-medium rounded-lg transition-all ${
                 interval === 'yearly'
-                  ? 'bg-[#00F5FF]/10 border border-[#00F5FF]/30 text-[#00F5FF]'
+                  ? 'bg-[#ff7a00]/10 border border-[#ff7a00]/30 text-[#ff7a00]'
                   : 'text-[#64748B] hover:text-[#94A3B8]'
               }`}
             >
@@ -146,14 +146,14 @@ export default function PricingPage() {
           </div>
 
           {/* Pro */}
-          <div className="relative bg-[#111827]/60 border border-[#00F5FF]/30 rounded-2xl p-8 flex flex-col overflow-hidden">
+          <div className="relative bg-[#111827]/60 border border-[#ff7a00]/30 rounded-2xl p-8 flex flex-col overflow-hidden">
             {/* Glow */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#00F5FF]/5 to-transparent pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#ff7a00]/5 to-transparent pointer-events-none" />
 
             <div className="relative mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <p className="text-sm font-medium text-[#00F5FF] uppercase tracking-widest">Pro</p>
-                <span className="px-2 py-0.5 text-xs bg-[#00F5FF]/10 border border-[#00F5FF]/20 text-[#00F5FF] rounded-full">
+                <p className="text-sm font-medium text-[#ff7a00] uppercase tracking-widest">Pro</p>
+                <span className="px-2 py-0.5 text-xs bg-[#ff7a00]/10 border border-[#ff7a00]/20 text-[#ff7a00] rounded-full">
                   Most popular
                 </span>
               </div>
@@ -169,7 +169,7 @@ export default function PricingPage() {
             <ul className="relative space-y-3 mb-8 flex-1">
               {FEATURES_PRO.map((f) => (
                 <li key={f} className="flex items-start gap-3 text-sm text-[#F1F5F9]">
-                  <span className="text-[#00F5FF] mt-0.5 flex-shrink-0">✓</span>
+                  <span className="text-[#ff7a00] mt-0.5 flex-shrink-0">✓</span>
                   {f}
                 </li>
               ))}
@@ -177,7 +177,7 @@ export default function PricingPage() {
 
             <button
               onClick={handleUpgrade}
-              className="relative py-3 bg-[#00F5FF] hover:bg-[#00D9FF] text-[#0A0F1C] font-bold rounded-xl text-sm transition-all shadow-lg shadow-[#00F5FF]/20"
+              className="relative py-3 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-sm transition-all shadow-lg shadow-[#ff7a00]/20"
             >
               {session ? 'Upgrade to Pro →' : 'Start Pro — free 7-day trial →'}
             </button>

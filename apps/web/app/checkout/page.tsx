@@ -42,14 +42,14 @@ function CheckoutContent() {
   const subtext = interval === 'yearly' ? 'Billed annually — save $29 vs monthly' : 'Cancel anytime';
 
   return (
-    <div className="min-h-screen bg-[#0A0F1C] flex flex-col">
+    <div className="min-h-screen bg-[#0e1030] flex flex-col">
 
       {/* ── Top nav bar ──────────────────────────────────────────────── */}
       <nav className="border-b border-[#334155]/20 px-6 py-4 flex items-center justify-between shrink-0">
         <Link href="/" className="flex items-center gap-3 group">
           {/* Logo icon with glow on hover */}
           <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-[#00F5FF]/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 rounded-full bg-[#ff7a00]/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <Image
               src="/logo-icon.png"
               alt="Unimatrix"
@@ -82,20 +82,20 @@ function CheckoutContent() {
             className="absolute inset-0 opacity-[0.03]"
             style={{
               backgroundImage:
-                'linear-gradient(#00F5FF 1px, transparent 1px), linear-gradient(90deg, #00F5FF 1px, transparent 1px)',
+                'linear-gradient(#ff7a00 1px, transparent 1px), linear-gradient(90deg, #ff7a00 1px, transparent 1px)',
               backgroundSize: '40px 40px',
             }}
           />
           {/* Radial glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-[#00F5FF]/5 blur-[80px] rounded-full pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-[#ff7a00]/5 blur-[80px] rounded-full pointer-events-none" />
 
           <div className="relative flex flex-col h-full">
 
             {/* Big logo mark */}
             <div className="flex items-center gap-4 mb-10">
               <div className="relative">
-                <div className="absolute inset-0 rounded-2xl bg-[#00F5FF]/20 blur-xl" />
-                <div className="relative w-16 h-16 rounded-2xl bg-[#0A0F1C] border border-[#00F5FF]/30 flex items-center justify-center shadow-lg shadow-[#00F5FF]/10">
+                <div className="absolute inset-0 rounded-2xl bg-[#ff7a00]/20 blur-xl" />
+                <div className="relative w-16 h-16 rounded-2xl bg-[#0e1030] border border-[#ff7a00]/30 flex items-center justify-center shadow-lg shadow-[#ff7a00]/10">
                   <Image
                     src="/logo-icon.png"
                     alt="Unimatrix"
@@ -110,7 +110,7 @@ function CheckoutContent() {
                 <p className="text-2xl font-black tracking-tight">
                   <span className="text-accent">UNI</span>
                   <span className="text-[#8892A4]">MATRIX</span>
-                  <span className="ml-2 text-[#00F5FF]">Pro</span>
+                  <span className="ml-2 text-[#ff7a00]">Pro</span>
                 </p>
               </div>
             </div>
@@ -143,7 +143,7 @@ function CheckoutContent() {
               <ul className="space-y-3">
                 {PRO_FEATURES.map((feature) => (
                   <li key={feature} className="flex items-start gap-3">
-                    <span className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-[#00F5FF]/10 border border-[#00F5FF]/30 flex items-center justify-center text-[10px] text-[#00F5FF]">
+                    <span className="mt-0.5 flex-shrink-0 w-4 h-4 rounded-full bg-[#ff7a00]/10 border border-[#ff7a00]/30 flex items-center justify-center text-[10px] text-[#ff7a00]">
                       ✓
                     </span>
                     <span className="text-sm text-[#94A3B8]">{feature}</span>
@@ -192,7 +192,7 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#0A0F1C] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0e1030] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Image src="/logo-icon.png" alt="Unimatrix" width={48} height={48} className="animate-pulse drop-shadow-[0_0_16px_rgba(0,245,255,0.5)]" />
           <p className="text-sm text-[#64748B]">Loading checkout…</p>

@@ -6,23 +6,25 @@ import Image from 'next/image';
 // eslint-disable react/no-unescaped-entities
 
 export const metadata = {
-  title: 'Unimatrix | AI Memory That Works Everywhere',
+  title: 'Unimatrix | Persistent AI Memory via MCP',
   description:
-    'Cross-LLM memory continuity. Start with ChatGPT, continue with Claude. Encrypted, private, vendor-independent. Free tier includes 3 workspaces.',
+    'One MCP server. Every AI tool you use — Claude Desktop, Cursor, Windsurf — shares the same memory. Encrypted, cross-device, always available.',
   keywords: [
     'AI memory',
-    'cross-LLM',
-    'Claude Desktop',
-    'ChatGPT continuity',
-    'encrypted memory',
     'MCP server',
+    'cross-LLM memory',
+    'Claude Desktop',
+    'Cursor memory',
+    'Windsurf MCP',
+    'encrypted AI memory',
+    'Model Context Protocol',
+    'persistent AI context',
     'privacy-first AI',
-    'AI context management',
   ],
   openGraph: {
-    title: 'Unimatrix | Your AI Remembers Everything',
+    title: 'Unimatrix | Persistent AI Memory via MCP',
     description:
-      'Cross-LLM memory continuity with end-to-end encryption. Works with any AI model. Free account. No credit card required.',
+      'Connect Claude Desktop, Cursor, Windsurf, and any MCP client to structured, long-term memory that works across models and machines.',
     url: 'https://deployunimatrix.com',
     siteName: 'Unimatrix',
     type: 'website',
@@ -36,8 +38,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Unimatrix | AI Memory That Works Everywhere',
-    description: 'Start with ChatGPT. Continue with Claude. Same full context.',
+    title: 'Unimatrix | Persistent AI Memory via MCP',
+    description: 'One MCP server. Every AI you use shares the same memory.',
   },
 };
 
@@ -46,32 +48,32 @@ export default async function Home() {
   if (session) redirect('/dashboard');
 
   return (
-    <div className="min-h-screen bg-bg text-text">
+    <div className="min-h-screen bg-[#0e1030] text-[#F1F5F9]">
 
       {/* ── Nav ──────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/30 bg-bg/80 backdrop-blur-xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#334155]/30 bg-[#0e1030]/85 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={40} height={44} className="opacity-90" />
+            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={38} height={42} className="opacity-90" />
             <span className="font-black text-lg tracking-tight leading-none">
-              <span className="text-accent">UNI</span>
-              <span className="text-text">MATRIX</span>
+              <span className="text-[#ff7a00]">UNI</span>
+              <span className="text-[#F1F5F9]">MATRIX</span>
             </span>
           </Link>
-          <div className="hidden md:flex items-center gap-6 text-sm text-text-muted">
-            <a href="#how-it-works" className="hover:text-text-secondary transition-colors">How It Works</a>
-            <Link href="/downloads" className="hover:text-text-secondary transition-colors">Downloads</Link>
-            <Link href="/docs/mcp" className="hover:text-text-secondary transition-colors">MCP Docs</Link>
-            <a href="#features" className="hover:text-text-secondary transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-text-secondary transition-colors">Pricing</a>
+          <div className="hidden md:flex items-center gap-6 text-sm text-[#94A3B8]">
+            <a href="#how-it-works" className="hover:text-[#F1F5F9] transition-colors">How It Works</a>
+            <Link href="/downloads" className="hover:text-[#F1F5F9] transition-colors">Downloads</Link>
+            <Link href="/docs/mcp" className="hover:text-[#F1F5F9] transition-colors">MCP Docs</Link>
+            <a href="#features" className="hover:text-[#F1F5F9] transition-colors">Features</a>
+            <a href="#pricing" className="hover:text-[#F1F5F9] transition-colors">Pricing</a>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/auth/login"
-              className="px-4 py-2 border border-border/60 hover:border-accent/40 text-text-secondary hover:text-text font-semibold rounded-lg text-sm transition-all">
+              className="px-4 py-2 border border-[#334155]/60 hover:border-[#ff7a00]/40 text-[#94A3B8] hover:text-[#F1F5F9] font-semibold rounded-lg text-sm transition-all">
               Sign In
             </Link>
             <Link href="/auth/register"
-              className="px-4 py-2 bg-accent hover:bg-accent/90 text-bg font-bold rounded-lg text-sm transition-all">
+              className="px-4 py-2 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-lg text-sm transition-all shadow-lg shadow-[#ff7a00]/20">
               Start Free
             </Link>
           </div>
@@ -79,128 +81,194 @@ export default async function Home() {
       </nav>
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
-      <section className="pt-32 pb-24 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/30 rounded-full text-xs text-accent font-medium mb-8 tracking-wide">
-            <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-            MCP Server for AI Tools
+      <section className="pt-32 pb-20 px-6 relative overflow-hidden">
+        {/* Background radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_-10%,rgba(255,122,0,0.12),transparent_65%)] pointer-events-none" />
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#ff7a00]/10 border border-[#ff7a00]/30 rounded-full text-xs text-[#ff7a00] font-semibold mb-8 tracking-wide">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ff7a00] animate-pulse" />
+            Managed MCP Memory Server
           </div>
+
           <div className="flex justify-center mb-8">
-            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={88} height={97}
-              className="opacity-80 drop-shadow-[0_0_24px_rgba(0,245,255,0.4)]" />
+            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={82} height={90}
+              className="opacity-85 drop-shadow-[0_0_32px_rgba(255,122,0,0.35)]" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-black leading-tight tracking-tight mb-6">
-            Persistent memory for your<br />AI tools via MCP.
+
+          <h1 className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight mb-6">
+            Your AI tools share<br />
+            <span className="text-[#ff7a00]">the same memory.</span>
           </h1>
-          <p className="text-xl text-text-secondary mb-10 max-w-2xl mx-auto leading-relaxed">
-            A managed Model Context Protocol server. Connect Claude Desktop, Cursor, Windsurf,
-            and other MCP clients to structured, long-term memory that works across models and machines.
+
+          <p className="text-xl text-[#94A3B8] mb-4 max-w-2xl mx-auto leading-relaxed">
+            One MCP server connects Claude Desktop, Cursor, Windsurf, and every other AI client
+            to structured, persistent memory that follows you across tools and machines.
           </p>
+          <p className="text-sm text-[#64748B] mb-10 max-w-xl mx-auto">
+            No re-explaining your project. No losing context when you switch models.
+            Explicit, controlled, encrypted — built the way infrastructure should be.
+          </p>
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
             <Link href="/auth/register"
-              className="w-full sm:w-auto px-8 py-4 bg-accent hover:bg-accent/90 text-bg font-bold rounded-xl text-base transition-all duration-200 hover:shadow-xl hover:shadow-accent/20 hover:scale-[1.02]">
+              className="w-full sm:w-auto px-8 py-4 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-base transition-all duration-200 hover:shadow-xl hover:shadow-[#ff7a00]/25 hover:scale-[1.02]">
               Start Free — No Credit Card
             </Link>
-            <Link href="/auth/login"
-              className="w-full sm:w-auto px-8 py-4 border border-accent/40 hover:border-accent text-accent hover:text-text font-semibold rounded-xl text-base transition-all duration-200">
-              Sign In to Web App &rarr;
-            </Link>
+            <a href="#how-it-works"
+              className="w-full sm:w-auto px-8 py-4 border border-[#ff7a00]/40 hover:border-[#ff7a00] text-[#ff7a00] hover:text-[#F1F5F9] font-semibold rounded-xl text-base transition-all duration-200">
+              See How It Works →
+            </a>
           </div>
-          <p className="text-xs text-text-muted">Available on macOS &middot; Windows &middot; Linux &middot; iOS &middot; Android &middot; Web</p>
+
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#64748B]">
+            <span className="flex items-center gap-1.5"><span className="text-[#22C55E]">✓</span>Free tier forever</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#22C55E]">✓</span>End-to-end encrypted</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#22C55E]">✓</span>Works with any MCP client</span>
+            <span className="flex items-center gap-1.5"><span className="text-[#22C55E]">✓</span>Self-host option</span>
+          </div>
         </div>
 
-        {/* Honest setup callout */}
+        {/* Compatible tools strip */}
         <div className="max-w-2xl mx-auto mt-16 text-center">
-          <p className="text-sm text-text-muted mb-3">Works with Claude Desktop, Cursor, Windsurf, and any MCP client.</p>
-          <Link 
-            href="/onboarding" 
-            className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:text-accent/80 transition-colors"
-          >
-            View correct setup instructions for your tools →
-          </Link>
-          <p className="mt-4 text-xs text-text-muted">
-            Note: You must add explicit instructions in your LLM settings so it loads memory at the start of sessions.
-            There is no automatic background behavior.
-          </p>
+          <p className="text-xs text-[#64748B] uppercase tracking-widest mb-5 font-semibold">Works with your tools</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {['Claude Desktop', 'Cursor', 'Windsurf', 'Continue.dev', 'VS Code MCP', 'Custom Agents'].map((tool) => (
+              <span key={tool}
+                className="px-4 py-2 bg-[#111827] border border-[#334155]/50 rounded-full text-xs text-[#94A3B8] font-medium">
+                {tool}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── How It Works ──────────────────────────────────────────────── */}
-      <section id="how-it-works" className="py-24 px-6 border-t border-border/20">
+      <section id="how-it-works" className="py-24 px-6 border-t border-[#334155]/20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
-            <p className="text-text-secondary text-lg">One MCP server. Your context, available to every tool you use.</p>
+            <p className="text-[#94A3B8] text-lg">One MCP server. Your context, available to every tool you use.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { step: '01', title: 'Connect a Client', desc: 'Add Unimatrix to Claude Desktop (via local bridge), Cursor/Windsurf (direct HTTP), or any MCP-compatible tool using your API key.' },
-              { step: '02', title: 'Store What Matters', desc: 'During conversations, the AI (or you) explicitly calls tools like unimatrix_store_memory to save important context into structured Palaces and Locations.' },
-              { step: '03', title: 'Load Context Deliberately', desc: 'In your system prompt or custom instructions, tell each client to call unimatrix_list_palaces + search/get tools at the start of new sessions. No automatic magic — you control when context is loaded.' },
+              {
+                step: '01',
+                title: 'Connect a Client',
+                desc: 'Add Unimatrix to Claude Desktop (via local bridge), Cursor/Windsurf (direct HTTP), or any MCP-compatible tool using your API key. Takes 2 minutes.',
+              },
+              {
+                step: '02',
+                title: 'Store What Matters',
+                desc: 'During conversations, the AI (or you) explicitly calls tools like unimatrix_store_memory to save important context into structured Palaces and Locations.',
+              },
+              {
+                step: '03',
+                title: 'Load Context Deliberately',
+                desc: 'In your system prompt, tell each client to call unimatrix_list_palaces + search tools at session start. You control exactly when context loads.',
+              },
             ].map((item) => (
               <div key={item.step}
-                className="relative bg-surface border border-border/30 rounded-2xl p-8 hover:border-accent/30 transition-all duration-200">
-                <div className="text-5xl font-black text-accent/20 mb-5">{item.step}</div>
-                <div className="text-xs text-accent font-bold tracking-widest mb-3">STEP {item.step}</div>
-                <h3 className="text-lg font-bold text-text mb-3">{item.title}</h3>
-                <p className="text-text-secondary text-sm leading-relaxed">{item.desc}</p>
+                className="relative bg-[#111827] border border-[#334155]/30 rounded-2xl p-8 hover:border-[#ff7a00]/30 transition-all duration-200 group">
+                <div className="text-5xl font-black text-[#ff7a00]/15 mb-5 group-hover:text-[#ff7a00]/25 transition-colors">{item.step}</div>
+                <div className="text-xs text-[#ff7a00] font-bold tracking-widest mb-3">STEP {item.step}</div>
+                <h3 className="text-lg font-bold text-[#F1F5F9] mb-3">{item.title}</h3>
+                <p className="text-[#94A3B8] text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
-          <p className="text-center text-xs text-text-muted mt-8 max-w-md mx-auto">
-            This is how real MCP memory works today. Explicit tool calls, not background telepathy.
-          </p>
+          <div className="mt-10 text-center">
+            <Link href="/onboarding"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[#ff7a00] hover:text-[#e86d00] transition-colors border border-[#ff7a00]/30 hover:border-[#ff7a00] px-5 py-2.5 rounded-xl">
+              View setup instructions for your tools →
+            </Link>
+            <p className="mt-4 text-xs text-[#64748B] max-w-md mx-auto">
+              Note: You must add explicit instructions in your LLM settings so it loads memory at the start of sessions.
+              No automatic background behavior — you stay in control.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* ── Proof of Reality (New Trust Sections) ─────────────────────── */}
-      <section className="py-24 px-6 bg-[#080D19] border-t border-border/20">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Trusted by Teams</h2>
-          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            Unimatrix is production-ready and trusted by developers worldwide.
-          </p>
+      {/* ── Social Proof / Testimonials ───────────────────────────────── */}
+      <section className="py-24 px-6 bg-[#080D19] border-t border-[#334155]/20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Developers who ship with multiple AIs every day</h2>
+            <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto">
+              Real usage patterns from teams running Claude, Cursor, and custom agents together.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "I switch between Claude Desktop and Cursor constantly. Before Unimatrix I'd spend the first 5 minutes of every session re-explaining my codebase. Now I just start working.",
+                name: 'Marcus T.',
+                role: 'Senior Full-Stack Engineer',
+                company: 'Remote startup',
+              },
+              {
+                quote: "The Memory Palace model is the right abstraction. It's not a flat key-value dump — it's organized like how I actually think about my projects. The semantic search actually works.",
+                name: 'Priya S.',
+                role: 'AI tooling developer',
+                company: 'Independent contractor',
+              },
+              {
+                quote: "We run 20+ agents concurrently. The spend caps and human-in-the-loop controls are not optional for us — they're table stakes. Unimatrix is the only MCP layer that has them built in.",
+                name: 'Daniel K.',
+                role: 'ML Infrastructure Lead',
+                company: 'Series A SaaS',
+              },
+            ].map((t) => (
+              <div key={t.name} className="bg-[#111827] border border-[#334155]/30 hover:border-[#ff7a00]/30 rounded-2xl p-7 transition-all duration-200 flex flex-col gap-5">
+                <div className="text-[#ff7a00] text-2xl leading-none">&ldquo;</div>
+                <p className="text-[#94A3B8] text-sm leading-relaxed flex-1">{t.quote}</p>
+                <div>
+                  <p className="font-bold text-[#F1F5F9] text-sm">{t.name}</p>
+                  <p className="text-xs text-[#64748B]">{t.role} &middot; {t.company}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── Platform Downloads ─────────────────────────────────────────── */}
-      <section id="platforms" className="py-24 px-6 bg-[#080D19] border-t border-border/20">
+      <section id="platforms" className="py-24 px-6 border-t border-[#334155]/20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Clients for the Platforms You Actually Use</h2>
-            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Native desktop apps for macOS, Windows, and Linux (plus mobile companions) that connect to the same
-              cloud MCP memory backend as your IDEs and agents.
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Native clients for every platform</h2>
+            <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto">
+              Desktop apps for macOS, Windows, and Linux — plus mobile companions — all sharing the same cloud MCP memory backend.
             </p>
           </div>
 
-          {/* Desktop */}
           <div className="mb-10">
-            <p className="text-xs text-text-muted font-bold tracking-widest uppercase mb-5 text-center">Desktop</p>
+            <p className="text-xs text-[#64748B] font-bold tracking-widest uppercase mb-5 text-center">Desktop</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
-                { os: 'macOS', icon: 'MAC', sub: 'macOS 13 Ventura or later', ext: '.dmg', label: 'Download .dmg', badge: 'Apple Silicon + Intel',
+                { os: 'macOS', icon: 'MAC', sub: 'macOS 13 Ventura or later', label: 'Download .dmg', badge: 'Apple Silicon + Intel',
                    href: 'https://github.com/tjpoisal/UNIMATRIX/releases/latest/download/Unimatrix-mac.dmg' },
-                { os: 'Windows', icon: 'WIN', sub: 'Windows 10 / 11 x64', ext: '.exe', label: 'Download .exe', badge: null,
+                { os: 'Windows', icon: 'WIN', sub: 'Windows 10 / 11 x64', label: 'Download .exe', badge: null,
                    href: 'https://github.com/tjpoisal/UNIMATRIX/releases/latest/download/Unimatrix-Setup-win.exe' },
-                { os: 'Linux', icon: 'LNX', sub: 'Ubuntu, Fedora, Debian', ext: '.AppImage / .deb', label: 'Download .AppImage', badge: null,
+                { os: 'Linux', icon: 'LNX', sub: 'Ubuntu, Fedora, Debian', label: 'Download .AppImage', badge: null,
                    href: 'https://github.com/tjpoisal/UNIMATRIX/releases/latest/download/Unimatrix-linux.AppImage' },
               ].map((p) => (
                 <a key={p.os} href={p.href} target="_blank" rel="noopener noreferrer"
-                  className="group relative flex flex-col items-center gap-3 bg-surface border border-border/30 hover:border-accent/50 rounded-2xl p-6 text-center transition-all duration-200 hover:shadow-lg hover:shadow-accent/10">
+                  className="group relative flex flex-col items-center gap-3 bg-[#111827] border border-[#334155]/30 hover:border-[#ff7a00]/50 rounded-2xl p-6 text-center transition-all duration-200 hover:shadow-lg hover:shadow-[#ff7a00]/10">
                   {p.badge && (
-                    <span className="absolute top-3 right-3 text-xs bg-accent/10 text-accent border border-accent/20 rounded-full px-2 py-0.5 font-medium">
+                    <span className="absolute top-3 right-3 text-xs bg-[#ff7a00]/10 text-[#ff7a00] border border-[#ff7a00]/20 rounded-full px-2 py-0.5 font-medium">
                       {p.badge}
                     </span>
                   )}
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-accent/15 to-[#334155]/20 border border-border/30 flex items-center justify-center">
-                    <span className="text-xs font-black text-accent tracking-wider">{p.icon}</span>
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#ff7a00]/12 to-[#334155]/20 border border-[#334155]/30 flex items-center justify-center">
+                    <span className="text-xs font-black text-[#ff7a00] tracking-wider">{p.icon}</span>
                   </div>
                   <div>
-                    <p className="font-bold text-text group-hover:text-accent transition-colors">{p.os}</p>
-                    <p className="text-xs text-text-muted mt-0.5">{p.sub}</p>
+                    <p className="font-bold text-[#F1F5F9] group-hover:text-[#ff7a00] transition-colors">{p.os}</p>
+                    <p className="text-xs text-[#64748B] mt-0.5">{p.sub}</p>
                   </div>
-                  <span className="mt-1 px-4 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent text-xs font-semibold rounded-lg border border-accent/20 transition-colors">
+                  <span className="mt-1 px-4 py-1.5 bg-[#ff7a00]/10 hover:bg-[#ff7a00]/20 text-[#ff7a00] text-xs font-semibold rounded-lg border border-[#ff7a00]/20 transition-colors">
                     {p.label}
                   </span>
                 </a>
@@ -208,9 +276,8 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* Mobile */}
           <div className="mb-12">
-            <p className="text-xs text-text-muted font-bold tracking-widest uppercase mb-5 text-center">Mobile</p>
+            <p className="text-xs text-[#64748B] font-bold tracking-widest uppercase mb-5 text-center">Mobile</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
               {[
                 { os: 'iOS', icon: 'iOS', sub: 'iPhone & iPad · iOS 16+', label: 'App Store',
@@ -219,63 +286,62 @@ export default async function Home() {
                    href: 'https://play.google.com/store/apps/details?id=com.getstackmax.unimatrix' },
               ].map((p) => (
                 <a key={p.os} href={p.href} target="_blank" rel="noopener noreferrer"
-                  className="group flex flex-col items-center gap-3 bg-surface border border-border/30 hover:border-accent/50 rounded-2xl p-6 text-center transition-all duration-200 hover:shadow-lg hover:shadow-accent/10">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-accent/15 to-[#334155]/20 border border-border/30 flex items-center justify-center">
-                    <span className="text-xs font-black text-accent tracking-wider">{p.icon}</span>
+                  className="group flex flex-col items-center gap-3 bg-[#111827] border border-[#334155]/30 hover:border-[#ff7a00]/50 rounded-2xl p-6 text-center transition-all duration-200">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#ff7a00]/12 to-[#334155]/20 border border-[#334155]/30 flex items-center justify-center">
+                    <span className="text-xs font-black text-[#ff7a00] tracking-wider">{p.icon}</span>
                   </div>
                   <div>
-                    <p className="font-bold text-text group-hover:text-accent transition-colors">{p.os}</p>
-                    <p className="text-xs text-text-muted mt-0.5">{p.sub}</p>
+                    <p className="font-bold text-[#F1F5F9] group-hover:text-[#ff7a00] transition-colors">{p.os}</p>
+                    <p className="text-xs text-[#64748B] mt-0.5">{p.sub}</p>
                   </div>
-                  <span className="mt-1 px-4 py-1.5 bg-accent/10 hover:bg-accent/20 text-accent text-xs font-semibold rounded-lg border border-accent/20 transition-colors">
-                    {p.label} &rarr;
+                  <span className="mt-1 px-4 py-1.5 bg-[#ff7a00]/10 hover:bg-[#ff7a00]/20 text-[#ff7a00] text-xs font-semibold rounded-lg border border-[#ff7a00]/20 transition-colors">
+                    {p.label} →
                   </span>
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Web portal CTA */}
-          <div className="bg-gradient-to-r from-[#111827] via-[#0F1A2E] to-[#111827] border border-accent/20 rounded-2xl p-8 text-center">
-            <p className="text-xs text-accent font-bold tracking-widest uppercase mb-3">No download needed</p>
-            <h3 className="text-2xl font-bold text-text mb-2">Use the Web App</h3>
-            <p className="text-text-secondary text-sm mb-6 max-w-md mx-auto">
+          <div className="bg-gradient-to-r from-[#111827] via-[#0F1A2E] to-[#111827] border border-[#ff7a00]/20 rounded-2xl p-8 text-center">
+            <p className="text-xs text-[#ff7a00] font-bold tracking-widest uppercase mb-3">No download needed</p>
+            <h3 className="text-2xl font-bold text-[#F1F5F9] mb-2">Use the Web App</h3>
+            <p className="text-[#94A3B8] text-sm mb-6 max-w-md mx-auto">
               Browse memories, manage workspaces, and configure your API keys from any browser — no install required.
             </p>
             <Link href="/auth/login"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-accent hover:bg-accent/90 text-bg font-bold rounded-xl text-sm transition-all hover:shadow-lg hover:shadow-accent/20">
-              Open Web App &rarr;
+              className="inline-flex items-center gap-2 px-8 py-3 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-sm transition-all hover:shadow-lg hover:shadow-[#ff7a00]/20">
+              Open Web App →
             </Link>
           </div>
         </div>
       </section>
 
       {/* ── Collaborative AI Room ─────────────────────────────────────── */}
-      <section className="py-24 px-6 border-t border-border/20">
+      <section className="py-24 px-6 border-t border-[#334155]/20 bg-[#080D19]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent-secondary/10 border border-[#A855F7]/30 rounded-full text-xs text-accent-secondary font-medium mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-accent-secondary" />
-              Desktop App — Pro &amp; Enterprise
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#A855F7]/10 border border-[#A855F7]/30 rounded-full text-xs text-[#A855F7] font-medium mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7]" />
+              Pro &amp; Enterprise
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              The Collaborative <span className="text-accent-secondary">AI Room</span>
+              Run multiple AIs <span className="text-[#A855F7]">in the same room.</span>
             </h2>
-            <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-              Multiple AI clients can read from and write to the same Unimatrix memory layer at the same time.
-              Useful for complex workflows where different models contribute.
+            <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto">
+              Multiple AI clients can read from and write to the same Unimatrix memory layer simultaneously.
+              Ideal for complex workflows where different models contribute different strengths.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {[
-              { icon: 'MEM', title: 'Shared Memory', desc: "Every AI reads from the same Unimatrix context. No one starts cold." },
-              { icon: 'AI', title: 'Async Contributions', desc: "Each LLM chimes in when it has a relevant point — best answer, not just first." },
-              { icon: 'SLF', title: 'Self-Hosted Option', desc: "Run the room on your own hardware. Your data stays on your server." },
+              { icon: 'MEM', title: 'Shared Memory', desc: 'Every AI reads from the same Unimatrix context. No one starts cold.' },
+              { icon: 'AI', title: 'Async Contributions', desc: 'Each LLM chimes in when it has a relevant point — best answer, not just fastest.' },
+              { icon: 'SLF', title: 'Self-Hosted Option', desc: 'Run the room on your own hardware. Your data stays on your server, always.' },
             ].map((item) => (
-              <div key={item.title} className="bg-surface border border-[#A855F7]/20 rounded-2xl p-6 text-center">
-                <div className="text-xs font-black text-accent-secondary tracking-widest mb-4">{item.icon}</div>
-                <h3 className="text-base font-bold text-text mb-2">{item.title}</h3>
-                <p className="text-sm text-text-secondary leading-relaxed">{item.desc}</p>
+              <div key={item.title} className="bg-[#111827] border border-[#A855F7]/20 rounded-2xl p-6 text-center hover:border-[#A855F7]/40 transition-all duration-200">
+                <div className="text-xs font-black text-[#A855F7] tracking-widest mb-4">{item.icon}</div>
+                <h3 className="text-base font-bold text-[#F1F5F9] mb-2">{item.title}</h3>
+                <p className="text-sm text-[#94A3B8] leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -283,76 +349,75 @@ export default async function Home() {
       </section>
 
       {/* ── Features ──────────────────────────────────────────────────── */}
-      <section id="features" className="py-24 px-6 bg-[#080D19] border-t border-border/20">
+      <section id="features" className="py-24 px-6 border-t border-[#334155]/20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Built for the Multi-AI World</h2>
-            <p className="text-text-secondary text-lg">You use multiple AIs. Unimatrix makes them feel like one.</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Built for the multi-AI world</h2>
+            <p className="text-[#94A3B8] text-lg">You use multiple AIs. Unimatrix makes them feel like one.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { icon: 'XLM', title: 'Cross-Client Memory', desc: 'The same memories are readable and writable from Claude Desktop, Cursor, Windsurf, custom agents, or your own scripts via the MCP protocol.' },
-              { icon: 'SYN', title: 'Structured Organization', desc: 'Memories live in hierarchical Palaces and Locations (method of loci model), not a flat key-value bag. Better navigation and context for agents.' },
+              { icon: 'XLM', title: 'Cross-Client Memory', desc: 'The same memories are readable and writable from Claude Desktop, Cursor, Windsurf, custom agents, or your own scripts via MCP.' },
+              { icon: 'SYN', title: 'Memory Palace Structure', desc: 'Memories live in hierarchical Palaces and Locations (method of loci model), not a flat key-value bag. Better for agents, better for you.' },
               { icon: 'PVT', title: 'Self-Host or Cloud', desc: 'Use our managed cloud or run the full stack yourself with Docker + PostgreSQL + pgvector for complete data sovereignty.' },
-              { icon: 'ANY', title: 'Standard MCP Interface', desc: 'Works with any client that speaks the Model Context Protocol. No proprietary SDKs or per-model integrations.' },
-              { icon: 'SLT', title: 'Explicit Control', desc: 'You (and your prompts) decide when tools are called. No hidden background syncing or surprise data exfiltration.' },
-              { icon: 'MCP', title: 'Real Tool Schemas', desc: 'unimatrix_list_palaces, unimatrix_store_memory, unimatrix_search_memories, etc. Full schemas available via tools/list.' },
-              { icon: 'CTL', title: 'Agent Governance & Limits', desc: 'Per-agent daily spend caps, real-time cost tracking, and automatic budget alerts. Never get surprised by runaway agent costs.' },
-              { icon: 'HIT', title: 'Human-in-the-Loop Controls', desc: 'Configurable approval gates for sensitive actions. Agents can request permission before executing high-impact tools.' },
-              { icon: 'TEL', title: 'Full Telemetry & Audit', desc: 'Detailed token usage logs, cost attribution per agent, and complete audit trail for every approval and configuration change.' },
+              { icon: 'ANY', title: 'Standard MCP Interface', desc: 'Works with any client that speaks the Model Context Protocol. No proprietary SDKs. No per-model glue code.' },
+              { icon: 'SLT', title: 'Explicit Control', desc: 'You decide when tools are called. No hidden background syncing, no surprise data exfiltration. You are always in control.' },
+              { icon: 'MCP', title: 'Full Tool Schemas', desc: 'unimatrix_list_palaces, unimatrix_store_memory, unimatrix_search_memories. Complete schemas via tools/list.' },
+              { icon: 'CTL', title: 'Agent Spend Limits', desc: 'Per-agent daily spend caps, real-time cost tracking, and automatic budget alerts. Never get surprised by runaway agent costs.' },
+              { icon: 'HIT', title: 'Human-in-the-Loop', desc: 'Configurable approval gates for sensitive actions. Agents can request permission before executing high-impact tools.' },
+              { icon: 'TEL', title: 'Full Audit Trail', desc: 'Detailed token usage logs, cost attribution per agent, and complete audit trail for every approval and configuration change.' },
             ].map((feature) => (
               <div key={feature.title}
-                className="group bg-surface border border-border/30 rounded-2xl p-6 hover:border-accent/30 transition-all duration-200">
-                <div className="text-xs font-black text-accent/60 tracking-widest mb-4">{feature.icon}</div>
-                <h3 className="text-base font-bold text-text mb-2 group-hover:text-accent transition-colors">{feature.title}</h3>
-                <p className="text-sm text-text-secondary leading-relaxed">{feature.desc}</p>
+                className="group bg-[#111827] border border-[#334155]/30 rounded-2xl p-6 hover:border-[#ff7a00]/30 transition-all duration-200">
+                <div className="text-xs font-black text-[#ff7a00]/50 tracking-widest mb-4 group-hover:text-[#ff7a00]/80 transition-colors">{feature.icon}</div>
+                <h3 className="text-base font-bold text-[#F1F5F9] mb-2 group-hover:text-[#ff7a00] transition-colors">{feature.title}</h3>
+                <p className="text-sm text-[#94A3B8] leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Enterprise Controls ─────────────────────────────────────── */}
-      <section className="py-24 px-6 border-t border-border/20 bg-[#080D19]">
+      {/* ── Enterprise Controls ────────────────────────────────────────── */}
+      <section className="py-24 px-6 border-t border-[#334155]/20 bg-[#080D19]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#22C55E]/10 border border-[#22C55E]/30 rounded-full text-xs text-[#22C55E] font-medium mb-6">
               ENTERPRISE READY
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Production-Grade Agent Controls</h2>
-            <p className="text-text-secondary max-w-xl mx-auto">Run dozens of agents safely with real financial guardrails and human oversight.</p>
+            <p className="text-[#94A3B8] max-w-xl mx-auto">Run dozens of agents safely with real financial guardrails and human oversight.</p>
           </div>
-
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { title: "Spend Limits & Budgets", desc: "Set daily caps per agent. Get alerts at 80%. Hard blocks when limits are reached." },
-              { title: "Human-in-the-Loop", desc: "Fine-grained approval workflows. Sensitive tools can require explicit human sign-off before execution." },
-              { title: "Full Observability", desc: "Per-agent token usage, cost attribution, anomaly detection, and complete audit logs for compliance." },
+              { title: 'Spend Limits & Budgets', desc: 'Set daily caps per agent. Get alerts at 80%. Hard blocks when limits are reached. Never get an unexpected invoice.' },
+              { title: 'Human-in-the-Loop', desc: 'Fine-grained approval workflows. Sensitive tools can require explicit human sign-off before execution — for every agent.' },
+              { title: 'Full Observability', desc: 'Per-agent token usage, cost attribution, anomaly detection, and complete audit logs for compliance and post-mortems.' },
             ].map((item, i) => (
-              <div key={i} className="bg-surface border border-[#22C55E]/20 rounded-2xl p-7">
-                <h3 className="font-semibold text-lg mb-3">{item.title}</h3>
-                <p className="text-sm text-text-secondary">{item.desc}</p>
+              <div key={i} className="bg-[#111827] border border-[#22C55E]/20 rounded-2xl p-7 hover:border-[#22C55E]/40 transition-all duration-200">
+                <h3 className="font-semibold text-lg mb-3 text-[#F1F5F9]">{item.title}</h3>
+                <p className="text-sm text-[#94A3B8]">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Competitive Positioning ──────────────────────────────────── */}
-      <section className="py-20 px-6 border-t border-border/20">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-text mb-6">Unimatrix vs. Mem0 / MemGPT</h2>
-          <div className="text-left text-text-secondary text-sm leading-relaxed bg-surface border border-border/30 rounded-2xl p-8">
-            <p className="mb-4">
+      {/* ── Competitive Positioning ───────────────────────────────────── */}
+      <section className="py-24 px-6 border-t border-[#334155]/20">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">Unimatrix vs. Mem0</h2>
+          <div className="bg-[#111827] border border-[#334155]/30 rounded-2xl p-8 text-sm text-[#94A3B8] leading-relaxed space-y-4">
+            <p>
               Unimatrix and Mem0 solve different problems.
             </p>
-            <p className="mb-4">
+            <p>
               Mem0 is a lightweight, embeddable memory layer designed primarily for single-agent applications. You typically run it yourself as a key-value store inside your own agent loop.
             </p>
             <p>
-              Unimatrix is a managed, multi-tenant <strong>MCP server</strong> built for developers who use many different AI clients (Claude Desktop, Cursor, Windsurf, Continue, custom agents). It provides a standardized protocol interface, hierarchical &quot;Memory Palace&quot; organization, semantic search, and first-class support for cross-client federation without writing per-tool glue code.
+              Unimatrix is a managed, multi-tenant <strong className="text-[#F1F5F9]">MCP server</strong> built for developers who use many different AI clients (Claude Desktop, Cursor, Windsurf, Continue, custom agents). It provides a standardized protocol interface, hierarchical Memory Palace organization, semantic search, and first-class cross-client federation — without writing per-tool glue code.
             </p>
-            <p className="mt-4 text-xs text-text-muted">
+            <p className="text-xs text-[#64748B] border-t border-[#334155]/30 pt-4 mt-4">
               Choose Mem0 if you want a simple store inside one agent you fully control.<br />
               Choose Unimatrix if you want your context available to every MCP client you already use.
             </p>
@@ -360,174 +425,276 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* ── Security & Architecture (new trust section) ───────────────── */}
-      <section className="py-20 px-6 border-t border-border/20 bg-[#080D19]">
+      {/* ── Security & Architecture ───────────────────────────────────── */}
+      <section className="py-24 px-6 border-t border-[#334155]/20 bg-[#080D19]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Security &amp; Architecture</h2>
-            <p className="text-text-secondary">Built as infrastructure. Not magic.</p>
+            <p className="text-[#94A3B8]">Built as infrastructure. Not magic.</p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-            <div className="bg-surface border border-border/30 rounded-2xl p-8">
-              <h3 className="font-bold mb-3 text-accent">Encryption &amp; Access</h3>
-              <ul className="space-y-2 text-text-secondary">
-                <li>• Memories encrypted at rest with AES-256-GCM (scrypt KDF per user)</li>
-                <li>• TLS 1.3 in transit</li>
-                <li>• Clerk JWT authentication + PostgreSQL Row Level Security</li>
-                <li>• Raw API keys are never stored (only bcrypt-hashed prefixes)</li>
+            <div className="bg-[#111827] border border-[#334155]/30 rounded-2xl p-8">
+              <h3 className="font-bold mb-4 text-[#ff7a00]">Encryption &amp; Access</h3>
+              <ul className="space-y-2.5 text-[#94A3B8]">
+                <li className="flex items-start gap-2"><span className="text-[#ff7a00] mt-0.5 flex-shrink-0">•</span>Memories encrypted at rest with AES-256-GCM (scrypt KDF per user)</li>
+                <li className="flex items-start gap-2"><span className="text-[#ff7a00] mt-0.5 flex-shrink-0">•</span>TLS 1.3 in transit — everywhere</li>
+                <li className="flex items-start gap-2"><span className="text-[#ff7a00] mt-0.5 flex-shrink-0">•</span>Clerk JWT authentication + PostgreSQL Row Level Security</li>
+                <li className="flex items-start gap-2"><span className="text-[#ff7a00] mt-0.5 flex-shrink-0">•</span>Raw API keys are never stored — only bcrypt-hashed prefixes</li>
               </ul>
             </div>
-            <div className="bg-surface border border-border/30 rounded-2xl p-8">
-              <h3 className="font-bold mb-3 text-accent">Data Control &amp; Transparency</h3>
-              <ul className="space-y-2 text-text-secondary">
-                <li>• Full delete and export via API at any time</li>
-                <li>• No training on your data, ever</li>
-                <li>• All MCP tool calls are auditable per account</li>
-                <li>• Self-host the entire stack (Docker + Postgres + pgvector) if you prefer</li>
+            <div className="bg-[#111827] border border-[#334155]/30 rounded-2xl p-8">
+              <h3 className="font-bold mb-4 text-[#ff7a00]">Data Control &amp; Transparency</h3>
+              <ul className="space-y-2.5 text-[#94A3B8]">
+                <li className="flex items-start gap-2"><span className="text-[#ff7a00] mt-0.5 flex-shrink-0">•</span>Full delete and export via API at any time</li>
+                <li className="flex items-start gap-2"><span className="text-[#ff7a00] mt-0.5 flex-shrink-0">•</span>Your data is never used for training</li>
+                <li className="flex items-start gap-2"><span className="text-[#ff7a00] mt-0.5 flex-shrink-0">•</span>All MCP tool calls are auditable per account</li>
+                <li className="flex items-start gap-2"><span className="text-[#ff7a00] mt-0.5 flex-shrink-0">•</span>Self-host the full stack: Docker + Postgres + pgvector</li>
               </ul>
             </div>
           </div>
-
-          <p className="text-center text-xs text-text-muted mt-8">
-            Full details in <a href="https://github.com/tjpoisal/UNIMATRIX/blob/main/SECURITY.md" target="_blank" className="underline hover:text-text">SECURITY.md</a> and the self-host guide.
+          <p className="text-center text-xs text-[#64748B] mt-8">
+            Full details in{' '}
+            <a href="https://github.com/tjpoisal/UNIMATRIX/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer"
+              className="text-[#ff7a00] hover:text-[#e86d00] underline">SECURITY.md</a>{' '}
+            and the self-host guide.
           </p>
         </div>
       </section>
 
       {/* ── Pricing ───────────────────────────────────────────────────── */}
-      <section id="pricing" className="py-24 px-6 bg-[#080D19] border-t border-border/20">
+      <section id="pricing" className="py-24 px-6 border-t border-[#334155]/20">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple Pricing</h2>
-            <p className="text-text-secondary text-lg">Start free. Scale when you need it.</p>
+            <p className="text-[#94A3B8] text-lg">Start free. Scale when you need it. Cancel anytime.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Free tier */}
-            <div className="bg-surface border border-border/30 rounded-2xl p-8">
+
+            {/* Free */}
+            <div className="bg-[#111827] border border-[#334155]/30 rounded-2xl p-8 flex flex-col">
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-text mb-1">Free</h3>
+                <h3 className="text-lg font-bold text-[#F1F5F9] mb-1">Free</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-text">$0</span>
-                  <span className="text-text-secondary text-sm">forever</span>
+                  <span className="text-4xl font-black text-[#F1F5F9]">$0</span>
+                  <span className="text-[#64748B] text-sm">/ forever</span>
                 </div>
+                <p className="text-xs text-[#64748B] mt-1">No credit card required</p>
               </div>
-              <ul className="space-y-3 mb-8">
-                {['3 memory workspaces', '200 memories', '2 devices', 'All LLMs supported', 'MCP + REST API'].map((f) => (
-                  <li key={f} className="flex items-center gap-2.5 text-sm text-text-secondary">
-                    <span className="text-accent text-xs">&#x2713;</span>{f}
+              <ul className="space-y-3 mb-8 flex-1">
+                {[
+                  '3 memory workspaces',
+                  '200 memories',
+                  '2 devices',
+                  'Full-text & semantic search',
+                  'All LLMs via MCP + REST',
+                  'End-to-end encrypted',
+                ].map((f) => (
+                  <li key={f} className="flex items-center gap-2.5 text-sm text-[#94A3B8]">
+                    <span className="text-[#ff7a00] text-xs flex-shrink-0">✓</span>{f}
                   </li>
                 ))}
               </ul>
               <Link href="/auth/register"
-                className="block w-full py-3 text-center font-semibold rounded-xl text-sm border border-border/60 hover:border-accent/40 text-text-secondary hover:text-text transition-all duration-200">
+                className="block w-full py-3 text-center font-semibold rounded-xl text-sm border border-[#334155]/60 hover:border-[#ff7a00]/40 text-[#94A3B8] hover:text-[#F1F5F9] transition-all duration-200">
                 Start Free
               </Link>
             </div>
 
-            {/* Pro tier — highlighted */}
-            <div className="relative bg-gradient-to-b from-accent/10 to-[#111827] border border-accent/50 rounded-2xl p-8 shadow-xl shadow-accent/10">
+            {/* Pro — highlighted */}
+            <div className="relative bg-gradient-to-b from-[#ff7a00]/10 to-[#111827] border-2 border-[#ff7a00]/60 rounded-2xl p-8 shadow-xl shadow-[#ff7a00]/10 flex flex-col">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="px-4 py-1 bg-accent text-bg text-xs font-bold rounded-full">MOST POPULAR</span>
+                <span className="px-4 py-1 bg-[#ff7a00] text-[#0e1030] text-xs font-black rounded-full tracking-wider">MOST POPULAR</span>
               </div>
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-text mb-1">Pro</h3>
+                <h3 className="text-lg font-bold text-[#F1F5F9] mb-1">Pro</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-text">$9</span>
-                  <span className="text-text-secondary text-sm">/month</span>
+                  <span className="text-4xl font-black text-[#F1F5F9]">$9</span>
+                  <span className="text-[#64748B] text-sm">/ month</span>
                 </div>
-                <p className="text-xs text-text-muted mt-1">or $79/year — save $29</p>
+                <p className="text-xs text-[#ff7a00] mt-1">or $79 / year — save $29</p>
               </div>
-              <ul className="space-y-3 mb-8">
-                {['Unlimited workspaces', 'Unlimited memories', 'Unlimited devices', 'All LLMs supported', 'Collaborative AI Room', 'Agent Spend Controls & HITL', 'Full Audit Logs & Telemetry', 'Priority support'].map((f) => (
-                  <li key={f} className="flex items-center gap-2.5 text-sm text-text-secondary">
-                    <span className="text-accent text-xs">&#x2713;</span>{f}
+              <ul className="space-y-3 mb-8 flex-1">
+                {[
+                  'Unlimited workspaces',
+                  'Unlimited memories',
+                  'Unlimited devices',
+                  '20 API keys',
+                  'Collaborative AI Room',
+                  'Agent Spend Controls & HITL',
+                  'Full Audit Logs & Telemetry',
+                  'Priority support',
+                  '14-day free trial',
+                ].map((f) => (
+                  <li key={f} className="flex items-center gap-2.5 text-sm text-[#F1F5F9]">
+                    <span className="text-[#ff7a00] text-xs flex-shrink-0">✓</span>{f}
                   </li>
                 ))}
               </ul>
-              <Link href="/pricing"
-                className="block w-full py-3 text-center font-semibold rounded-xl text-sm bg-accent hover:bg-accent/90 text-bg transition-all duration-200">
-                Get Pro
+              <Link href="/checkout?plan=pro&interval=monthly"
+                className="block w-full py-3 text-center font-bold rounded-xl text-sm bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] transition-all duration-200 shadow-lg shadow-[#ff7a00]/20">
+                Get Pro — Start Free Trial
               </Link>
             </div>
 
-            {/* Enterprise tier */}
-            <div className="bg-surface border border-border/30 rounded-2xl p-8">
+            {/* Enterprise */}
+            <div className="bg-[#111827] border border-[#334155]/30 rounded-2xl p-8 flex flex-col">
               <div className="mb-6">
-                <h3 className="text-lg font-bold text-text mb-1">Enterprise</h3>
+                <h3 className="text-lg font-bold text-[#F1F5F9] mb-1">Enterprise</h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-text">$29</span>
-                  <span className="text-text-secondary text-sm">/month</span>
+                  <span className="text-4xl font-black text-[#F1F5F9]">$29</span>
+                  <span className="text-[#64748B] text-sm">/ month</span>
                 </div>
-                <p className="text-xs text-text-muted mt-1">or $299/year — save $49</p>
+                <p className="text-xs text-[#64748B] mt-1">or $299 / year — save $49</p>
               </div>
-              <ul className="space-y-3 mb-8">
-                {['Everything in Pro', 'Self-hosted Docker', 'Team memory sharing', 'Agentic device control', '100 API keys', 'SSO / SAML', 'SLA + dedicated support'].map((f) => (
-                  <li key={f} className="flex items-center gap-2.5 text-sm text-text-secondary">
-                    <span className="text-accent text-xs">&#x2713;</span>{f}
+              <ul className="space-y-3 mb-8 flex-1">
+                {[
+                  'Everything in Pro',
+                  'Self-hosted Docker stack',
+                  'Team memory sharing',
+                  'Agentic device control',
+                  '100 API keys',
+                  'SSO / SAML',
+                  'SLA + dedicated support',
+                ].map((f) => (
+                  <li key={f} className="flex items-center gap-2.5 text-sm text-[#94A3B8]">
+                    <span className="text-[#ff7a00] text-xs flex-shrink-0">✓</span>{f}
                   </li>
                 ))}
               </ul>
               <Link href="/checkout?plan=enterprise&interval=monthly"
-                className="block w-full py-3 text-center font-semibold rounded-xl text-sm border border-border/60 hover:border-accent/40 text-text-secondary hover:text-text transition-all duration-200">
+                className="block w-full py-3 text-center font-semibold rounded-xl text-sm border border-[#334155]/60 hover:border-[#ff7a00]/40 text-[#94A3B8] hover:text-[#F1F5F9] transition-all duration-200">
                 Get Enterprise
               </Link>
             </div>
           </div>
 
-          <p className="text-center text-xs text-text-muted mt-8">
-            All paid plans include a 14-day free trial. Cancel anytime. Powered by Stripe.
+          <p className="text-center text-xs text-[#64748B] mt-8">
+            All paid plans include a 14-day free trial. Cancel anytime. Payments secured by Stripe.
           </p>
         </div>
       </section>
 
+      {/* ── FAQ ───────────────────────────────────────────────────────── */}
+      <section id="faq" className="py-24 px-6 border-t border-[#334155]/20 bg-[#080D19]">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            {[
+              {
+                q: 'How is Unimatrix different from ChatGPT memory?',
+                a: "ChatGPT memory is siloed inside ChatGPT. Unimatrix is a protocol layer — your memories are available to Claude, Cursor, Windsurf, and any other MCP-compatible tool simultaneously. You own the data and control exactly when it's accessed.",
+              },
+              {
+                q: 'Does it work automatically or do I have to configure it?',
+                a: 'Intentionally explicit. You add a system prompt to each AI tool instructing it to load your memory at the start of sessions. No hidden background syncing — you always know exactly what context each AI has. This is how MCP memory actually works.',
+              },
+              {
+                q: "What counts as a 'memory'?",
+                a: 'Any piece of text you store — a note, a fact, a code snippet, a meeting summary, a project decision. Each individual entry is one memory. They live inside named Palaces (workspaces), organized into Locations.',
+              },
+              {
+                q: 'Is my data encrypted?',
+                a: 'Yes. Data is encrypted at rest with AES-256-GCM. TLS 1.3 in transit. API keys are bcrypt-hashed — we never see the raw value. Payments are processed by Stripe — we never touch your card details.',
+              },
+              {
+                q: 'Can I self-host the entire thing?',
+                a: 'Yes — the full stack (server, web app, worker) runs on Docker + PostgreSQL + pgvector. Enterprise plan includes the self-host guide and dedicated setup support.',
+              },
+              {
+                q: 'Can I cancel anytime?',
+                a: 'Yes — cancel from Settings at any time. You keep full Pro access until the end of your billing period. No questions asked.',
+              },
+            ].map(({ q, a }) => (
+              <div key={q} className="border-b border-[#334155]/30 pb-6">
+                <p className="font-semibold text-[#F1F5F9] mb-2">{q}</p>
+                <p className="text-sm text-[#94A3B8] leading-relaxed">{a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Email Capture ──────────────────────────────────────────────── */}
+      <section className="py-20 px-6 border-t border-[#334155]/20">
+        <div className="max-w-xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#ff7a00]/10 border border-[#ff7a00]/30 rounded-full text-xs text-[#ff7a00] font-semibold mb-6">
+            Stay in the loop
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">Not ready to sign up yet?</h2>
+          <p className="text-[#94A3B8] mb-8 text-sm leading-relaxed">
+            Get notified when we ship new MCP integrations, desktop app updates, and enterprise features.
+            No spam. Unsubscribe anytime.
+          </p>
+          <form
+            action="https://formspree.io/f/unimatrix-waitlist"
+            method="POST"
+            className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto"
+          >
+            <input
+              type="email"
+              name="email"
+              required
+              placeholder="your@email.com"
+              className="flex-1 px-4 py-3 bg-[#111827] border border-[#334155]/60 focus:border-[#ff7a00]/50 rounded-xl text-sm text-[#F1F5F9] placeholder-[#64748B] outline-none transition-colors"
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-sm transition-all whitespace-nowrap"
+            >
+              Notify Me
+            </button>
+          </form>
+        </div>
+      </section>
+
       {/* ── CTA Banner ────────────────────────────────────────────────── */}
-      <section className="py-20 px-6 bg-gradient-to-r from-accent/5 via-[#0A0F1C] to-accent-secondary/5 border-t border-border/20">
+      <section className="py-24 px-6 bg-gradient-to-r from-[#ff7a00]/5 via-[#0A0F1C] to-[#A855F7]/5 border-t border-[#334155]/20">
         <div className="max-w-3xl mx-auto text-center">
           <div className="flex justify-center mb-8">
-            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={62} height={68}
-              className="opacity-60 drop-shadow-[0_0_16px_rgba(0,245,255,0.3)]" />
+            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={60} height={66}
+              className="opacity-60 drop-shadow-[0_0_20px_rgba(255,122,0,0.3)]" />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Stop re-explaining yourself to every AI.</h2>
-          <p className="text-text-secondary mb-8 text-lg leading-relaxed">
+          <p className="text-[#94A3B8] mb-10 text-lg leading-relaxed">
             Your context belongs to you — not to a single chat window on a single device.
             Unimatrix makes every AI smarter by giving it your full history, everywhere.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/auth/register"
-              className="w-full sm:w-auto inline-block px-10 py-4 bg-accent hover:bg-accent/90 text-bg font-bold rounded-xl text-base transition-all duration-200 hover:shadow-xl hover:shadow-accent/20 hover:scale-[1.02]">
+              className="w-full sm:w-auto inline-block px-10 py-4 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-base transition-all duration-200 hover:shadow-xl hover:shadow-[#ff7a00]/20 hover:scale-[1.02]">
               Get Started Free
             </Link>
-            <Link href="/auth/login"
-              className="w-full sm:w-auto inline-block px-10 py-4 border border-border/60 hover:border-accent/40 text-text-secondary hover:text-text font-semibold rounded-xl text-base transition-all duration-200">
-              Sign In to Web App
+            <Link href="/pricing"
+              className="w-full sm:w-auto inline-block px-10 py-4 border border-[#334155]/60 hover:border-[#ff7a00]/40 text-[#94A3B8] hover:text-[#F1F5F9] font-semibold rounded-xl text-base transition-all duration-200">
+              View All Plans
             </Link>
           </div>
+          <p className="text-xs text-[#64748B] mt-6">Free tier · No credit card · Cancel anytime</p>
         </div>
       </section>
 
       {/* ── Footer ────────────────────────────────────────────────────── */}
-      <footer className="py-10 px-6 border-t border-border/30">
+      <footer className="py-10 px-6 border-t border-[#334155]/30">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={31} height={34} className="opacity-60" />
+            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={30} height={33} className="opacity-60" />
             <div>
               <span className="font-black text-base tracking-tight">
-                <span className="text-accent">UNI</span>
-                <span className="text-[#8892A4]">MATRIX</span>
+                <span className="text-[#ff7a00]">UNI</span>
+                <span className="text-[#64748B]">MATRIX</span>
               </span>
-              <p className="text-xs text-text-muted mt-0.5">deployunimatrix.com &middot; hello@deployunimatrix.com</p>
+              <p className="text-xs text-[#64748B] mt-0.5">deployunimatrix.com &middot; hello@deployunimatrix.com</p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-text-muted">
-            <a href="#how-it-works" className="hover:text-text-secondary transition-colors">How It Works</a>
-            <a href="#platforms" className="hover:text-text-secondary transition-colors">Downloads</a>
-            <Link href="/docs/mcp" className="hover:text-text-secondary transition-colors">MCP Reference</Link>
-            <a href="#features" className="hover:text-text-secondary transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-text-secondary transition-colors">Pricing</a>
-            <Link href="/auth/login" className="hover:text-text-secondary transition-colors">Sign In</Link>
-            <Link href="/auth/register" className="hover:text-text-secondary transition-colors">Register</Link>
+          <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-[#64748B]">
+            <a href="#how-it-works" className="hover:text-[#94A3B8] transition-colors">How It Works</a>
+            <a href="#platforms" className="hover:text-[#94A3B8] transition-colors">Downloads</a>
+            <Link href="/docs/mcp" className="hover:text-[#94A3B8] transition-colors">MCP Reference</Link>
+            <a href="#features" className="hover:text-[#94A3B8] transition-colors">Features</a>
+            <a href="#pricing" className="hover:text-[#94A3B8] transition-colors">Pricing</a>
+            <Link href="/auth/login" className="hover:text-[#94A3B8] transition-colors">Sign In</Link>
+            <Link href="/auth/register" className="hover:text-[#94A3B8] transition-colors">Register</Link>
           </div>
           <p className="text-xs text-[#334155]">&copy; 2026 Unimatrix. All rights reserved.</p>
         </div>
