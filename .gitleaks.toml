@@ -1,0 +1,39 @@
+# Gitleaks configuration for Unimatrix
+# Docs: https://github.com/gitleaks/gitleaks
+
+title = "Unimatrix gitleaks config"
+
+[extend]
+# Extend the default rules from the official gitleaks repo
+useDefault = true
+
+# Allow test fixtures that use obviously fake/placeholder values
+[[allowlists]]
+description = "Allow test fixture placeholder values"
+regexes = [
+  '''test-password-\d+''',
+  '''sk_test_xxxx''',
+  '''sk-ant-xxxx''',
+  '''AKIAIOSFODNN7EXAMPLE''',
+  '''wJalrXUtnFEMI''',
+  '''xxxxxxxx''',
+  '''\.\.\.''',
+  '''YOUR_''',
+  '''PLACEHOLDER''',
+  '''REDACTED_''',
+  '''sk_placeholder''',
+]
+
+[[allowlists]]
+description = "Allow .env.example files"
+paths = [
+  '''.env.example''',
+  '''apps/mobile/.env.example''',
+]
+
+[[allowlists]]
+description = "Allow test files with fake credentials"
+paths = [
+  '''apps/web/__tests__/''',
+  '''scripts/k6-loadtest.js''',
+]

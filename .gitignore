@@ -13,11 +13,49 @@ out/
 # Expo EAS local artifacts / caches (mobile)
 .eas/
 
-# Environment
+# Environment — never commit real secrets
 .env
 .env.local
 .env.*.local
+.env.production
 .env.production.local
+.env.staging
+.env.development.local
+
+# Secret/credential files — keep local only
+ACCOUNTS_AND_SECRETS.md
+LOCAL_SETUP.md
+scripts/restore-secrets.sh
+
+# Private keys, certs, and keystores
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.cer
+*.crt
+*.der
+
+# AWS credentials
+.aws/
+credentials
+
+# Generic secret file name patterns
+*secret*
+*Secret*
+*SECRET*
+*credential*
+*Credential*
+*CREDENTIAL*
+*private*key*
+*.private
+secrets.json
+secrets.yaml
+secrets.yml
+vault-token
+.vault-token
 
 # IDE
 .vscode/
