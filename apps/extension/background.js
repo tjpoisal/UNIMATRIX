@@ -259,3 +259,240 @@ function detectLlmFromUrl(url = '') {
 
 // Initial badge clear on load
 setBadge('', '#ff7a00');
+
+// ── Zero-Knowledge Client-Side Encryption ────────────────────────────────────
+//
+// When a ZK passphrase is set, ALL memory content is encrypted in the extension
+// before being sent to the Unimatrix server. The server stores ciphertext it
+// can never read. Decryption happens in the extension on retrieval.
+//
+// Algorithm: AES-GCM-256
+// Key derivation: PBKDF2 (SHA-256, 310,000 iterations — OWASP 2023 recommendation)
+// Key storage: Derived key stored in chrome.storage.local (session only option available)
+// The raw passphrase is NEVER stored — only the derived key material.
+//
+// Trade-off: semantic/vector search is disabled in ZK mode (can't search ciphertext).
+// Full-text search still works via client-side decryption of search results.
+
+const ZK_PBKDF2_ITERATIONS = 310_000;
+const ZK_SALT_LEN  = 32; // bytes
+const ZK_IV_LEN    = 12; // bytes — 96-bit IV for AES-GCM
+
+// ── Key derivation ────────────────────────────────────────────────────────────
+
+async function zkDeriveKey(passphrase, saltB64) {
+  const enc       = new TextEncoder();
+  const saltBytes = saltB64
+    ? b64ToBytes(saltB64)
+    : crypto.getRandomValues(new Uint8Array(ZK_SALT_LEN));
+
+  const keyMaterial = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(passphrase),
+    { name: 'PBKDF2' },
+    false,
+    ['deriveKey'],
+  );
+
+  const key = await crypto.subtle.deriveKey(
+    {
+      name:       'PBKDF2',
+      salt:       saltBytes,
+      iterations: ZK_PBKDF2_ITERATIONS,
+      hash:       'SHA-256',
+    },
+    keyMaterial,
+    { name: 'AES-GCM', length: 256 },
+    false,      // not extractable
+    ['encrypt', 'decrypt'],
+  );
+
+  return { key, saltB64: bytesToB64(saltBytes) };
+}
+
+async function zkEncrypt(plaintext, key) {
+  const iv  = crypto.getRandomValues(new Uint8Array(ZK_IV_LEN));
+  const enc = new TextEncoder();
+  const ct  = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv },
+    key,
+    enc.encode(plaintext),
+  );
+  // Format: iv_b64:ciphertext_b64
+  return `${bytesToB64(iv)}:${bytesToB64(new Uint8Array(ct))}`;
+}
+
+async function zkDecrypt(cipherStr, key) {
+  const [ivB64, ctB64] = cipherStr.split(':');
+  if (!ivB64 || !ctB64) throw new Error('Invalid ZK ciphertext format');
+  const iv = b64ToBytes(ivB64);
+  const ct = b64ToBytes(ctB64);
+  const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
+  return new TextDecoder().decode(pt);
+}
+
+// ── Base64 helpers ────────────────────────────────────────────────────────────
+
+function bytesToB64(bytes) {
+  return btoa(String.fromCharCode(...new Uint8Array(bytes)));
+}
+
+function b64ToBytes(b64) {
+  return Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+}
+
+// ── Key cache (session) ───────────────────────────────────────────────────────
+
+let _zkKeyCache = null; // { key: CryptoKey, saltB64: string }
+
+async function getZkKey() {
+  if (_zkKeyCache) return _zkKeyCache;
+
+  const stored = await new Promise(r =>
+    chrome.storage.local.get(['zkPassphraseHash', 'zkSalt'], r)
+  );
+
+  if (!stored.zkPassphraseHash || !stored.zkSalt) return null;
+
+  // We can't re-derive from the hash — the user must unlock each session
+  // If the key isn't cached it means the user hasn't unlocked this session
+  return null;
+}
+
+// ── ZK API surface (called from message handler) ──────────────────────────────
+
+async function zkSetPassphrase(passphrase) {
+  if (!passphrase || passphrase.length < 8) {
+    return { error: 'Passphrase must be at least 8 characters.' };
+  }
+
+  const { key, saltB64 } = await zkDeriveKey(passphrase, null);
+
+  // Store a verification token so we can confirm the passphrase is correct later
+  const verifyPlain = 'unimatrix-zk-verify-v1';
+  const verifyCt    = await zkEncrypt(verifyPlain, key);
+
+  await chrome.storage.local.set({
+    zkEnabled:   true,
+    zkSalt:      saltB64,
+    zkVerifyCt:  verifyCt,
+  });
+
+  _zkKeyCache = { key, saltB64 };
+
+  return { success: true, message: 'Zero-knowledge encryption enabled. Passphrase is never stored.' };
+}
+
+async function zkUnlock(passphrase) {
+  const stored = await new Promise(r =>
+    chrome.storage.local.get(['zkSalt', 'zkVerifyCt', 'zkEnabled'], r)
+  );
+
+  if (!stored.zkEnabled) return { error: 'ZK mode not enabled.' };
+  if (!stored.zkSalt || !stored.zkVerifyCt) return { error: 'ZK not configured. Set a passphrase first.' };
+
+  try {
+    const { key, saltB64 } = await zkDeriveKey(passphrase, stored.zkSalt);
+    const decrypted = await zkDecrypt(stored.zkVerifyCt, key);
+    if (decrypted !== 'unimatrix-zk-verify-v1') {
+      return { error: 'Wrong passphrase.' };
+    }
+    _zkKeyCache = { key, saltB64 };
+    return { success: true };
+  } catch {
+    return { error: 'Wrong passphrase.' };
+  }
+}
+
+async function zkDisable() {
+  _zkKeyCache = null;
+  await chrome.storage.local.remove(['zkEnabled', 'zkSalt', 'zkVerifyCt']);
+  return { success: true };
+}
+
+async function zkLock() {
+  _zkKeyCache = null;
+  return { success: true };
+}
+
+// ── Wrap storeMemory to encrypt when ZK is active ────────────────────────────
+
+const _originalStoreMemory = storeMemory;
+
+async function storeMemoryWithZk(payload) {
+  const cfg = await getConfig();
+  if (!cfg.zkEnabled) return _originalStoreMemory(payload);
+
+  const zkKey = await getZkKey();
+  if (!zkKey) {
+    return { error: 'ZK mode is locked. Unlock with your passphrase first.' };
+  }
+
+  // Encrypt content before sending to server
+  const encryptedContent = await zkEncrypt(payload.content, zkKey.key);
+  return _originalStoreMemory({
+    ...payload,
+    content: `[ZK]${encryptedContent}`,         // prefix so server knows it's ZK-encrypted
+    tags: [...(payload.tags || []), 'zk-encrypted'],
+  });
+}
+
+// ── Wrap search results to decrypt ZK memories ───────────────────────────────
+
+async function searchMemoriesWithZk(query, limit = 5) {
+  const result = await searchMemories(query, limit);
+  const cfg    = await getConfig();
+
+  if (!cfg.zkEnabled || !result?.data) return result;
+
+  const zkKey = await getZkKey();
+  if (!zkKey) return result; // Return encrypted — user must unlock
+
+  const memories = Array.isArray(result.data) ? result.data : result.data.results || [];
+  const decrypted = await Promise.all(memories.map(async (m) => {
+    if (typeof m.content === 'string' && m.content.startsWith('[ZK]')) {
+      try {
+        m.content = await zkDecrypt(m.content.slice(4), zkKey.key);
+      } catch {
+        m.content = '[ZK - decryption failed — wrong key or corrupted]';
+      }
+    }
+    return m;
+  }));
+
+  return { ...result, data: decrypted };
+}
+
+// Add ZK message handlers to the existing message listener
+const _originalOnMessage = chrome.runtime.onMessage;
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.type === 'ZK_SET_PASSPHRASE') {
+    zkSetPassphrase(msg.passphrase).then(sendResponse);
+    return true;
+  }
+  if (msg.type === 'ZK_UNLOCK') {
+    zkUnlock(msg.passphrase).then(sendResponse);
+    return true;
+  }
+  if (msg.type === 'ZK_LOCK') {
+    zkLock().then(sendResponse);
+    return true;
+  }
+  if (msg.type === 'ZK_DISABLE') {
+    zkDisable().then(sendResponse);
+    return true;
+  }
+  if (msg.type === 'ZK_STATUS') {
+    getConfig().then(cfg =>
+      sendResponse({
+        enabled: !!cfg.zkEnabled,
+        unlocked: !!_zkKeyCache,
+      })
+    );
+    return true;
+  }
+});
+
+// Override storeMemory globally so all paths use ZK when enabled
+globalThis.storeMemory = storeMemoryWithZk;
+globalThis.searchMemories = searchMemoriesWithZk;

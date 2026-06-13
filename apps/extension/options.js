@@ -94,4 +94,102 @@ $('autoCaptureToggle')?.addEventListener('change', async (e) => {
   showStatus(e.target.checked ? 'Auto-capture enabled.' : 'Auto-capture disabled.', 'success');
 });
 
+// Intercept memory toggle
+$('interceptMemoryToggle')?.addEventListener('change', async (e) => {
+  await msg('SAVE_CONFIG', { config: { interceptMemory: e.target.checked } });
+  showStatus(
+    e.target.checked
+      ? 'Native LLM memory intercepted — saves will redirect to Unimatrix.'
+      : 'Native LLM memory interception disabled.',
+    'success'
+  );
+});
+
+// ── Zero-Knowledge Encryption ─────────────────────────────────────────────
+
+async function refreshZkUi() {
+  const status = await new Promise(r =>
+    chrome.runtime.sendMessage({ type: 'ZK_STATUS' }, r)
+  );
+  const cfg = await msg('GET_CONFIG');
+
+  if (status?.enabled) {
+    $('zkLockedSection').style.display  = 'none';
+    $('zkEnabledSection').style.display = 'block';
+    $('zkPassphraseLabel').textContent  = status.unlocked
+      ? 'ZK Passphrase (unlocked ✅)'
+      : 'ZK Passphrase (locked 🔒)';
+    // Show unlock button if locked
+    if (!status.unlocked) {
+      $('zkUnlockBtn').style.display  = 'inline-flex';
+      $('zkEnableBtn').style.display  = 'none';
+      $('zkLockedSection').style.display = 'block';
+      $('zkEnabledSection').style.display = 'none';
+    }
+  } else {
+    $('zkLockedSection').style.display  = 'block';
+    $('zkEnabledSection').style.display = 'none';
+    $('zkUnlockBtn').style.display      = 'none';
+    $('zkEnableBtn').style.display      = 'inline-flex';
+  }
+
+  if ($('interceptMemoryToggle')) {
+    $('interceptMemoryToggle').checked = !!cfg?.data?.interceptMemory;
+  }
+}
+
+$('zkEnableBtn')?.addEventListener('click', async () => {
+  const passphrase = $('zkPassphraseInput')?.value?.trim();
+  if (!passphrase) { showStatus('Enter a passphrase first.', 'error'); return; }
+
+  $('zkEnableBtn').disabled    = true;
+  $('zkEnableBtn').textContent = 'Encrypting…';
+
+  const result = await new Promise(r =>
+    chrome.runtime.sendMessage({ type: 'ZK_SET_PASSPHRASE', passphrase }, r)
+  );
+
+  $('zkEnableBtn').disabled    = false;
+  $('zkEnableBtn').textContent = 'Enable ZK Encryption';
+
+  if (result?.success) {
+    $('zkPassphraseInput').value = '';
+    showStatus('ZK encryption enabled. Passphrase not stored. Do not lose it.', 'success');
+    await refreshZkUi();
+  } else {
+    showStatus(result?.error || 'Failed to enable ZK.', 'error');
+  }
+});
+
+$('zkUnlockBtn')?.addEventListener('click', async () => {
+  const passphrase = $('zkPassphraseInput')?.value?.trim();
+  if (!passphrase) { showStatus('Enter your ZK passphrase.', 'error'); return; }
+
+  const result = await new Promise(r =>
+    chrome.runtime.sendMessage({ type: 'ZK_UNLOCK', passphrase }, r)
+  );
+  $('zkPassphraseInput').value = '';
+
+  if (result?.success) {
+    showStatus('ZK unlocked. Memories will be decrypted in this session.', 'success');
+    await refreshZkUi();
+  } else {
+    showStatus(result?.error || 'Wrong passphrase.', 'error');
+  }
+});
+
+$('zkLockBtn')?.addEventListener('click', async () => {
+  await new Promise(r => chrome.runtime.sendMessage({ type: 'ZK_LOCK' }, r));
+  showStatus('ZK locked. Memories will not be decrypted until you unlock.', 'success');
+  await refreshZkUi();
+});
+
+$('zkDisableBtn')?.addEventListener('click', async () => {
+  if (!confirm('Disable ZK encryption? Future memories will be stored unencrypted. Existing ZK memories will remain encrypted on the server.')) return;
+  await new Promise(r => chrome.runtime.sendMessage({ type: 'ZK_DISABLE' }, r));
+  showStatus('ZK encryption disabled.', 'success');
+  await refreshZkUi();
+});
+
 init();
+refreshZkUi();

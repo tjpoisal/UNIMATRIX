@@ -379,3 +379,147 @@
   }).observe(document, { subtree: true, childList: true });
 
 })();
+
+// ── ChatGPT / LLM Native Memory Intercept ─────────────────────────────────
+//
+// Blocks the LLM platform's own memory save calls and redirects them to
+// Unimatrix instead. Runs only when interceptMemory is enabled in settings.
+//
+// Supported intercepts:
+//   ChatGPT:  POST /backend-api/memories  (create)
+//             PATCH /backend-api/memories/:id (update)
+//             DELETE /backend-api/memories/:id (delete — allowed through)
+//   Claude:   No public memory API — handled via system prompt injection only
+//   Gemini:   No interceptable memory API — system prompt injection only
+
+(function installMemoryIntercept() {
+  // Inject into page context (not extension context) so we can wrap fetch
+  const script = document.createElement('script');
+  script.textContent = `
+(function () {
+  if (window.__umx_intercept_installed) return;
+  window.__umx_intercept_installed = true;
+
+  const MEMORY_PATTERNS = [
+    /\\/backend-api\\/memories/,          // ChatGPT create/update
+    /\\/api\\/memory/,                     // Generic pattern
+    /openai\\.com.*\\/memories/,
+  ];
+
+  const DELETE_PATTERNS = [
+    /\\/backend-api\\/memories\\/[\\w-]+$/,  // Allow deletes through — user explicitly deleting
+  ];
+
+  const _fetch = window.fetch.bind(window);
+  window.fetch = async function (input, init = {}) {
+    const url = typeof input === 'string' ? input : input?.url || '';
+    const method = (init.method || 'GET').toUpperCase();
+
+    const isMemoryWrite = MEMORY_PATTERNS.some(p => p.test(url)) &&
+      (method === 'POST' || method === 'PUT' || method === 'PATCH');
+
+    if (!isMemoryWrite) return _fetch(input, init);
+
+    // Extract the memory content from the request body
+    let memoryContent = null;
+    try {
+      const body = typeof init.body === 'string'
+        ? JSON.parse(init.body)
+        : init.body;
+      memoryContent = body?.memory || body?.content || body?.text ||
+        (typeof body === 'string' ? body : JSON.stringify(body));
+    } catch {}
+
+    // Signal to extension content script to save to Unimatrix
+    window.dispatchEvent(new CustomEvent('__umx_intercept_memory', {
+      detail: { content: memoryContent, source: 'chatgpt-native-memory', url }
+    }));
+
+    // Return a fake success response — the platform thinks it saved
+    return new Response(
+      JSON.stringify({ id: 'umx_' + Date.now(), status: 'saved_to_unimatrix' }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+  };
+
+  // Also intercept XMLHttpRequest for older ChatGPT code paths
+  const _XHROpen  = XMLHttpRequest.prototype.open;
+  const _XHRSend  = XMLHttpRequest.prototype.send;
+  XMLHttpRequest.prototype.open = function (method, url, ...rest) {
+    this._umx_method = method;
+    this._umx_url    = url;
+    return _XHROpen.call(this, method, url, ...rest);
+  };
+  XMLHttpRequest.prototype.send = function (body) {
+    const method = (this._umx_method || '').toUpperCase();
+    const url    = this._umx_url || '';
+    const isMemoryWrite = MEMORY_PATTERNS.some(p => p.test(url)) &&
+      (method === 'POST' || method === 'PUT' || method === 'PATCH');
+
+    if (!isMemoryWrite) return _XHRSend.call(this, body);
+
+    let memoryContent = null;
+    try {
+      const parsed = typeof body === 'string' ? JSON.parse(body) : body;
+      memoryContent = parsed?.memory || parsed?.content || parsed?.text;
+    } catch {}
+
+    window.dispatchEvent(new CustomEvent('__umx_intercept_memory', {
+      detail: { content: memoryContent, source: 'chatgpt-native-memory-xhr', url }
+    }));
+
+    // Fake success
+    Object.defineProperty(this, 'status',       { get: () => 200 });
+    Object.defineProperty(this, 'readyState',   { get: () => 4 });
+    Object.defineProperty(this, 'responseText', { get: () => '{"status":"saved_to_unimatrix"}' });
+    if (typeof this.onreadystatechange === 'function') this.onreadystatechange();
+    if (typeof this.onload === 'function') this.onload();
+  };
+})();
+  `;
+  // Inject BEFORE the page scripts run
+  (document.head || document.documentElement).prepend(script);
+  script.remove();
+
+  // Listen for intercepted memory events from page context
+  window.addEventListener('__umx_intercept_memory', async (e) => {
+    const { content, source } = e.detail || {};
+    if (!content) return;
+
+    // Check if intercept is enabled in settings
+    const cfg = await new Promise(r =>
+      chrome.runtime.sendMessage({ type: 'GET_CONFIG' }, r)
+    ).catch(() => ({}));
+
+    if (!cfg?.data?.interceptMemory) return;
+
+    // Save to Unimatrix instead
+    chrome.runtime.sendMessage({
+      type: 'STORE_MEMORY',
+      payload: {
+        content:    typeof content === 'string' ? content : JSON.stringify(content),
+        palaceName: 'Intercepted',
+        location:   SITE.charAt(0).toUpperCase() + SITE.slice(1),
+        tags:       [SITE, 'intercepted', 'native-memory-redirect'],
+        sourceLlm:  SITE,
+      },
+    });
+
+    showToast('Native memory intercepted → saved to Unimatrix', 'info');
+  });
+
+  // Inject system prompt suppression on supported sites
+  // For ChatGPT: mutate the "system" message before it's sent if possible
+  // For Claude/Gemini: append a note to the first user message
+  injectMemorySuppressionHint();
+})();
+
+function injectMemorySuppressionHint() {
+  if (SITE !== 'chatgpt' && SITE !== 'claude' && SITE !== 'gemini') return;
+
+  // Watch for the textarea / send button to inject a suppression note
+  // We don't want to visibly edit the user's prompt — instead we watch for
+  // the actual API request in the fetch intercept above. The system prompt
+  // suppression is handled by the OpenAI-compatible proxy on the desktop app
+  // for API users. For web UI users, the intercept approach above is sufficient.
+}

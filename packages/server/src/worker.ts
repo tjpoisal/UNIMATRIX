@@ -106,9 +106,38 @@ async function processBatch() {
   }
 }
 
+// ── TTL Expiry Cleanup ─────────────────────────────────────────────────────
+
+const TTL_CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // hourly
+
+async function expireOldMemories(): Promise<void> {
+  try {
+    const result = await prisma.memory.updateMany({
+      where: {
+        expiresAt:  { lte: new Date() },
+        deletedAt:  null,
+        status:     { not: 'deleted' },
+      },
+      data: {
+        deletedAt: new Date(),
+        status:    'deleted',
+      },
+    });
+    if (result.count > 0) {
+      console.log(`[Worker] TTL expiry: soft-deleted ${result.count} expired memories`);
+    }
+  } catch (err: any) {
+    console.error('[Worker] TTL expiry error:', err?.message);
+  }
+}
+
 async function main() {
   console.log('[Worker] Unimatrix background worker starting...');
   console.log(`[Worker] Poll interval: ${POLL_INTERVAL_MS}ms, batch: ${BATCH_SIZE}`);
+
+  // Run TTL cleanup immediately on start, then hourly
+  await expireOldMemories();
+  setInterval(expireOldMemories, TTL_CLEANUP_INTERVAL_MS);
 
   // eslint-disable-next-line no-constant-condition
   while (true) {

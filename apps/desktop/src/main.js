@@ -130,6 +130,12 @@ function buildTrayMenu(syncStatus = 'Idle') {
     },
     { type: 'separator' },
     {
+      label:   readConfig().paranoidMode ? '🔴 Paranoid Mode: ON' : '⚪ Paranoid Mode: OFF',
+      toolTip: 'Store memories locally only — no cloud, no account',
+      click:   () => toggleParanoidMode(!readConfig().paranoidMode),
+    },
+    { type: 'separator' },
+    {
       label: 'Sync Now',
       click: () => triggerSync(),
     },
@@ -509,6 +515,7 @@ app.whenReady().then(() => {
   createTray();
   startMcpProxy();
   startOpenAIProxy();
+  if (readConfig().paranoidMode) startParanoidServer();
   startBackgroundSync();
 
   // Only open window if not started hidden (e.g., from login item)
@@ -536,6 +543,7 @@ app.on('before-quit', () => {
   if (memorySyncInterval)   clearInterval(memorySyncInterval);
   if (proxyServer)          proxyServer.close();
   if (openaiProxyServer)    openaiProxyServer.close();
+  stopParanoidServer();
 });
 
 autoUpdater.on('update-downloaded', () => {
@@ -1022,3 +1030,303 @@ function proxyPassthrough(req, res, body, upstreamBase) {
   proxyReq.end();
 }
 
+
+// ── Paranoid Mode — Local-Only SQLite MCP Server ──────────────────────────
+//
+// When enabled, Unimatrix runs entirely on the user's machine:
+//   - No cloud account required
+//   - No network calls — everything stays on localhost
+//   - SQLite database in the user's app data directory
+//   - Full-text search (FTS5) — semantic search disabled (no embeddings)
+//   - MCP proxy on port 8765 forwards to THIS local server on port 8767
+//     instead of the cloud endpoint
+//
+// Trade-offs vs. cloud mode:
+//   - No cross-device sync
+//   - No semantic/vector search (text search only)
+//   - No Librarian agent (no Anthropic API call)
+//   - Memories never leave the machine
+
+const PARANOID_PORT    = 8767;
+let   paranoidServer   = null;
+let   paranoidDb       = null; // better-sqlite3 instance
+
+function getParanoidDbPath() {
+  return require('path').join(app.getPath('userData'), 'unimatrix-local.db');
+}
+
+function initParanoidDb() {
+  // better-sqlite3 is bundled with the desktop app
+  let Database;
+  try {
+    Database = require('better-sqlite3');
+  } catch {
+    console.error('[Paranoid] better-sqlite3 not available — paranoid mode disabled');
+    return null;
+  }
+
+  const db = new Database(getParanoidDbPath());
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS palaces (
+      id         TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+      name       TEXT NOT NULL UNIQUE,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS memories (
+      id          TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+      palace_id   TEXT REFERENCES palaces(id) ON DELETE SET NULL,
+      location    TEXT,
+      content     TEXT NOT NULL,
+      tags        TEXT DEFAULT '[]',
+      expires_at  TEXT,
+      created_at  TEXT DEFAULT (datetime('now')),
+      deleted_at  TEXT
+    );
+
+    CREATE VIRTUAL TABLE IF NOT EXISTS memories_fts USING fts5(
+      content,
+      content='memories',
+      content_rowid='rowid'
+    );
+
+    CREATE TRIGGER IF NOT EXISTS memories_ai AFTER INSERT ON memories BEGIN
+      INSERT INTO memories_fts(rowid, content) VALUES (new.rowid, new.content);
+    END;
+    CREATE TRIGGER IF NOT EXISTS memories_au AFTER UPDATE ON memories BEGIN
+      INSERT INTO memories_fts(memories_fts, rowid, content) VALUES ('delete', old.rowid, old.content);
+      INSERT INTO memories_fts(rowid, content) VALUES (new.rowid, new.content);
+    END;
+    CREATE TRIGGER IF NOT EXISTS memories_ad AFTER DELETE ON memories BEGIN
+      INSERT INTO memories_fts(memories_fts, rowid, content) VALUES ('delete', old.rowid, old.content);
+    END;
+
+    INSERT OR IGNORE INTO palaces (name) VALUES ('General');
+  `);
+
+  // Background cleanup of expired memories (runs every hour)
+  setInterval(() => {
+    try {
+      const deleted = db.prepare(`
+        UPDATE memories SET deleted_at = datetime('now')
+        WHERE expires_at IS NOT NULL
+          AND datetime(expires_at) <= datetime('now')
+          AND deleted_at IS NULL
+      `).run();
+      if (deleted.changes > 0) {
+        console.log(`[Paranoid] Expired ${deleted.changes} memories`);
+      }
+    } catch (e) {
+      console.error('[Paranoid] Expiry cleanup error:', e);
+    }
+  }, 60 * 60 * 1000);
+
+  return db;
+}
+
+function handleParanoidMcpRequest(method, params, db) {
+  try {
+    if (method === 'tools/list') {
+      return {
+        tools: [
+          {
+            name: 'unimatrix_store_memory',
+            description: 'Store a memory locally (paranoid mode — no cloud)',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                content:     { type: 'string' },
+                palace_name: { type: 'string' },
+                location:    { type: 'string' },
+                tags:        { type: 'array', items: { type: 'string' } },
+                ttl_days:    { type: 'number', description: 'Auto-delete after N days' },
+              },
+              required: ['content'],
+            },
+          },
+          {
+            name: 'unimatrix_search_memories',
+            description: 'Full-text search local memories (paranoid mode)',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                query: { type: 'string' },
+                limit: { type: 'number' },
+              },
+              required: ['query'],
+            },
+          },
+          {
+            name: 'unimatrix_list_palaces',
+            description: 'List local memory palaces',
+            inputSchema: { type: 'object', properties: {} },
+          },
+        ],
+      };
+    }
+
+    if (method === 'tools/call') {
+      const name = params?.name;
+      const args = params?.arguments || {};
+
+      if (name === 'unimatrix_store_memory') {
+        const { content, palace_name, location, tags, ttl_days } = args;
+
+        // Find or create palace
+        let palace = db.prepare('SELECT id FROM palaces WHERE name = ?')
+          .get(palace_name || 'General');
+        if (!palace) {
+          db.prepare('INSERT INTO palaces (name) VALUES (?)').run(palace_name);
+          palace = db.prepare('SELECT id FROM palaces WHERE name = ?').get(palace_name);
+        }
+
+        const expiresAt = ttl_days
+          ? new Date(Date.now() + ttl_days * 86400000).toISOString()
+          : null;
+
+        const result = db.prepare(`
+          INSERT INTO memories (palace_id, location, content, tags, expires_at)
+          VALUES (?, ?, ?, ?, ?)
+        `).run(
+          palace?.id || null,
+          location || null,
+          content,
+          JSON.stringify(tags || []),
+          expiresAt,
+        );
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({
+              success:    true,
+              id:         result.lastInsertRowid,
+              palace:     palace_name || 'General',
+              local_only: true,
+              expires_at: expiresAt,
+            }),
+          }],
+        };
+      }
+
+      if (name === 'unimatrix_search_memories') {
+        const { query, limit = 5 } = args;
+        const rows = db.prepare(`
+          SELECT m.id, m.content, m.location, m.tags, m.created_at, p.name as palace_name
+          FROM memories_fts
+          JOIN memories m ON memories_fts.rowid = m.rowid
+          LEFT JOIN palaces p ON m.palace_id = p.id
+          WHERE memories_fts MATCH ?
+            AND m.deleted_at IS NULL
+            AND (m.expires_at IS NULL OR datetime(m.expires_at) > datetime('now'))
+          LIMIT ?
+        `).all(query, limit);
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({ results: rows, local_only: true }),
+          }],
+        };
+      }
+
+      if (name === 'unimatrix_list_palaces') {
+        const rows = db.prepare(`
+          SELECT p.id, p.name, COUNT(m.id) as memory_count
+          FROM palaces p
+          LEFT JOIN memories m ON m.palace_id = p.id AND m.deleted_at IS NULL
+          GROUP BY p.id
+        `).all();
+
+        return {
+          content: [{
+            type: 'text',
+            text: JSON.stringify({ palaces: rows, local_only: true }),
+          }],
+        };
+      }
+
+      return { error: { code: -32601, message: `Unknown tool: ${name}` } };
+    }
+
+    return { error: { code: -32601, message: `Unknown method: ${method}` } };
+  } catch (err) {
+    return { error: { code: -32603, message: err.message } };
+  }
+}
+
+function startParanoidServer() {
+  paranoidDb = initParanoidDb();
+  if (!paranoidDb) return;
+
+  paranoidServer = http.createServer((req, res) => {
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204, {
+        'Access-Control-Allow-Origin':  '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      });
+      res.end();
+      return;
+    }
+
+    let body = '';
+    req.on('data', c => { body += c; });
+    req.on('end', () => {
+      try {
+        const rpc = JSON.parse(body);
+        const result = handleParanoidMcpRequest(rpc.method, rpc.params, paranoidDb);
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        });
+        res.end(JSON.stringify({ jsonrpc: '2.0', id: rpc.id, result }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+  });
+
+  paranoidServer.listen(PARANOID_PORT, '127.0.0.1', () => {
+    console.log(`[Paranoid Mode] Local MCP server on localhost:${PARANOID_PORT}`);
+  });
+
+  paranoidServer.on('error', err => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`[Paranoid] Port ${PARANOID_PORT} in use`);
+    }
+  });
+}
+
+function stopParanoidServer() {
+  if (paranoidServer) { paranoidServer.close(); paranoidServer = null; }
+  if (paranoidDb)     { paranoidDb.close();     paranoidDb     = null; }
+}
+
+function toggleParanoidMode(enable) {
+  const cfg = readConfig();
+  cfg.paranoidMode = enable;
+  saveConfig(cfg);
+
+  if (enable) {
+    startParanoidServer();
+    // Redirect MCP proxy to local paranoid server instead of cloud
+    cfg.mcpApiUrl = `http://localhost:${PARANOID_PORT}`;
+    saveConfig(cfg);
+    showNotification(
+      'Paranoid Mode ON',
+      'All memories stored locally only. No cloud. No account needed.'
+    );
+  } else {
+    stopParanoidServer();
+    // Restore cloud endpoint
+    delete cfg.mcpApiUrl;
+    saveConfig(cfg);
+    showNotification('Paranoid Mode OFF', 'Back to cloud memory sync.');
+  }
+
+  // Rebuild tray menu to reflect new state
+  createTray();
+}

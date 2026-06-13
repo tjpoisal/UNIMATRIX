@@ -62,14 +62,16 @@ $('saveBtn').addEventListener('click', async () => {
   $('saveBtnText').textContent = 'Saving…';
   $('saveBtn').disabled = true;
 
-  const context = $('memoryContext').value.trim();
-  const importance = $('memoryImportance').value;
+  const context    = $('memoryContext').value.trim();
+  const importance  = $('memoryImportance').value;
+  const ttlDays     = $('memoryTtl') ? parseInt($('memoryTtl').value, 10) || null : null;
 
   const result = await msg('STORE_MEMORY', {
     payload: {
       content,
       palaceName: context || 'Web Captures',
-      tags: [importance, 'manual', 'popup'].filter(Boolean),
+      tags:       [importance, 'manual', 'popup'].filter(Boolean),
+      ttl_days:   ttlDays,
     },
   });
 
