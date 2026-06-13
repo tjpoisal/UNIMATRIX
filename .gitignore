@@ -35,6 +35,8 @@ coverage/
 cdk.out/
 *.js
 !infrastructure/aws-cdk/lib/**/*.js
+!apps/extension/*.js
+!apps/desktop/src/*.js
 
 # Expo
 .expo/

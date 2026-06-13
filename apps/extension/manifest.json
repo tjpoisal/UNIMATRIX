@@ -2,18 +2,25 @@
   "manifest_version": 3,
   "name": "Unimatrix — AI Memory for Web LLMs",
   "version": "1.0.0",
-  "description": "Capture and save your web LLM conversations to Unimatrix. Works with ChatGPT, Claude web, Gemini, and more.",
+  "description": "Persistent AI memory for ChatGPT, Claude, Gemini, Grok, Perplexity, and Copilot. One memory layer for every AI you use.",
   "permissions": [
     "storage",
     "scripting",
-    "webRequest"
+    "contextMenus",
+    "tabs"
   ],
   "host_permissions": [
     "https://chat.openai.com/*",
+    "https://chatgpt.com/*",
     "https://claude.ai/*",
     "https://gemini.google.com/*",
     "https://copilot.microsoft.com/*",
-    "https://huggingface.co/*"
+    "https://huggingface.co/*",
+    "https://x.com/*",
+    "https://grok.x.ai/*",
+    "https://www.perplexity.ai/*",
+    "https://perplexity.ai/*",
+    "https://deployunimatrix.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -31,10 +38,15 @@
     {
       "matches": [
         "https://chat.openai.com/*",
+        "https://chatgpt.com/*",
         "https://claude.ai/*",
         "https://gemini.google.com/*",
         "https://copilot.microsoft.com/*",
-        "https://huggingface.co/*"
+        "https://huggingface.co/*",
+        "https://x.com/grok*",
+        "https://grok.x.ai/*",
+        "https://www.perplexity.ai/*",
+        "https://perplexity.ai/*"
       ],
       "js": ["content.js"],
       "css": ["content.css"],

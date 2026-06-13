@@ -3,311 +3,214 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Unimatrix Settings</title>
+  <title>Unimatrix Extension Settings</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: linear-gradient(135deg, #0e1030 0%, #1a1f3a 100%);
       color: #f1f5f9;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      padding: 20px;
+      padding: 32px 20px;
       min-height: 100vh;
     }
-
     .container {
-      max-width: 600px;
+      max-width: 520px;
       margin: 0 auto;
       background: #111827;
       border: 1px solid rgba(255, 122, 0, 0.2);
-      border-radius: 8px;
-      padding: 24px;
+      border-radius: 12px;
+      padding: 28px;
     }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      color: #94a3b8;
-      margin-bottom: 24px;
-    }
-
-    h2 {
-      font-size: 18px;
-      margin-top: 24px;
-      margin-bottom: 12px;
-      color: #f1f5f9;
-    }
-
-    h2:first-child {
-      margin-top: 0;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
+    .logo { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+    .logo span { color: #ff7a00; }
+    .subtitle { color: #64748b; font-size: 13px; margin-bottom: 24px; }
+    h2 { font-size: 15px; font-weight: 700; color: #f1f5f9; margin: 20px 0 10px; }
+    h2:first-of-type { margin-top: 0; }
+    .form-group { margin-bottom: 14px; }
     label {
       display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #94a3b8;
-      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 5px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
     }
-
-    input[type="text"],
-    input[type="password"],
-    textarea,
-    select {
+    input[type="text"], input[type="password"] {
       width: 100%;
       padding: 10px 12px;
       background: #1f2937;
       border: 1px solid rgba(255, 122, 0, 0.2);
-      border-radius: 6px;
+      border-radius: 8px;
       color: #f1f5f9;
       font-size: 13px;
-      font-family: inherit;
+      font-family: monospace;
+      transition: border-color 0.15s;
     }
-
-    input:focus,
-    textarea:focus,
-    select:focus {
-      outline: none;
-      border-color: #ff7a00;
-      box-shadow: 0 0 0 2px rgba(255, 122, 0, 0.1);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .button-group {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-
+    input:focus { outline: none; border-color: #ff7a00; box-shadow: 0 0 0 2px rgba(255,122,0,0.1); }
+    .hint { font-size: 11px; color: #64748b; margin-top: 4px; line-height: 1.5; }
+    .hint a { color: #ff7a00; text-decoration: none; }
+    .hint a:hover { text-decoration: underline; }
     button {
-      padding: 10px 16px;
+      padding: 10px 18px;
       border: none;
-      border-radius: 6px;
-      font-weight: 600;
+      border-radius: 8px;
+      font-weight: 700;
       cursor: pointer;
       font-size: 13px;
-      transition: all 0.2s;
+      transition: all 0.15s;
     }
-
-    .btn-primary {
-      background: #ff7a00;
-      color: #0e1030;
-      flex: 1;
-    }
-
-    .btn-primary:hover {
-      background: #ff8a1a;
-      transform: translateY(-1px);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
+    .btn-primary { background: #ff7a00; color: #0e1030; }
+    .btn-primary:hover { background: #e86d00; transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .btn-secondary {
       background: #1f2937;
       color: #f1f5f9;
-      border: 1px solid rgba(255, 122, 0, 0.2);
-      flex: 1;
+      border: 1px solid rgba(255,122,0,0.2);
     }
-
-    .btn-secondary:hover {
-      background: #374151;
-      border-color: #ff7a00;
-    }
-
-    .btn-danger {
-      background: #ef4444;
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: #dc2626;
-    }
-
+    .btn-secondary:hover { background: #374151; border-color: #ff7a00; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger:hover { background: #dc2626; }
+    .button-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
     .status {
-      padding: 12px;
-      border-radius: 6px;
-      margin-bottom: 16px;
+      padding: 10px 14px;
+      border-radius: 8px;
       font-size: 13px;
+      margin-bottom: 16px;
       display: none;
+      line-height: 1.4;
     }
-
-    .status.show {
-      display: block;
-    }
-
-    .status.success {
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      color: #22c55e;
-    }
-
-    .status.error {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #ef4444;
-    }
-
+    .status.show { display: block; }
+    .status.success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; }
+    .status.error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: #ef4444; }
+    .divider { height: 1px; background: rgba(255,122,0,0.1); margin: 24px 0; }
     .info-box {
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      padding: 12px;
-      border-radius: 6px;
+      background: rgba(255,122,0,0.07);
+      border: 1px solid rgba(255,122,0,0.2);
+      padding: 12px 14px;
+      border-radius: 8px;
       font-size: 12px;
-      color: #3b82f6;
-      margin-bottom: 16px;
-    }
-
-    .divider {
-      height: 1px;
-      background: rgba(255, 122, 0, 0.1);
-      margin: 24px 0;
-    }
-
-    .logo-text {
-      color: #ff7a00;
-    }
-
-    .auth-section {
-      display: none;
-    }
-
-    .auth-section.show {
-      display: block;
-    }
-
-    .feature-list {
-      list-style: none;
-      margin-bottom: 16px;
-    }
-
-    .feature-list li {
-      padding: 6px 0;
       color: #94a3b8;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,122,0,0.08);
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-label { font-size: 13px; color: #f1f5f9; }
+    .toggle-desc  { font-size: 11px; color: #64748b; margin-top: 2px; }
+    input[type="checkbox"] {
+      width: 38px;
+      height: 22px;
+      accent-color: #ff7a00;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .supported-list { list-style: none; margin: 0; padding: 0; }
+    .supported-list li {
+      padding: 6px 0;
       font-size: 13px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid rgba(255,122,0,0.06);
     }
-
-    .feature-list li:before {
-      content: "✓ ";
-      color: #ff7a00;
-      font-weight: bold;
-      margin-right: 6px;
-    }
+    .supported-list li:last-child { border-bottom: none; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: #ff7a00; flex-shrink: 0; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Uni<span class="logo-text">matrix</span> Extension</h1>
-    <p class="subtitle">Settings & Authentication</p>
+    <div class="logo"><span>UNI</span>MATRIX</div>
+    <div class="subtitle">Extension Settings</div>
 
     <div id="status" class="status"></div>
 
-    <!-- Authentication Section -->
+    <!-- Connect section -->
     <div id="loginSection">
-      <h2>Sign In</h2>
-      <p style="color: #94a3b8; margin-bottom: 12px; font-size: 13px;">
-        Sign in to start saving your web LLM conversations to Unimatrix.
-      </p>
-
+      <h2>Connect Your Account</h2>
       <div class="info-box">
-        🔐 Your encryption password never leaves your device. It's used only to encrypt memories before sending to Unimatrix.
+        Get your API key from the Unimatrix dashboard under
+        <strong>Settings → API Keys</strong>.
+        Your memories are encrypted and belong only to you.
       </div>
 
       <div class="form-group">
-        <label>Email</label>
-        <input type="text" id="email" placeholder="you@example.com">
+        <label>Unimatrix API Key</label>
+        <input type="password" id="apiKeyInput" placeholder="umx_…" autocomplete="off" />
+        <div class="hint">
+          <a href="https://deployunimatrix.com/dashboard/settings/api-keys" target="_blank" id="getDashboardKeyBtn">
+            Get your API key →
+          </a>
+          &nbsp;·&nbsp;
+          <a href="https://deployunimatrix.com/auth/register" target="_blank" id="createAccountBtn">
+            Create free account
+          </a>
+        </div>
       </div>
 
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="password" placeholder="Your account password">
+        <label>Custom API URL <span style="color:#64748b;font-weight:400;text-transform:none">(optional — leave blank for cloud)</span></label>
+        <input type="text" id="apiUrlInput" placeholder="https://deployunimatrix.com" />
+        <div class="hint">Only change this if you are self-hosting Unimatrix.</div>
       </div>
 
-      <div class="form-group">
-        <label>Encryption Password</label>
-        <input type="password" id="encryptionPassword" placeholder="Used to encrypt your memories locally">
+      <div class="button-row">
+        <button class="btn-primary" id="signInBtn">Save &amp; Connect</button>
       </div>
-
-      <div class="button-group">
-        <button class="btn-primary" id="signInBtn">Sign In</button>
-        <button class="btn-secondary" id="signUpBtn">Create Account</button>
-      </div>
-
-      <p style="color: #64748b; margin-top: 12px; font-size: 12px; text-align: center;">
-        Don't have an account? <a href="#" id="toggleSignUp" style="color: #ff7a00; text-decoration: none;">Create one for free</a>
-      </p>
     </div>
 
-    <!-- Authenticated Section -->
-    <div id="authSection" class="auth-section">
+    <!-- Authenticated section -->
+    <div id="authSection" style="display:none">
       <h2>✓ Connected</h2>
-      <p style="color: #94a3b8; margin-bottom: 16px; font-size: 13px;">
-        You're signed in and ready to save memories from any web LLM.
+      <p style="color:#94a3b8;font-size:13px;margin-bottom:16px;">
+        Your extension is connected to Unimatrix. Memories from every supported LLM are saved to your dashboard.
       </p>
-
-      <h2>Supported LLMs</h2>
-      <ul class="feature-list">
-        <li>ChatGPT (chat.openai.com)</li>
-        <li>Claude Web (claude.ai)</li>
-        <li>Google Gemini (gemini.google.com)</li>
-        <li>Microsoft Copilot (copilot.microsoft.com)</li>
-        <li>HuggingFace Spaces</li>
-      </ul>
-
-      <h2>How It Works</h2>
-      <ol style="margin-left: 20px; color: #94a3b8; font-size: 13px; line-height: 1.8;">
-        <li>Visit any supported LLM website</li>
-        <li>Click the "💾 Save to Unimatrix" button that appears</li>
-        <li>Paste your conversation or select "Auto-Capture"</li>
-        <li>Add context tags (optional) and importance level</li>
-        <li>Click "Save Memory" — encrypted automatically</li>
-      </ol>
 
       <div class="divider"></div>
 
-      <h2>Privacy</h2>
-      <p style="color: #94a3b8; margin-bottom: 12px; font-size: 13px;">
-        • All memories encrypted end-to-end with AES-256-GCM<br/>
-        • Your encryption password stays on your device<br/>
-        • Server stores only ciphertext<br/>
-        • You control your data completely
-      </p>
+      <h2>Preferences</h2>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Auto-capture responses</div>
+          <div class="toggle-desc">Automatically save AI responses as they finish (Pro feature)</div>
+        </div>
+        <input type="checkbox" id="autoCaptureToggle" />
+      </div>
 
-      <div class="button-group">
-        <button class="btn-secondary" id="logoutBtn">Sign Out</button>
-        <button class="btn-danger" id="deleteDataBtn">Clear Local Data</button>
+      <div class="divider"></div>
+
+      <h2>Supported LLMs</h2>
+      <ul class="supported-list">
+        <li><span class="dot"></span>ChatGPT (chat.openai.com)</li>
+        <li><span class="dot"></span>Claude Web (claude.ai)</li>
+        <li><span class="dot"></span>Google Gemini (gemini.google.com)</li>
+        <li><span class="dot"></span>Grok (x.com/grok, grok.x.ai)</li>
+        <li><span class="dot"></span>Perplexity (perplexity.ai)</li>
+        <li><span class="dot"></span>Microsoft Copilot</li>
+        <li><span class="dot"></span>HuggingFace Spaces</li>
+      </ul>
+
+      <div class="divider"></div>
+
+      <div class="button-row">
+        <button class="btn-secondary" id="logoutBtn">Disconnect</button>
+        <button class="btn-danger"    id="deleteDataBtn">Clear Local Data</button>
       </div>
     </div>
 
     <div class="divider"></div>
-
-    <h2>About</h2>
-    <p style="color: #94a3b8; font-size: 13px; line-height: 1.8;">
-      Unimatrix is a cross-LLM memory platform. Save conversations from ChatGPT, Claude, Gemini, and more — all encrypted, all in one place.<br/><br/>
-      <a href="https://deployunimatrix.com" target="_blank" style="color: #ff7a00; text-decoration: none;">Learn more →</a>
+    <p style="color:#334155;font-size:12px;text-align:center;">
+      <a href="https://deployunimatrix.com" target="_blank" style="color:#ff7a00;text-decoration:none;">deployunimatrix.com</a>
+      &nbsp;·&nbsp; v1.0.0
     </p>
   </div>
-
   <script src="options.js"></script>
 </body>
 </html>

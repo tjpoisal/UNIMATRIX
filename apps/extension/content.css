@@ -1,0 +1,7 @@
+/* Unimatrix extension content styles — all scoped by ID to avoid conflicts */
+
+#__unimatrix_save_btn {
+  /* Base styles set inline in content.js for reliability across CSP environments */
+  /* This file is kept minimal to avoid injection issues on strict CSPs */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif !important;
+}
