@@ -24,8 +24,8 @@
     "prisma": "^6.19.3",
     "bcryptjs": "^2.4.3",
     "svix": "^1.93.0",
-    "@xenova/transformers": "^2.6.5",
-    "zod": "^3.23.0"
+    "zod": "^3.23.0",
+    "@huggingface/transformers": "^3.5.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

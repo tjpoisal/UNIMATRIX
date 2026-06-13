@@ -13,7 +13,7 @@
  * Output dimension changed from 512 → 384; update DB schema if needed.
  */
 
-import { pipeline, env } from '@xenova/transformers';
+import { pipeline, env } from '@huggingface/transformers';
 
 // Suppress local file system warnings in Node.js
 env.allowLocalModels = true;
