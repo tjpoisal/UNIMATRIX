@@ -54,7 +54,7 @@ export default async function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#334155]/30 bg-[#0e1030]/85 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={38} height={42} className="opacity-90" />
+            <Image src="/logo.png" alt="Unimatrix" width={38} height={42} className="opacity-90" />
             <span className="font-black text-lg tracking-tight leading-none">
               <span className="text-[#ff7a00]">UNI</span>
               <span className="text-[#F1F5F9]">MATRIX</span>
@@ -92,7 +92,7 @@ export default async function Home() {
           </div>
 
           <div className="flex justify-center mb-8">
-            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={82} height={90}
+            <Image src="/logo.png" alt="Unimatrix" width={82} height={90}
               className="opacity-85 drop-shadow-[0_0_32px_rgba(255,122,0,0.35)]" />
           </div>
 
@@ -320,30 +320,52 @@ export default async function Home() {
       <section className="py-24 px-6 border-t border-[#334155]/20 bg-[#080D19]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#A855F7]/10 border border-[#A855F7]/30 rounded-full text-xs text-[#A855F7] font-medium mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#A855F7]" />
-              Pro &amp; Enterprise
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#ff7a00]/10 border border-[#ff7a00]/30 rounded-full text-xs text-[#ff7a00] font-semibold mb-6">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ff7a00] animate-pulse" />
+              Pro &amp; Enterprise &mdash; 1 week free for new users
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Run multiple AIs <span className="text-[#A855F7]">in the same room.</span>
+              The Collaborative AI Room
             </h2>
-            <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto">
-              Multiple AI clients can read from and write to the same Unimatrix memory layer simultaneously.
-              Ideal for complex workflows where different models contribute different strengths.
+            <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto mb-4">
+              Ask one question. Every AI in the room answers independently &mdash; then they listen to each other.
+            </p>
+            <p className="text-sm text-[#64748B] max-w-xl mx-auto leading-relaxed">
+              Claude spots a hallucination in GPT&apos;s answer. Gemini adds context the others missed. Grok pushes back on the consensus.
+              The room works as a team &mdash; no auto-routing, no silent delegation. Every model speaks, and the best ideas survive.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-10">
             {[
-              { icon: 'MEM', title: 'Shared Memory', desc: 'Every AI reads from the same Unimatrix context. No one starts cold.' },
-              { icon: 'AI', title: 'Async Contributions', desc: 'Each LLM chimes in when it has a relevant point — best answer, not just fastest.' },
-              { icon: 'SLF', title: 'Self-Hosted Option', desc: 'Run the room on your own hardware. Your data stays on your server, always.' },
+              {
+                icon: '01',
+                title: 'Ask the Room',
+                desc: 'You post one question or task. Every connected AI model receives it simultaneously — no model is pre-selected as the lead.',
+              },
+              {
+                icon: '02',
+                title: 'Independent Answers',
+                desc: 'Each LLM responds on its own. Different models catch different things — one may hallucinate where another is precise.',
+              },
+              {
+                icon: '03',
+                title: 'Collaborative Refinement',
+                desc: 'Models can see each other\'s answers and respond: correct a mistake, add missing context, or suggest a better direction. Teamwork, not just parallelism.',
+              },
             ].map((item) => (
-              <div key={item.title} className="bg-[#111827] border border-[#A855F7]/20 rounded-2xl p-6 text-center hover:border-[#A855F7]/40 transition-all duration-200">
-                <div className="text-xs font-black text-[#A855F7] tracking-widest mb-4">{item.icon}</div>
+              <div key={item.title} className="bg-[#111827] border border-[#ff7a00]/20 rounded-2xl p-6 hover:border-[#ff7a00]/40 transition-all duration-200">
+                <div className="text-2xl font-black text-[#ff7a00]/30 mb-4 group-hover:text-[#ff7a00]/50">{item.icon}</div>
                 <h3 className="text-base font-bold text-[#F1F5F9] mb-2">{item.title}</h3>
                 <p className="text-sm text-[#94A3B8] leading-relaxed">{item.desc}</p>
               </div>
             ))}
+          </div>
+          <div className="text-center">
+            <Link href="/auth/register"
+              className="inline-flex items-center gap-2 px-7 py-3 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-sm transition-all duration-200 hover:shadow-lg hover:shadow-[#ff7a00]/20">
+              Try the Collab Room Free for 7 Days
+            </Link>
+            <p className="text-xs text-[#64748B] mt-3">No credit card needed for the trial. Available on Pro and Enterprise plans.</p>
           </div>
         </div>
       </section>
@@ -652,7 +674,7 @@ export default async function Home() {
       <section className="py-24 px-6 bg-gradient-to-r from-[#ff7a00]/5 via-[#0A0F1C] to-[#A855F7]/5 border-t border-[#334155]/20">
         <div className="max-w-3xl mx-auto text-center">
           <div className="flex justify-center mb-8">
-            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={60} height={66}
+            <Image src="/logo.png" alt="Unimatrix" width={60} height={66}
               className="opacity-60 drop-shadow-[0_0_20px_rgba(255,122,0,0.3)]" />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Stop re-explaining yourself to every AI.</h2>
@@ -678,7 +700,7 @@ export default async function Home() {
       <footer className="py-10 px-6 border-t border-[#334155]/30">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <Image src="/LOGO_DARK_BACKGROUND.png" alt="Unimatrix" width={30} height={33} className="opacity-60" />
+            <Image src="/logo.png" alt="Unimatrix" width={30} height={33} className="opacity-60" />
             <div>
               <span className="font-black text-base tracking-tight">
                 <span className="text-[#ff7a00]">UNI</span>
