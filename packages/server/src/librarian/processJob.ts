@@ -1,39 +1,115 @@
 /**
  * src/librarian/processJob.ts
  *
- * The Librarian — async semantic layer processor.
+ * The Librarian — CSMTER-enhanced async semantic layer processor.
  *
  * Called after store_memory inserts the episodic row.
  * Runs fire-and-forget so it never blocks the MCP response to the caller.
  *
- * Pipeline per job (Phase 1D/E — fully local, zero external API calls):
- *   1. generateEmbedding()    → 512-dim BGE-small vector (Xenova, on-device)
- *   2. classifyMemory()       → semanticCategory, importance, tags, supersession flag
- *                               (local-model.ts: unimatrix-librarian LoRA → mistral → rule-based)
- *   3. extractiveSummarize()  → top-2 sentences by TF × position × length
- *   4. classifySpace()        → pgvector cosine similarity against space embeddings
- *   5. UPDATE memories        → summary, embedding, space_id, indexed_at = NOW()
- *   6. INSERT memory_tags     → upsert combined tags (LLM + TF-IDF)
- *   7. Poly-tag               → when altSpaceId is set (confidence < 0.80)
- *   8. Supersession           → soft-supersede prior memories when suggestsSupersession=true
+ * Pipeline per job (Phase 1F — CSMTER upgrade):
+ *   1. generateEmbedding()    → 384-dim BGE-small vector (Xenova, on-device)
+ *   2. quantize2bit()         → 2-bit Lloyd-Max + 1-bit QJL residual (96 + 48 bytes)
+ *   3. classifyMemory()       → semanticCategory, importance, tags, supersession flag
+ *   4. extractiveSummarize()  → top-2 sentences by TF × position × length
+ *   5. classifySpace()        → pgvector cosine similarity against space embeddings
+ *   6. extractTriplesHeuristic() → subject-predicate-object facts
+ *   7. UPDATE memories        → all semantic fields + quantized columns + hierarchy_path
+ *   8. INSERT memory_tags     → upsert combined tags (LLM + TF-IDF)
+ *   9. UPSERT memory_triples  → supersede contradicting triples, insert new ones
+ *  10. Poly-tag               → when altSpaceId is set (confidence < 0.80)
+ *  11. Supersession           → soft-supersede prior memories when suggestsSupersession=true
+ *  12. Importance decay       → async batch decay of stale memories (non-blocking)
  */
 
-import { withUserContextRaw }      from '../db/client.js';
-import { generateEmbedding }       from '../embeddings.js';
-import { extractiveSummarize }     from './summarize.js';
-import { extractTags }             from './extractTags.js';
-import { classifySpace }           from './classifySpace.js';
-import { classifyMemory }          from './local-model.js';
+import { withUserContextRaw }            from '../db/client.js';
+import { generateEmbedding }             from '../embeddings.js';
+import { extractiveSummarize }           from './summarize.js';
+import { extractTags }                   from './extractTags.js';
+import { classifySpace }                 from './classifySpace.js';
+import { classifyMemory }                from './local-model.js';
+import { quantize2bit }                  from '../lib/quantize.js';
 import type { LibrarianJob, LibrarianResult } from '../types/domain.js';
 
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
+// Triple extraction (heuristic, zero-cost, no LLM required)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface Triple {
+  subject:   string;
+  predicate: string;
+  object:    string;
+}
+
+/**
+ * Lightweight regex-based triple extractor.
+ * Covers the most common first-person fact patterns without any LLM call.
+ * Full NLI-based extraction is Phase 2.
+ */
+function extractTriplesHeuristic(content: string, userId: string): Triple[] {
+  const triples: Triple[] = [];
+  const c = content.toLowerCase();
+
+  const patterns: Array<{ re: RegExp; pred: string }> = [
+    { re: /\bi\s+prefer[s]?\s+(.+?)(?:[.,;]|$)/gi,    pred: 'prefers'   },
+    { re: /\bi\s+like[s]?\s+(.+?)(?:[.,;]|$)/gi,       pred: 'likes'     },
+    { re: /\bi\s+use[s]?\s+(.+?)(?:[.,;]|$)/gi,        pred: 'uses'      },
+    { re: /\bi\s+am\s+(.+?)(?:[.,;]|$)/gi,             pred: 'is'        },
+    { re: /\bi'?m\s+(.+?)(?:[.,;]|$)/gi,               pred: 'is'        },
+    { re: /\bi\s+work\s+(?:on|at|for)\s+(.+?)(?:[.,;]|$)/gi, pred: 'works_on' },
+    { re: /\bbuilding\s+(.+?)(?:[.,;]|$)/gi,            pred: 'building'  },
+    { re: /\bdeveloping\s+(.+?)(?:[.,;]|$)/gi,          pred: 'developing'},
+    { re: /\bmy\s+(?:name\s+is|name's)\s+(.+?)(?:[.,;]|$)/gi, pred: 'name_is' },
+    { re: /\bmy\s+goal\s+is\s+(.+?)(?:[.,;]|$)/gi,     pred: 'goal_is'   },
+  ];
+
+  for (const { re, pred } of patterns) {
+    let m: RegExpMatchArray | null;
+    re.lastIndex = 0;
+    while ((m = re.exec(c)) !== null) {
+      const obj = m[1]?.trim().slice(0, 140);
+      if (obj && obj.length > 2) {
+        triples.push({ subject: userId, predicate: pred, object: obj });
+      }
+    }
+  }
+
+  return triples;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Importance decay
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Exponential decay constants (λ) per semantic category.
+// Lower λ → slower decay (preferences are stable; episodic events fade faster).
+const DECAY_LAMBDA: Record<string, number> = {
+  personal:  0.001,
+  work:      0.002,
+  research:  0.002,
+  learning:  0.003,
+  code:      0.003,
+  general:   0.004,
+  default:   0.004,
+};
+
+function decayedImportance(
+  original:       number,
+  semanticCat:    string | null,
+  lastAccessedAt: Date,
+): number {
+  const λ          = DECAY_LAMBDA[semanticCat ?? 'default'] ?? DECAY_LAMBDA.default;
+  const daysSince  = (Date.now() - lastAccessedAt.getTime()) / 86_400_000;
+  return original * Math.exp(-λ * daysSince);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Main job processor
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianResult> {
-  const { memoryId, userId, content } = job;
+  const { memoryId, userId, content, spaceId: jobSpaceId, sourceLlm } = job;
 
-  // 1. Generate embedding from sanitized content.
+  // ── 1. Generate embedding ──────────────────────────────────────────────────
   let embedding: number[];
   try {
     embedding = await generateEmbedding(content);
@@ -42,46 +118,64 @@ export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianR
     throw err;
   }
 
-  // 2. Local Librarian classification (Phase 1D/E)
-  //    unimatrix-librarian LoRA → mistral fallback → rule-based
+  // ── 2. Quantize to 2-bit + QJL residual ───────────────────────────────────
+  const { quantized: embQ2, scale: embScale, residual: embResidual } = quantize2bit(embedding);
+
+  // ── 3. Classify (importance, semantic category, tags, supersession) ────────
   const classification = await classifyMemory(content);
 
-  // 3. Extractive summary (no LLM, pure sentence scoring)
+  // ── 4. Extractive summary ─────────────────────────────────────────────────
   const summary = extractiveSummarize(content, 2, 300);
 
-  // 4. Merge LLM tags + TF-IDF tags (deduplicated)
+  // ── 5. Merge tags ─────────────────────────────────────────────────────────
   const tfidfTags = extractTags(content, 5);
   const allTags   = [...new Set([...classification.tags, ...tfidfTags])].slice(0, 10);
 
-  // 5. Space classification via pgvector cosine similarity
+  // ── 6. Space classification ───────────────────────────────────────────────
   const { spaceId, confidence, altSpaceId } = await classifySpace(embedding, userId);
 
-  // 6. Write back to memories + insert tags (within RLS context)
+  // Build hierarchy_path from space ancestry (best-effort)
+  const hierarchyPath = spaceId ? spaceId : null;
+
+  // ── 7. Extract semantic triples ───────────────────────────────────────────
+  const triples = extractTriplesHeuristic(content, userId);
+
+  // ── 8. Write back within RLS context ─────────────────────────────────────
   await withUserContextRaw(userId, async (client) => {
-    // UPDATE memories — set semantic layer fields
+
+    // UPDATE memories — all semantic + quantized fields in one round-trip
     await client.query(
       `UPDATE memories
-          SET summary         = $1,
-              embedding       = $2,
-              space_id        = $3,
-              confidence      = $4,
-              importance      = $5,
-              semantic_cat    = $6,
-              indexed_at      = NOW()
-        WHERE id      = $7
+          SET summary          = $1,
+              embedding        = $2,
+              embedding_q2     = $3,
+              embedding_scale  = $4,
+              vector_residual  = $5,
+              space_id         = $6,
+              confidence       = $7,
+              importance       = $8,
+              semantic_cat     = $9,
+              hierarchy_path   = $10,
+              last_accessed_at = NOW(),
+              indexed_at       = NOW()
+        WHERE id      = $11
           AND user_id = current_user_id()::uuid`,
       [
         summary,
-        JSON.stringify(embedding),
-        spaceId,
+        `[${embedding.join(',')}]`,       // full float32 for L3 reranking
+        embQ2,                             // 96-byte quantized
+        embScale,                          // float32 scale factor
+        embResidual,                       // 48-byte QJL residual
+        spaceId ?? null,
         confidence,
         classification.importance,
         classification.semanticCategory,
+        hierarchyPath,
         memoryId,
       ],
     );
 
-    // INSERT combined tags (ignore duplicates)
+    // INSERT combined tags
     if (allTags.length > 0) {
       const tagValues = allTags
         .map((_, i) => `($1, $2, $${i + 3})`)
@@ -94,7 +188,46 @@ export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianR
       );
     }
 
-    // Poly-tag: altSpaceId non-null → strong second candidate
+    // UPSERT semantic triples — supersede contradictions, insert new
+    for (const triple of triples) {
+      // Check for an active triple with the same subject+predicate but different object
+      const existing = await client.query<{ id: string; object: string }>(
+        `SELECT id, object FROM memory_triples
+          WHERE user_id   = current_user_id()::uuid
+            AND subject   = $1
+            AND predicate = $2
+            AND superseded_at IS NULL
+          LIMIT 1`,
+        [triple.subject, triple.predicate],
+      );
+
+      if (existing.rows.length > 0 && existing.rows[0].object !== triple.object) {
+        // Supersede the contradicting triple
+        await client.query(
+          `UPDATE memory_triples SET superseded_at = NOW() WHERE id = $1`,
+          [existing.rows[0].id],
+        );
+      }
+
+      // Insert the new triple (ON CONFLICT DO NOTHING guards exact duplicates)
+      await client.query(
+        `INSERT INTO memory_triples
+           (user_id, space_id, subject, predicate, object, source_memory_id, source_llm)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT DO NOTHING`,
+        [
+          userId,
+          spaceId ?? null,
+          triple.subject,
+          triple.predicate,
+          triple.object,
+          memoryId,
+          sourceLlm ?? null,
+        ],
+      );
+    }
+
+    // Poly-tag when alt-space confidence is high enough
     if (altSpaceId) {
       const altSpaceRow = await client.query<{ name: string }>(
         `SELECT name FROM spaces WHERE id = $1 AND user_id = current_user_id()::uuid`,
@@ -111,32 +244,74 @@ export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianR
       }
     }
 
-    // Supersession: soft-supersede prior memories on same topic
+    // Supersession: soft-supersede prior very-similar memories
     if (classification.suggestsSupersession && spaceId) {
       await client.query(
         `UPDATE memories
             SET status        = 'superseded',
                 superseded_by = $1,
                 superseded_at = NOW()
-          WHERE user_id = current_user_id()::uuid
+          WHERE user_id  = current_user_id()::uuid
             AND space_id = $2
             AND id       != $3
             AND status   = 'active'
             AND indexed_at < NOW() - INTERVAL '1 minute'
-            AND (
-              embedding <=> $4::vector
-            ) < 0.25`,   // very close vector distance = same topic
-        [memoryId, spaceId, memoryId, JSON.stringify(embedding)],
+            AND (embedding <=> $4::vector) < 0.25`,
+        [memoryId, spaceId, memoryId, `[${embedding.join(',')}]`],
       );
     }
   });
 
+  // ── 9. Async importance decay (non-blocking, runs after response) ──────────
+  setImmediate(async () => {
+    try {
+      await withUserContextRaw(userId, async (client) => {
+        const stale = await client.query<{
+          id:              string;
+          importance:      string;
+          semantic_cat:    string | null;
+          last_accessed_at: string;
+        }>(
+          `SELECT id, importance, semantic_cat, last_accessed_at
+             FROM memories
+            WHERE user_id          = current_user_id()::uuid
+              AND last_accessed_at < NOW() - INTERVAL '3 days'
+              AND importance        > 0.05
+              AND deleted_at        IS NULL
+            LIMIT 200`,
+          [],
+        );
+
+        for (const row of stale.rows) {
+          const newImportance = decayedImportance(
+            parseFloat(row.importance),
+            row.semantic_cat,
+            new Date(row.last_accessed_at),
+          );
+          if (newImportance < parseFloat(row.importance) - 0.01) {
+            await client.query(
+              `UPDATE memories SET importance = $1 WHERE id = $2`,
+              [Math.max(newImportance, 0.01), row.id],
+            );
+          }
+        }
+      });
+    } catch (err) {
+      console.error('[Librarian] Decay batch error (non-fatal):', err);
+    }
+  });
+
   console.log(
-    `[Librarian] ✓ ${memoryId} — space: ${spaceId ?? 'unclassified'}, ` +
-    `cat: ${classification.semanticCategory}, importance: ${classification.importance}, ` +
-    `confidence: ${confidence.toFixed(2)}, tags: [${allTags.join(', ')}]` +
-    (altSpaceId ? `, alt-space: ${altSpaceId}` : '') +
-    (classification.suggestsSupersession ? ', [supersession]' : ''),
+    `[Librarian] ✓ ${memoryId}` +
+    ` space:${spaceId ?? 'unclassified'}` +
+    ` cat:${classification.semanticCategory}` +
+    ` imp:${classification.importance}` +
+    ` conf:${confidence.toFixed(2)}` +
+    ` q2:${embQ2.length}B` +
+    ` triples:${triples.length}` +
+    ` tags:[${allTags.join(', ')}]` +
+    (altSpaceId ? ` alt:${altSpaceId}` : '') +
+    (classification.suggestsSupersession ? ' [supersession]' : ''),
   );
 
   return {
