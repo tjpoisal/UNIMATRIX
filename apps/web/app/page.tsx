@@ -2,6 +2,13 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import Image from 'next/image';
+import { JsonLd } from '@/components/JsonLd';
+import {
+  organizationSchema,
+  softwareApplicationSchema,
+  faqSchema,
+  websiteSchema,
+} from '@/lib/homepage-schema';
 
 // eslint-disable react/no-unescaped-entities
 
@@ -21,6 +28,9 @@ export const metadata = {
     'persistent AI context',
     'privacy-first AI',
   ],
+  alternates: {
+    canonical: 'https://deployunimatrix.com',
+  },
   openGraph: {
     title: 'Unimatrix | Persistent AI Memory via MCP',
     description:
@@ -49,37 +59,44 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-[#0e1030] text-[#F1F5F9]">
+      <JsonLd data={organizationSchema} />
+      <JsonLd data={softwareApplicationSchema} />
+      <JsonLd data={faqSchema} />
+      <JsonLd data={websiteSchema} />
 
       {/* ── Nav ──────────────────────────────────────────────────────── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#334155]/30 bg-[#0e1030]/85 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Unimatrix" width={38} height={42} className="opacity-90" />
-            <span className="font-black text-lg tracking-tight leading-none">
-              <span className="text-[#ff7a00]">UNI</span>
-              <span className="text-[#F1F5F9]">MATRIX</span>
-            </span>
-          </Link>
-          <div className="hidden md:flex items-center gap-6 text-sm text-[#94A3B8]">
-            <a href="#how-it-works" className="hover:text-[#F1F5F9] transition-colors">How It Works</a>
-            <Link href="/downloads" className="hover:text-[#F1F5F9] transition-colors">Downloads</Link>
-            <Link href="/docs/mcp" className="hover:text-[#F1F5F9] transition-colors">MCP Docs</Link>
-            <a href="#features" className="hover:text-[#F1F5F9] transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-[#F1F5F9] transition-colors">Pricing</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/auth/login"
-              className="px-4 py-2 border border-[#334155]/60 hover:border-[#ff7a00]/40 text-[#94A3B8] hover:text-[#F1F5F9] font-semibold rounded-lg text-sm transition-all">
-              Sign In
+      <header>
+        <nav aria-label="Main navigation" className="fixed top-0 left-0 right-0 z-50 border-b border-[#334155]/30 bg-[#0e1030]/85 backdrop-blur-xl">
+          <div className="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-3">
+              <Image src="/logo.png" alt="Unimatrix logo" width={38} height={42} className="opacity-90" />
+              <span className="font-black text-lg tracking-tight leading-none">
+                <span className="text-[#ff7a00]">UNI</span>
+                <span className="text-[#F1F5F9]">MATRIX</span>
+              </span>
             </Link>
-            <Link href="/auth/register"
-              className="px-4 py-2 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-lg text-sm transition-all shadow-lg shadow-[#ff7a00]/20">
-              Start Free
-            </Link>
+            <div className="hidden md:flex items-center gap-6 text-sm text-[#94A3B8]">
+              <a href="#how-it-works" className="hover:text-[#F1F5F9] transition-colors">How It Works</a>
+              <Link href="/downloads" className="hover:text-[#F1F5F9] transition-colors">Downloads</Link>
+              <Link href="/docs/mcp" className="hover:text-[#F1F5F9] transition-colors">MCP Docs</Link>
+              <a href="#features" className="hover:text-[#F1F5F9] transition-colors">Features</a>
+              <a href="#pricing" className="hover:text-[#F1F5F9] transition-colors">Pricing</a>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link href="/auth/login"
+                className="px-4 py-2 border border-[#334155]/60 hover:border-[#ff7a00]/40 text-[#94A3B8] hover:text-[#F1F5F9] font-semibold rounded-lg text-sm transition-all">
+                Sign In
+              </Link>
+              <Link href="/auth/register"
+                className="px-4 py-2 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-lg text-sm transition-all shadow-lg shadow-[#ff7a00]/20">
+                Start Free
+              </Link>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
+      <main id="main-content">
       {/* ── Hero ────────────────────────────────────────────────────── */}
       <section className="pt-32 pb-20 px-6 relative overflow-hidden">
         {/* Background radial glow */}
@@ -92,7 +109,7 @@ export default async function Home() {
           </div>
 
           <div className="flex justify-center mb-8">
-            <Image src="/logo.png" alt="Unimatrix" width={82} height={90}
+            <Image src="/logo.png" alt="Unimatrix logo" width={82} height={90} priority
               className="opacity-85 drop-shadow-[0_0_32px_rgba(255,122,0,0.35)]" />
           </div>
 
@@ -105,7 +122,7 @@ export default async function Home() {
             One MCP server connects Claude Desktop, Cursor, Windsurf, and every other AI client
             to structured, persistent memory that follows you across tools and machines.
           </p>
-          <p className="text-sm text-[#64748B] mb-10 max-w-xl mx-auto">
+          <p className="text-sm text-[#94A3B8] mb-10 max-w-xl mx-auto">
             No re-explaining your project. No losing context when you switch models.
             Explicit, controlled, encrypted — built the way infrastructure should be.
           </p>
@@ -121,7 +138,7 @@ export default async function Home() {
             </a>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#64748B]">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-[#94A3B8]">
             <span className="flex items-center gap-1.5"><span className="text-[#22C55E]">✓</span>Free tier forever</span>
             <span className="flex items-center gap-1.5"><span className="text-[#22C55E]">✓</span>End-to-end encrypted</span>
             <span className="flex items-center gap-1.5"><span className="text-[#22C55E]">✓</span>Works with any MCP client</span>
@@ -131,7 +148,7 @@ export default async function Home() {
 
         {/* Compatible tools strip */}
         <div className="max-w-2xl mx-auto mt-16 text-center">
-          <p className="text-xs text-[#64748B] uppercase tracking-widest mb-5 font-semibold">Works with your tools</p>
+          <p className="text-xs text-[#94A3B8] uppercase tracking-widest mb-5 font-semibold">Works with your tools</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {['Claude Desktop', 'Cursor', 'Windsurf', 'Continue.dev', 'VS Code MCP', 'Custom Agents'].map((tool) => (
               <span key={tool}
@@ -182,7 +199,7 @@ export default async function Home() {
               className="inline-flex items-center gap-2 text-sm font-semibold text-[#ff7a00] hover:text-[#e86d00] transition-colors border border-[#ff7a00]/30 hover:border-[#ff7a00] px-5 py-2.5 rounded-xl">
               View setup instructions for your tools →
             </Link>
-            <p className="mt-4 text-xs text-[#64748B] max-w-md mx-auto">
+            <p className="mt-4 text-xs text-[#94A3B8] max-w-md mx-auto">
               Note: You must add explicit instructions in your LLM settings so it loads memory at the start of sessions.
               No automatic background behavior — you stay in control.
             </p>
@@ -225,7 +242,7 @@ export default async function Home() {
                 <p className="text-[#94A3B8] text-sm leading-relaxed flex-1">{t.quote}</p>
                 <div>
                   <p className="font-bold text-[#F1F5F9] text-sm">{t.name}</p>
-                  <p className="text-xs text-[#64748B]">{t.role} &middot; {t.company}</p>
+                  <p className="text-xs text-[#94A3B8]">{t.role} &middot; {t.company}</p>
                 </div>
               </div>
             ))}
@@ -244,7 +261,7 @@ export default async function Home() {
           </div>
 
           <div className="mb-10">
-            <p className="text-xs text-[#64748B] font-bold tracking-widest uppercase mb-5 text-center">Desktop</p>
+            <p className="text-xs text-[#94A3B8] font-bold tracking-widest uppercase mb-5 text-center">Desktop</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 { os: 'macOS', icon: 'MAC', sub: 'macOS 13 Ventura or later', label: 'Download .dmg', badge: 'Apple Silicon + Intel',
@@ -266,7 +283,7 @@ export default async function Home() {
                   </div>
                   <div>
                     <p className="font-bold text-[#F1F5F9] group-hover:text-[#ff7a00] transition-colors">{p.os}</p>
-                    <p className="text-xs text-[#64748B] mt-0.5">{p.sub}</p>
+                    <p className="text-xs text-[#94A3B8] mt-0.5">{p.sub}</p>
                   </div>
                   <span className="mt-1 px-4 py-1.5 bg-[#ff7a00]/10 hover:bg-[#ff7a00]/20 text-[#ff7a00] text-xs font-semibold rounded-lg border border-[#ff7a00]/20 transition-colors">
                     {p.label}
@@ -277,7 +294,7 @@ export default async function Home() {
           </div>
 
           <div className="mb-12">
-            <p className="text-xs text-[#64748B] font-bold tracking-widest uppercase mb-5 text-center">Mobile</p>
+            <p className="text-xs text-[#94A3B8] font-bold tracking-widest uppercase mb-5 text-center">Mobile</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
               {[
                 { os: 'iOS', icon: 'iOS', sub: 'iPhone & iPad · iOS 16+', label: 'App Store',
@@ -292,7 +309,7 @@ export default async function Home() {
                   </div>
                   <div>
                     <p className="font-bold text-[#F1F5F9] group-hover:text-[#ff7a00] transition-colors">{p.os}</p>
-                    <p className="text-xs text-[#64748B] mt-0.5">{p.sub}</p>
+                    <p className="text-xs text-[#94A3B8] mt-0.5">{p.sub}</p>
                   </div>
                   <span className="mt-1 px-4 py-1.5 bg-[#ff7a00]/10 hover:bg-[#ff7a00]/20 text-[#ff7a00] text-xs font-semibold rounded-lg border border-[#ff7a00]/20 transition-colors">
                     {p.label} →
@@ -330,7 +347,7 @@ export default async function Home() {
             <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto mb-4">
               Ask one question. Every AI in the room answers independently &mdash; then they listen to each other.
             </p>
-            <p className="text-sm text-[#64748B] max-w-xl mx-auto leading-relaxed">
+            <p className="text-sm text-[#94A3B8] max-w-xl mx-auto leading-relaxed">
               Claude spots a hallucination in GPT&apos;s answer. Gemini adds context the others missed. Grok pushes back on the consensus.
               The room works as a team &mdash; no auto-routing, no silent delegation. Every model speaks, and the best ideas survive.
             </p>
@@ -365,7 +382,7 @@ export default async function Home() {
               className="inline-flex items-center gap-2 px-7 py-3 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-sm transition-all duration-200 hover:shadow-lg hover:shadow-[#ff7a00]/20">
               Try the Collab Room Free for 7 Days
             </Link>
-            <p className="text-xs text-[#64748B] mt-3">No credit card needed for the trial. Available on Pro and Enterprise plans.</p>
+            <p className="text-xs text-[#94A3B8] mt-3">No credit card needed for the trial. Available on Pro and Enterprise plans.</p>
           </div>
         </div>
       </section>
@@ -439,7 +456,7 @@ export default async function Home() {
             <p>
               Unimatrix is a managed, multi-tenant <strong className="text-[#F1F5F9]">MCP server</strong> built for developers who use many different AI clients (Claude Desktop, Cursor, Windsurf, Continue, custom agents). It provides a standardized protocol interface, hierarchical Memory Palace organization, semantic search, and first-class cross-client federation — without writing per-tool glue code.
             </p>
-            <p className="text-xs text-[#64748B] border-t border-[#334155]/30 pt-4 mt-4">
+            <p className="text-xs text-[#94A3B8] border-t border-[#334155]/30 pt-4 mt-4">
               Choose Mem0 if you want a simple store inside one agent you fully control.<br />
               Choose Unimatrix if you want your context available to every MCP client you already use.
             </p>
@@ -474,7 +491,7 @@ export default async function Home() {
               </ul>
             </div>
           </div>
-          <p className="text-center text-xs text-[#64748B] mt-8">
+          <p className="text-center text-xs text-[#94A3B8] mt-8">
             Full details in{' '}
             <a href="https://github.com/tjpoisal/UNIMATRIX/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer"
               className="text-[#ff7a00] hover:text-[#e86d00] underline">SECURITY.md</a>{' '}
@@ -499,9 +516,9 @@ export default async function Home() {
                 <h3 className="text-lg font-bold text-[#F1F5F9] mb-1">Free</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-[#F1F5F9]">$0</span>
-                  <span className="text-[#64748B] text-sm">/ forever</span>
+                  <span className="text-[#94A3B8] text-sm">/ forever</span>
                 </div>
-                <p className="text-xs text-[#64748B] mt-1">No credit card required</p>
+                <p className="text-xs text-[#94A3B8] mt-1">No credit card required</p>
               </div>
               <ul className="space-y-3 mb-8 flex-1">
                 {[
@@ -532,7 +549,7 @@ export default async function Home() {
                 <h3 className="text-lg font-bold text-[#F1F5F9] mb-1">Pro</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-[#F1F5F9]">$9</span>
-                  <span className="text-[#64748B] text-sm">/ month</span>
+                  <span className="text-[#94A3B8] text-sm">/ month</span>
                 </div>
                 <p className="text-xs text-[#ff7a00] mt-1">or $79 / year — save $29</p>
               </div>
@@ -565,9 +582,9 @@ export default async function Home() {
                 <h3 className="text-lg font-bold text-[#F1F5F9] mb-1">Enterprise</h3>
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-[#F1F5F9]">$29</span>
-                  <span className="text-[#64748B] text-sm">/ month</span>
+                  <span className="text-[#94A3B8] text-sm">/ month</span>
                 </div>
-                <p className="text-xs text-[#64748B] mt-1">or $299 / year — save $49</p>
+                <p className="text-xs text-[#94A3B8] mt-1">or $299 / year — save $49</p>
               </div>
               <ul className="space-y-3 mb-8 flex-1">
                 {[
@@ -591,17 +608,17 @@ export default async function Home() {
             </div>
           </div>
 
-          <p className="text-center text-xs text-[#64748B] mt-8">
+          <p className="text-center text-xs text-[#94A3B8] mt-8">
             All paid plans include a 14-day free trial. Cancel anytime. Payments secured by Stripe.
           </p>
         </div>
       </section>
 
       {/* ── FAQ ───────────────────────────────────────────────────────── */}
-      <section id="faq" className="py-24 px-6 border-t border-[#334155]/20 bg-[#080D19]">
+      <section id="faq" aria-labelledby="faq-heading" className="py-24 px-6 border-t border-[#334155]/20 bg-[#080D19]">
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-          <div className="space-y-6">
+          <h2 id="faq-heading" className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+          <dl className="space-y-6">
             {[
               {
                 q: 'How is Unimatrix different from ChatGPT memory?',
@@ -629,11 +646,11 @@ export default async function Home() {
               },
             ].map(({ q, a }) => (
               <div key={q} className="border-b border-[#334155]/30 pb-6">
-                <p className="font-semibold text-[#F1F5F9] mb-2">{q}</p>
-                <p className="text-sm text-[#94A3B8] leading-relaxed">{a}</p>
+                <dt className="font-semibold text-[#F1F5F9] mb-2">{q}</dt>
+                <dd className="text-sm text-[#94A3B8] leading-relaxed">{a}</dd>
               </div>
             ))}
-          </div>
+          </dl>
         </div>
       </section>
 
@@ -653,20 +670,25 @@ export default async function Home() {
             method="POST"
             className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto"
           >
+            <label htmlFor="email-input" className="sr-only">Email address</label>
             <input
+              id="email-input"
               type="email"
               name="email"
               required
+              autoComplete="email"
+              aria-label="Email address"
               placeholder="your@email.com"
-              className="flex-1 px-4 py-3 bg-[#111827] border border-[#334155]/60 focus:border-[#ff7a00]/50 rounded-xl text-sm text-[#F1F5F9] placeholder-[#64748B] outline-none transition-colors"
+              className="flex-1 px-4 py-3 bg-[#111827] border border-[#334155]/60 rounded-xl text-sm text-[#F1F5F9] placeholder-[#94A3B8] transition-colors focus:outline-none focus:border-[#ff7a00]/50 focus-visible:ring-2 focus-visible:ring-[#ff7a00] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1030]"
             />
             <button
               type="submit"
-              className="px-6 py-3 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-sm transition-all whitespace-nowrap"
+              className="px-6 py-3 bg-[#ff7a00] hover:bg-[#e86d00] text-[#0e1030] font-bold rounded-xl text-sm transition-all whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff7a00] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0e1030]"
             >
               Notify Me
             </button>
           </form>
+          <div aria-live="polite" aria-atomic="true" className="sr-only" />
         </div>
       </section>
 
@@ -674,7 +696,7 @@ export default async function Home() {
       <section className="py-24 px-6 bg-gradient-to-r from-[#ff7a00]/5 via-[#0A0F1C] to-[#A855F7]/5 border-t border-[#334155]/20">
         <div className="max-w-3xl mx-auto text-center">
           <div className="flex justify-center mb-8">
-            <Image src="/logo.png" alt="Unimatrix" width={60} height={66}
+            <Image src="/logo.png" alt="" width={60} height={66}
               className="opacity-60 drop-shadow-[0_0_20px_rgba(255,122,0,0.3)]" />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Stop re-explaining yourself to every AI.</h2>
@@ -692,32 +714,33 @@ export default async function Home() {
               View All Plans
             </Link>
           </div>
-          <p className="text-xs text-[#64748B] mt-6">Free tier · No credit card · Cancel anytime</p>
+          <p className="text-xs text-[#94A3B8] mt-6">Free tier · No credit card · Cancel anytime</p>
         </div>
       </section>
+      </main>
 
       {/* ── Footer ────────────────────────────────────────────────────── */}
       <footer className="py-10 px-6 border-t border-[#334155]/30">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Unimatrix" width={30} height={33} className="opacity-60" />
+            <Image src="/logo.png" alt="" width={30} height={33} className="opacity-60" />
             <div>
               <span className="font-black text-base tracking-tight">
                 <span className="text-[#ff7a00]">UNI</span>
                 <span className="text-[#64748B]">MATRIX</span>
               </span>
-              <p className="text-xs text-[#64748B] mt-0.5">deployunimatrix.com &middot; hello@deployunimatrix.com</p>
+              <p className="text-xs text-[#94A3B8] mt-0.5">deployunimatrix.com &middot; hello@deployunimatrix.com</p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-[#64748B]">
-            <a href="#how-it-works" className="hover:text-[#94A3B8] transition-colors">How It Works</a>
-            <a href="#platforms" className="hover:text-[#94A3B8] transition-colors">Downloads</a>
-            <Link href="/docs/mcp" className="hover:text-[#94A3B8] transition-colors">MCP Reference</Link>
-            <a href="#features" className="hover:text-[#94A3B8] transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-[#94A3B8] transition-colors">Pricing</a>
-            <Link href="/auth/login" className="hover:text-[#94A3B8] transition-colors">Sign In</Link>
-            <Link href="/auth/register" className="hover:text-[#94A3B8] transition-colors">Register</Link>
-          </div>
+          <nav aria-label="Footer navigation" className="flex flex-wrap items-center justify-center gap-5 text-sm text-[#94A3B8]">
+            <a href="#how-it-works" className="hover:text-[#F1F5F9] transition-colors">How It Works</a>
+            <a href="#platforms" className="hover:text-[#F1F5F9] transition-colors">Downloads</a>
+            <Link href="/docs/mcp" className="hover:text-[#F1F5F9] transition-colors">MCP Reference</Link>
+            <a href="#features" className="hover:text-[#F1F5F9] transition-colors">Features</a>
+            <a href="#pricing" className="hover:text-[#F1F5F9] transition-colors">Pricing</a>
+            <Link href="/auth/login" className="hover:text-[#F1F5F9] transition-colors">Sign In</Link>
+            <Link href="/auth/register" className="hover:text-[#F1F5F9] transition-colors">Register</Link>
+          </nav>
           <p className="text-xs text-[#334155]">&copy; 2026 Unimatrix. All rights reserved.</p>
         </div>
       </footer>

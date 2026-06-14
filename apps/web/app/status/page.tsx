@@ -4,6 +4,7 @@ import Image from 'next/image';
 export const metadata = {
   title: 'Status — Unimatrix',
   description: 'Current operational status of the Unimatrix MCP service.',
+  alternates: { canonical: 'https://deployunimatrix.com/status' },
 };
 
 export default function StatusPage() {

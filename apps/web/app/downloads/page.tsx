@@ -4,6 +4,7 @@ import Image from 'next/image';
 export const metadata = {
   title: 'Downloads - Unimatrix',
   description: 'Companion apps for managing your Unimatrix memory palaces. The primary interface for AI clients is the MCP protocol.',
+  alternates: { canonical: 'https://deployunimatrix.com/downloads' },
 };
 
 export default function DownloadsPage() {

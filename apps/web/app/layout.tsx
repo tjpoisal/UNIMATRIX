@@ -14,12 +14,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://deployunimatrix.com"),
   title: {
     default: "Unimatrix — One memory. Every AI. Any device.",
     template: "%s | Unimatrix",
   },
   description: "A managed Model Context Protocol server for durable, hierarchical memory. Explicit tool calls. Auditable. Works with Claude Desktop, Cursor, Windsurf, and custom agents.",
   keywords: ["MCP server", "Model Context Protocol", "Claude Desktop memory", "Cursor MCP", "persistent context", "AI infrastructure"],
+  alternates: {
+    canonical: "https://deployunimatrix.com",
+  },
   icons: {
     icon: "/logo-icon.png",
     apple: "/logo-icon.png",
@@ -56,6 +60,12 @@ export default function RootLayout({
         className="min-h-full flex flex-col bg-bg"
         suppressHydrationWarning
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded"
+        >
+          Skip to main content
+        </a>
         <Providers>{children}</Providers>
       </body>
     </html>

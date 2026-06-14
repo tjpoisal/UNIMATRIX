@@ -4,6 +4,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'MCP Reference — Unimatrix',
   description: 'Model Context Protocol tool schemas, authentication, and examples for Unimatrix.',
+  alternates: { canonical: 'https://deployunimatrix.com/docs/mcp' },
 };
 
 const CodeBlock = ({ children }: { children: React.ReactNode }) => (
