@@ -16,7 +16,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserIdFromRequest }       from '@/lib/api-auth';
 import { prisma }                     from '@unimatrix/db';
-import { processLibrarianJob }        from '@unimatrix/server/librarian/processJob';
+
+const MCP_SERVER_URL = process.env.MCP_SERVER_URL ?? 'https://unimatrix-mcp.fly.dev';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const userId = await getUserIdFromRequest(request);
@@ -79,14 +80,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       });
     }
 
-    // Fire-and-forget CSMTER Librarian pipeline (embed → quantize → classify → triples)
+    // Fire-and-forget CSMTER Librarian pipeline (embed → quantize → classify → triples),
+    // delegated to the MCP server which owns the librarian implementation.
     setImmediate(() => {
-      processLibrarianJob({
-        memoryId:  memory.id,
-        userId,
-        content,
-        spaceId:   space_id,
-        sourceLlm: source_llm,
+      fetch(`${MCP_SERVER_URL}/api/librarian/process`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          memoryId:  memory.id,
+          userId,
+          content,
+          spaceId:   space_id,
+          sourceLlm: source_llm,
+        }),
       }).catch(err => {
         console.error(`[/api/memory/store] Librarian job failed for ${memory.id}:`, err);
       });

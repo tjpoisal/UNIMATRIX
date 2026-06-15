@@ -11,9 +11,98 @@
  */
 
 import { TOOLS as legacyMemoryTools, handleTool as legacyHandleTool } from '@/app/api/mcp/route';
-import { MEMORY_TOOL_MANIFESTS, handleMemoryTool } from '@unimatrix/server/mcp/memoryTools';
 import { sendMessage, getMessages, subscribeWebhook, createRoom, listRooms } from '@/lib/collab/service';
 import type { OpenAITool } from '@/lib/mcp-client';
+
+const MCP_SERVER_URL = process.env.MCP_SERVER_URL ?? 'https://unimatrix-mcp.fly.dev';
+
+// CSMTER memory tool manifests (inlined from packages/server/src/mcp/memoryTools.ts).
+// Execution is delegated to the MCP server via /api/mcp/execute.
+const MEMORY_TOOL_MANIFESTS: ToolDefinition[] = [
+  {
+    name: 'unimatrix_recall',
+    description:
+      'Hybrid memory recall across ALL your LLM conversations. ' +
+      'Combines semantic vector search (L1), BM25 keyword cross-check (L2), ' +
+      'Reciprocal Rank Fusion reranking (L3), and semantic triple injection (L4). ' +
+      'Use this for broad contextual recall — it surfaces what ChatGPT wrote, ' +
+      'what Cursor inferred, and what Claude remembered, all in one call.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Natural language query — what context do you need?',
+        },
+        space_id: {
+          type: 'string',
+          description: 'Optional: scope to a specific Space (and its descendants).',
+        },
+        limit: {
+          type: 'number',
+          description: 'Max memories to return (default: 8, max: 20).',
+        },
+        profile: {
+          type: 'string',
+          enum: ['desktop', 'mobile'],
+          description: 'Token budget profile (default: desktop).',
+        },
+      },
+      required: ['query'],
+    },
+  },
+  {
+    name: 'unimatrix_search_csmter',
+    description:
+      'Explicit memory search with filter controls. Differs from unimatrix_recall: ' +
+      'requires a query, supports tag/status/date filters, and applies no recency decay. ' +
+      'Use when you want precise filtered search rather than broad contextual recall.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query:    { type: 'string', description: 'Search query.' },
+        space_id: { type: 'string', description: 'Filter to a specific Space.' },
+        tags:     { type: 'array', items: { type: 'string' }, description: 'Tag filter (ANY match).' },
+        status:   { type: 'string', enum: ['active', 'superseded', 'archived'], description: 'Memory status filter.' },
+        limit:    { type: 'number', description: 'Max results (default: 10, max: 50).' },
+      },
+      required: ['query'],
+    },
+  },
+  {
+    name: 'unimatrix_list_triples',
+    description:
+      'List active semantic triples (subject-predicate-object facts) the Librarian has ' +
+      'extracted from your memories. These represent stable known facts: preferences, ' +
+      'goals, projects, identities. Inject these directly into your system prompt for ' +
+      'zero-vector-cost personalization.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        limit:   { type: 'number', description: 'Max triples to return (default: 20).' },
+        subject: { type: 'string', description: 'Filter by subject (e.g. userId for user facts).' },
+      },
+    },
+  },
+  {
+    name: 'unimatrix_system_prompt',
+    description:
+      'Get a ready-to-inject system-prompt block containing active memories and known facts. ' +
+      'For non-MCP LLMs (ChatGPT, Gemini, etc.) — prepend this to your system message. ' +
+      'Returns a compact text block summarizing context relevant to a given query.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Current user message (used to retrieve relevant memories).',
+        },
+        limit: { type: 'number', description: 'Max memories in the block (default: 6).' },
+      },
+      required: ['query'],
+    },
+  },
+];
 
 export interface ToolDefinition {
   name: string;
@@ -139,12 +228,16 @@ export async function executeTool(
     return executeCollabTool(name, args, context);
   }
 
-  // CSMTER hybrid memory tools (L1+L2+L3+L4 pipeline)
+  // CSMTER hybrid memory tools (L1+L2+L3+L4 pipeline) — delegated to the MCP server
   if (name.startsWith('unimatrix_recall') || name.startsWith('unimatrix_search_csmter') || name.startsWith('unimatrix_list_triples') || name.startsWith('unimatrix_system_prompt')) {
-    const result = await handleMemoryTool(name, args, context.userId);
-    if (result !== null) {
-      return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
-    }
+    const mcpRes = await fetch(`${MCP_SERVER_URL}/api/mcp/execute`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tool: name, args, userId: context.userId }),
+    });
+    if (!mcpRes.ok) throw new Error(`MCP execute failed: ${mcpRes.status}`);
+    const result = await mcpRes.json();
+    return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
   }
 
   // Legacy memory tools (delegate to existing implementation)

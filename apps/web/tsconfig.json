@@ -19,11 +19,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@unimatrix/server": ["../../packages/server/src/index.ts"],
-      "@unimatrix/server/*": ["../../packages/server/src/*"],
-      "@unimatrix/db": ["../../packages/db/src/index.ts"],
-      "@unimatrix/db/*": ["../../packages/db/src/*"]
+      "@/*": ["./*"]
     }
   },
   "include": [

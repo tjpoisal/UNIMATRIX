@@ -17,11 +17,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserIdFromRequest }       from '@/lib/api-auth';
 import { pool }                       from '@/lib/db';
-import { generateQueryEmbedding }     from '@unimatrix/server/embeddings';
-import { cosineSim }                  from '@unimatrix/server/lib/quantize';
 
 const TOP_K_BUFFER = 40;
 const RRF_K        = 60;
+const MCP_SERVER_URL = process.env.MCP_SERVER_URL ?? 'https://unimatrix-mcp.fly.dev';
+
+function cosineSim(a: Float32Array, b: Float32Array): number {
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) { dot += a[i]*b[i]; na += a[i]*a[i]; nb += b[i]*b[i]; }
+  return dot / (Math.sqrt(na) * Math.sqrt(nb) + 1e-8);
+}
 
 interface MemRow {
   id: string; summary: string; space_id: string | null; source: string;
@@ -43,7 +48,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const limit = Math.min(rawLimit ?? 8, 50);
 
   try {
-    const embedding = await generateQueryEmbedding(query);
+    const embedRes = await fetch(`${MCP_SERVER_URL}/api/embed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: query }),
+    });
+    if (!embedRes.ok) throw new Error(`Embed request failed: ${embedRes.status}`);
+    const { embedding } = await embedRes.json() as { embedding: number[] };
     const qFloat    = new Float32Array(embedding);
     const vecStr    = `[${embedding.join(',')}]`;
 
