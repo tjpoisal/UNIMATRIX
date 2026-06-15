@@ -5,6 +5,7 @@ import Image from 'next/image';
 export const metadata = {
   title: 'MCP Quickstart — Unimatrix',
   description: 'Get started with Unimatrix in minutes. Correct configuration for Claude Desktop, Cursor, Windsurf, and custom agents.',
+  alternates: { canonical: 'https://deployunimatrix.com/quickstart' },
 };
 
 const Code = ({ children }: { children: React.ReactNode }) => (

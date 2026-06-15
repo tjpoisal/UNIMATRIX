@@ -7,6 +7,7 @@ export const metadata = {
   title: 'Security & Architecture — Unimatrix',
   description: 'How Unimatrix protects your data. Encryption details, access controls, retention policy, and architecture.',
   robots: { index: true, follow: true },
+  alternates: { canonical: 'https://deployunimatrix.com/security' },
 };
 
 export default function SecurityPage() {

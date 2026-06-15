@@ -22,7 +22,7 @@ export default function AppShell({ children }: AppShellProps) {
         <TopBar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
         {/* Content Area */}
-        <main className="flex-1 overflow-auto">
+        <main id="main-content" className="flex-1 overflow-auto">
           {children}
         </main>
       </div>
