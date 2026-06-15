@@ -27,7 +27,7 @@ let embeddingPipeline: any = null;
 async function getEmbeddingPipeline() {
   if (!embeddingPipeline) {
     embeddingPipeline = await pipeline('feature-extraction', MODEL_ID, {
-      quantized: true,  // Use quantized version for speed
+      dtype: 'q8',  // Use quantized version for speed (transformers.js v3 API)
     });
   }
   return embeddingPipeline;

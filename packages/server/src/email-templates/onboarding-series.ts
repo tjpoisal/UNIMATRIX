@@ -49,7 +49,7 @@ export const onboardingEmails = {
   // Day 1: Encryption Setup
   encryptionSetup: {
     subject: 'Your encryption password is the key to your memory palace',
-    preheader: 'Make sure you've saved it somewhere safe',
+    preheader: "Make sure you've saved it somewhere safe",
     template: 'encryption-setup',
     html: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0e1030; color: #f1f5f9; padding: 40px 20px;">
@@ -196,7 +196,7 @@ export const onboardingEmails = {
   // Day 14: Re-engagement (inactive users)
   reengagement: {
     subject: 'You have a week of memories waiting',
-    preheader: 'Check out what you've been saving',
+    preheader: "Check out what you've been saving",
     template: 're-engagement',
     html: `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0e1030; color: #f1f5f9; padding: 40px 20px;">

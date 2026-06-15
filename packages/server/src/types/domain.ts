@@ -97,8 +97,11 @@ export interface LibrarianJob {
   memoryId:  string;
   userId:    string;
   content:   string;      // sanitized — no API keys or PII
-  hint:      string | null;
-  createdAt: Date;
+  hint?:     string | null;
+  createdAt?: Date;
+  // Optional CSMTER fields passed by REST store endpoint
+  spaceId?:   string | null;
+  sourceLlm?: string;
 }
 
 export interface LibrarianResult {

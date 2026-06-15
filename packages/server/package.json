@@ -3,7 +3,30 @@
   "version": "0.1.0",
   "description": "Memory Palace for LLMs via MCP",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./embeddings": {
+      "types": "./src/embeddings.ts",
+      "default": "./src/embeddings.ts"
+    },
+    "./lib/quantize": {
+      "types": "./src/lib/quantize.ts",
+      "default": "./src/lib/quantize.ts"
+    },
+    "./mcp/memoryTools": {
+      "types": "./src/mcp/memoryTools.ts",
+      "default": "./src/mcp/memoryTools.ts"
+    },
+    "./librarian/processJob": {
+      "types": "./src/librarian/processJob.ts",
+      "default": "./src/librarian/processJob.ts"
+    }
+  },
   "scripts": {
     "dev": "tsx watch --env-file=.env src/index.ts",
     "build": "tsc && echo 'Build complete (includes worker.ts)'",

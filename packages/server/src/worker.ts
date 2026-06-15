@@ -116,11 +116,11 @@ async function expireOldMemories(): Promise<void> {
       where: {
         expiresAt:  { lte: new Date() },
         deletedAt:  null,
-        status:     { not: 'deleted' },
+        status:     { not: 'archived' },
       },
       data: {
         deletedAt: new Date(),
-        status:    'deleted',
+        status:    'archived',
       },
     });
     if (result.count > 0) {

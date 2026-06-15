@@ -142,6 +142,7 @@ export const RecallInputSchema = z.object({
   query:   z.string().min(1).max(500),
   limit:   z.number().int().min(1).max(50).default(10),
   profile: z.enum(['desktop', 'mobile']).default('desktop'),
+  spaceId: z.string().uuid().optional(),
 });
 
 export type RecallInput = z.infer<typeof RecallInputSchema>;

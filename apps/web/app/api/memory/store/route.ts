@@ -15,7 +15,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserIdFromRequest }       from '@/lib/api-auth';
-import { prisma }                     from '@/lib/prisma';
+import { prisma }                     from '@unimatrix/db';
 import { processLibrarianJob }        from '@unimatrix/server/librarian/processJob';
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -56,17 +56,24 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       data: {
         userId,
         spaceId:    space_id ?? null,
-        content:    Buffer.from(content, 'utf8'),
-        contentIv:  Buffer.alloc(16, 0), // placeholder IV — encryption layer overwrites this
+        content:    new Uint8Array(Buffer.from(content, 'utf8')),
+        contentIv:  new Uint8Array(16), // placeholder IV — encryption layer overwrites this
         source:     'api',
         status:     'active',
-        expiresAt,
       },
     });
 
+    // Apply TTL if requested (expiresAt added in migration 006 — set via raw SQL
+    // until Prisma client is regenerated to include the new column)
+    if (expiresAt) {
+      await prisma.$executeRaw`
+        UPDATE memories SET expires_at = ${expiresAt} WHERE id = ${memory.id}::uuid
+      `;
+    }
+
     // Insert tags
     if (finalTags.length > 0) {
-      await prisma.memoryTag.createMany({
+      await prisma.memoryTag.createMany({ // eslint-disable-line @typescript-eslint/no-explicit-any
         data: finalTags.map(tag => ({ memoryId: memory.id, tag })),
         skipDuplicates: true,
       });
