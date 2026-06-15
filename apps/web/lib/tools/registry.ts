@@ -11,6 +11,7 @@
  */
 
 import { TOOLS as legacyMemoryTools, handleTool as legacyHandleTool } from '@/app/api/mcp/route';
+import { MEMORY_TOOL_MANIFESTS, handleMemoryTool } from '@unimatrix/server/mcp/memoryTools';
 import { sendMessage, getMessages, subscribeWebhook, createRoom, listRooms } from '@/lib/collab/service';
 import type { OpenAITool } from '@/lib/mcp-client';
 
@@ -113,6 +114,9 @@ const collabTools: ToolDefinition[] = [
 
 collabTools.forEach((tool) => registry.set(tool.name, tool));
 
+// CSMTER memory tools (L1 vector + L2 BM25 + L3 RRF + L4 triples)
+MEMORY_TOOL_MANIFESTS.forEach((tool) => registry.set(tool.name, tool));
+
 export function getAllTools(): ToolDefinition[] {
   return Array.from(registry.values());
 }
@@ -133,6 +137,14 @@ export async function executeTool(
   // Collaboration tools (new, preferred path)
   if (name.startsWith('collab.')) {
     return executeCollabTool(name, args, context);
+  }
+
+  // CSMTER hybrid memory tools (L1+L2+L3+L4 pipeline)
+  if (name.startsWith('unimatrix_recall') || name.startsWith('unimatrix_search_csmter') || name.startsWith('unimatrix_list_triples') || name.startsWith('unimatrix_system_prompt')) {
+    const result = await handleMemoryTool(name, args, context.userId);
+    if (result !== null) {
+      return { content: [{ type: 'text' as const, text: JSON.stringify(result) }] };
+    }
   }
 
   // Legacy memory tools (delegate to existing implementation)
