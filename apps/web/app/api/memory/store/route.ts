@@ -85,7 +85,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     setImmediate(() => {
       fetch(`${MCP_SERVER_URL}/api/librarian/process`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${process.env.INTERNAL_API_SECRET ?? 'dev-internal-secret'}`,
+        },
         body: JSON.stringify({
           memoryId:  memory.id,
           userId,

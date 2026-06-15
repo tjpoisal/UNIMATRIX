@@ -9,6 +9,11 @@ primary_region = "iad"
 [env]
   NODE_ENV = "production"
   PORT = "8080"
+  # Shared secret authenticating internal server-to-server calls from the web
+  # app (apps/web) to /internal/librarian and /api/librarian/process.
+  # Set the real value via `fly secrets set INTERNAL_API_SECRET=...` — this is
+  # only a placeholder to document the variable.
+  INTERNAL_API_SECRET = "set-via-fly-secrets"
 
 [[services]]
   protocol = "tcp"

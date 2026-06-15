@@ -38,6 +38,8 @@ import { continueFromHandler }  from './handlers/continueFrom.js';
 import { listContextsHandler }  from './handlers/listContexts.js';
 import { clerkWebhookHandler }   from './webhooks/clerk.js';
 import { handleOllamaWebhook }  from './integrations/ollama-integration.js';
+import { processLibrarianJob }  from './librarian/processJob.js';
+import type { LibrarianJob }    from './types/domain.js';
 
 import {
   StoreMemoryInputSchema,
@@ -64,6 +66,28 @@ import {
 
 // RLS guard — module-level, only runs once per process/container
 installRlsGuard();
+
+// ---------------------------------------------------------------------------
+// Internal API secret — shared secret authenticating server-to-server calls
+// from the web app (apps/web) to this MCP server's /internal/* routes.
+// Required in production; falls back to a dev value otherwise.
+// ---------------------------------------------------------------------------
+
+function internalApiSecret(): string {
+  const secret = process.env.INTERNAL_API_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('INTERNAL_API_SECRET is required in production');
+  }
+  return 'dev-internal-secret';
+}
+
+/** Extracts the Bearer token from an Authorization header value. */
+function bearerToken(authHeader: string | undefined): string | null {
+  if (!authHeader) return null;
+  const match = /^Bearer\s+(.+)$/i.exec(authHeader.trim());
+  return match ? match[1].trim() : null;
+}
 
 // ---------------------------------------------------------------------------
 // Adapter — bridges MCP SDK (args, extra) → internal (input, userId)
@@ -247,6 +271,52 @@ export function buildApp() {
     });
     return reply.code(result.success ? 200 : 400).send(result);
   });
+
+  // ── Internal Librarian processing ─────────────────────────────────────────
+  // Server-to-server endpoint used by apps/web to hand off the CSMTER Librarian
+  // pipeline (embed → quantize → classify → triples) to the MCP server, which
+  // owns the librarian implementation. Authenticated via INTERNAL_API_SECRET.
+  //
+  // Accepts either shape:
+  //   { job: LibrarianJob }                                  (explicit envelope)
+  //   { memoryId, userId, content, spaceId?, sourceLlm? }    (flat — REST store)
+  //
+  // Fire-and-forget: responds 202 immediately and processes in the background.
+  const librarianRoute = async (request: any, reply: any) => {
+    const token = bearerToken(request.headers['authorization']);
+    if (!token || token !== internalApiSecret()) {
+      return reply.code(401).send({ error: 'Unauthorized' });
+    }
+
+    const body = (request.body ?? {}) as Record<string, unknown>;
+    const raw  = (body.job ?? body) as Partial<LibrarianJob>;
+
+    if (!raw.memoryId || !raw.userId || typeof raw.content !== 'string') {
+      return reply
+        .code(400)
+        .send({ error: 'memoryId, userId, and content are required' });
+    }
+
+    const job: LibrarianJob = {
+      memoryId:  raw.memoryId,
+      userId:    raw.userId,
+      content:   raw.content,
+      hint:      raw.hint      ?? null,
+      spaceId:   raw.spaceId   ?? null,
+      sourceLlm: raw.sourceLlm,
+      createdAt: raw.createdAt ?? new Date(),
+    };
+
+    // Fire-and-forget — never block the response on the pipeline.
+    processLibrarianJob(job).catch((err) => {
+      request.log.error({ err, memoryId: job.memoryId }, '[Librarian] job failed');
+    });
+
+    return reply.code(202).send({ ok: true });
+  };
+
+  fastify.post('/internal/librarian',    librarianRoute);
+  fastify.post('/api/librarian/process', librarianRoute);
 
   return fastify;
 }
