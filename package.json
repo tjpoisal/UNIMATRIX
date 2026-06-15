@@ -26,14 +26,14 @@
   },
   "_eas_mobile_note": "Use these for the React Native / Expo app (apps/mobile). They guarantee the correct working directory. See apps/mobile/README.md and ACCOUNTS_AND_SECRETS.md for details. Direct npx eas-cli from here is the #1 cause of 'expo-modules-autolinking' errors and huge uploads. NOTE: iOS production requires $99/yr Apple Developer membership (currently unaffordable for user) - :ios alias uses preview/simulator (free). Android full prod ok.",
   "dependencies": {
-    "next": "16.2.6"
+    "next": "16.2.9"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "eslint": "^9",
-    "eslint-config-next": "16.2.6",
-    "prettier": "^3.0.0",
-    "turbo": "^2.9.14",
+    "eslint-config-next": "16.2.9",
+    "prettier": "^3.8.4",
+    "turbo": "^2.9.18",
     "typescript": "^5.9.2"
   },
   "packageManager": "pnpm@10.33.0",
