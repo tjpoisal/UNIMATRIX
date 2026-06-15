@@ -44,7 +44,7 @@ jobs:
         run: |
           mv apps/desktop/dist/*.dmg apps/desktop/dist/Unimatrix-mac.dmg 2>/dev/null || true
           mv apps/desktop/dist/*-mac.zip apps/desktop/dist/Unimatrix-mac.zip 2>/dev/null || true
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: |
             apps/desktop/dist/Unimatrix-mac.dmg
@@ -72,7 +72,7 @@ jobs:
         run: |
           $exe = Get-ChildItem apps/desktop/dist/*.exe | Select-Object -First 1
           if ($exe) { Rename-Item $exe.FullName "Unimatrix-Setup-win.exe" }
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: apps/desktop/dist/Unimatrix-Setup-win.exe
 
@@ -100,7 +100,7 @@ jobs:
           mv apps/desktop/dist/*.AppImage apps/desktop/dist/Unimatrix-linux-x64.AppImage 2>/dev/null || true
           mv apps/desktop/dist/*.deb apps/desktop/dist/Unimatrix-linux.deb 2>/dev/null || true
           mv apps/desktop/dist/*.snap apps/desktop/dist/Unimatrix-linux.snap 2>/dev/null || true
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           files: |
             apps/desktop/dist/Unimatrix-linux-x64.AppImage
