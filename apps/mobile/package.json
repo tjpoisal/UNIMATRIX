@@ -22,7 +22,7 @@
   "_note": "IMPORTANT: EAS build commands MUST run with apps/mobile as CWD. From monorepo root use the pnpm aliases: pnpm mobile:build:all (or :ios, :android, :prod, :preview). For extra flags: pnpm --filter mobile exec npx eas-cli@latest build --platform all --profile production --non-interactive. NEVER run raw npx eas-cli from the Unimatrix/ root dir. iOS REAL builds (device/App Store) require $99/yr Apple Developer Program membership (user cannot currently afford). Use :ios alias for free simulator builds (preview profile). Android is fully supported. TEAM_ID_PLACEHOLDER in eas.json only needed if/when obtaining membership.",
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
-    "@react-native-async-storage/async-storage": "^2.0.0",
+    "@react-native-async-storage/async-storage": "^3.1.1",
     "@react-navigation/bottom-tabs": "^7.18.2",
     "@react-navigation/elements": "^2.9.25",
     "@react-navigation/native": "^7.3.3",
