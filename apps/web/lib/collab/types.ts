@@ -14,7 +14,7 @@ export const SendMessageInput = z.object({
   sender_name: z.string().min(1).max(120),
   sender_type: SenderType,
   message: z.string().min(1).max(8000),
-  metadata: z.record(z.unknown()).optional().default({}),
+  metadata: z.record(z.string(), z.unknown()).optional().default({}),
 });
 
 export type SendMessageInput = z.infer<typeof SendMessageInput>;

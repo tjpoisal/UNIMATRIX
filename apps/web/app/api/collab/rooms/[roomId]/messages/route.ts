@@ -14,7 +14,7 @@ const PostMessageSchema = z.object({
   sender_name: z.string().min(1),
   sender_type: z.enum(['human', 'agent', 'system']),
   message: z.string().min(1).max(8000),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function GET(
