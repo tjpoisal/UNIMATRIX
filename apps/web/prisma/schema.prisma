@@ -18,13 +18,22 @@ model User {
   stripeCustomerId     String? @unique
   stripeSubscriptionId String?
 
+  // ── MFA / 2FA (SOC2 CC6.1, HIPAA §164.312(d)) ────────────────────────
+  mfaEnabled         Boolean  @default(false)
+  mfaSecret          String?  // AES-256-GCM encrypted TOTP secret
+  mfaIv              String?  // IV for mfaSecret decryption
+  recoveryCodes      String[] // bcrypt-hashed recovery codes (consumed on use)
+  trustedPersonEmail String?  // email of a trusted person for account recovery
+
   // Relations
-  accounts     Account[]
-  palaces      Palace[]
-  sessions     Session[]
-  apiKeys      ApiKey[]
-  llmProviders LLMProvider[]
-  agentRuns    AgentRun[]
+  accounts             Account[]
+  palaces              Palace[]
+  sessions             Session[]
+  apiKeys              ApiKey[]
+  llmProviders         LLMProvider[]
+  agentRuns            AgentRun[]
+  authAttempts         AuthAttempt[]
+  mfaRecoveryRequests  MfaRecoveryRequest[]
 
   // Social
   friendRequestsSent     Friendship[]  @relation("FriendRequests")
@@ -490,4 +499,41 @@ model WebhookDeliveryAttempt {
 
   @@index([subscriptionId, createdAt])
   @@index([succeeded, createdAt])
+}
+
+// ============================================================================
+// AUTHENTICATION SECURITY — SOC2 CC6 / HIPAA §164.312
+// ============================================================================
+
+/// Records every login attempt for brute-force detection and audit trails.
+/// Retained for ≥ 1 year per SOC2 CC7.2 / HIPAA §164.312(b).
+model AuthAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  success   Boolean
+  ip        String   @default("unknown")
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([userId, createdAt])
+  @@index([success, createdAt])
+}
+
+/// One-time MFA recovery request sent to a trusted person.
+/// Token is valid for 15 minutes (single-use).
+model MfaRecoveryRequest {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token   String   @unique
+  expires DateTime
+  usedAt  DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expires])
 }
