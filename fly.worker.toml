@@ -27,7 +27,8 @@ primary_region = "iad"
 # No public services needed for a pure worker
 # It will just run the process in the machine
 
+[processes]
+  worker = "node dist/worker.js"
+
 [deploy]
-  # We will run it manually or via a machine command that executes the worker
-  # For always-on worker, you can use:
-  # fly machine update <id> --command "node dist/worker.js" or use a process in toml
+  strategy = "immediate"  # Workers don't need rolling deploys
