@@ -17,8 +17,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.0",
-    "@google/generative-ai": "^0.14.0",
+    "@anthropic-ai/sdk": "^0.104.2",
+    "@google/generative-ai": "^0.24.1",
     "groq-sdk": "^0.8.0",
     "openai": "^4.52.0",
     "@unimatrix/types": "workspace:*"
