@@ -1,0 +1,196 @@
+# =============================================================================
+# .github/workflows/pre-deploy-env-check.yml
+#
+# Pre-deploy environment validation for unimatrix-web.
+# Runs on every push to main and on PRs targeting main.
+#
+# Checks:
+#   1. All required secrets are present in GitHub Secrets (mapped to Fly.io)
+#   2. DATABASE_URL format is valid (postgres://, contains neon.tech, has ssl param)
+#   3. Live database connectivity probe (SELECT 1 via pg)
+#   4. next.config.ts has no unrecognised keys that would crash next build
+#   5. Prisma schema validates cleanly (prisma validate)
+#
+# On failure: posts a Slack notification with a direct link to the failed run.
+#
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#   DATABASE_URL          — Neon connection string
+#   NEXTAUTH_SECRET       — random 32-byte hex string
+#   NEXTAUTH_URL          — https://unimatrix-web.fly.dev (or custom domain)
+#   GOOGLE_CLIENT_ID      — from Google Cloud Console
+#   GOOGLE_CLIENT_SECRET  — from Google Cloud Console
+#   MFA_ENCRYPTION_KEY    — 64 hex chars (32 bytes), generate with: openssl rand -hex 32
+#   SLACK_WEBHOOK_URL     — Incoming Webhook URL from your Slack app
+#
+# Optional GitHub Secrets (workflow warns but does not fail if absent):
+#   RESEND_API_KEY        — for trusted-person MFA recovery emails
+#   INTERNAL_API_SECRET   — shared secret for MCP ↔ web internal calls
+#   MCP_SERVER_URL        — defaults to https://unimatrix-mcp.fly.dev
+# =============================================================================
+
+name: Pre-deploy Environment Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: env-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  env-check:
+    name: Validate secrets & database
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Expose secrets as env vars so check-env.sh --ci can read them
+    env:
+      DATABASE_URL:          ${{ secrets.DATABASE_URL }}
+      NEXTAUTH_SECRET:       ${{ secrets.NEXTAUTH_SECRET }}
+      NEXTAUTH_URL:          ${{ secrets.NEXTAUTH_URL }}
+      GOOGLE_CLIENT_ID:      ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET:  ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      MFA_ENCRYPTION_KEY:    ${{ secrets.MFA_ENCRYPTION_KEY }}
+      RESEND_API_KEY:        ${{ secrets.RESEND_API_KEY }}
+      INTERNAL_API_SECRET:   ${{ secrets.INTERNAL_API_SECRET }}
+      MCP_SERVER_URL:        ${{ secrets.MCP_SERVER_URL }}
+
+    steps:
+      # ── Checkout ─────────────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Node ─────────────────────────────────────────────────────────────────
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      # ── Install (need pg for DB probe + prisma for schema validate) ──────────
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ── Run check-env.sh --ci ─────────────────────────────────────────────────
+      - name: Run environment check
+        id: env_check
+        run: |
+          chmod +x scripts/check-env.sh
+          scripts/check-env.sh --ci
+        # DATABASE_URL is in the env already; the script reads it directly
+
+      # ── Prisma schema validate ────────────────────────────────────────────────
+      - name: Validate Prisma schema
+        working-directory: apps/web
+        run: pnpm prisma validate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      # ── Validate next.config.ts has no banned keys ────────────────────────────
+      - name: Check next.config.ts for removed options
+        run: |
+          echo "Checking for deprecated/removed Next.js config keys..."
+          BANNED_KEYS=("eslint:" "swcMinify:" "experimental.legacyBrowsers:" "target:")
+          FOUND=0
+          for key in "${BANNED_KEYS[@]}"; do
+            if grep -qF "$key" apps/web/next.config.ts 2>/dev/null; then
+              echo "::error file=apps/web/next.config.ts::Deprecated/removed Next.js config key found: $key"
+              FOUND=$((FOUND+1))
+            fi
+          done
+          if [[ $FOUND -gt 0 ]]; then
+            echo "Fix: remove the flagged keys from apps/web/next.config.ts"
+            exit 1
+          fi
+          echo "next.config.ts looks clean."
+
+      # ── Summary annotation ────────────────────────────────────────────────────
+      - name: Summarise results
+        if: always()
+        run: |
+          echo "## Pre-deploy Environment Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.env_check.outcome }}" == "success" ]]; then
+            echo "✅ All required secrets are present and DATABASE_URL is reachable." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ One or more checks failed — see logs above." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Quick fixes" >> $GITHUB_STEP_SUMMARY
+            echo "- Add missing secrets: **Settings → Secrets and variables → Actions → New repository secret**" >> $GITHUB_STEP_SUMMARY
+            echo "- Sync Fly.io secrets: \`flyctl secrets list --app unimatrix-web\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Neon console: https://console.neon.tech" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # ---------------------------------------------------------------------------
+  # Slack notification — only fires on push to main (not on PRs), and only
+  # when the env-check job actually fails.
+  # ---------------------------------------------------------------------------
+  notify-slack:
+    name: Notify Slack on failure
+    runs-on: ubuntu-latest
+    needs: env-check
+    if: |
+      failure() &&
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Post failure to Slack
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚨 Unimatrix pre-deploy check FAILED",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    { "type": "mrkdwn", "text": "*Repo:*\n<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>" },
+                    { "type": "mrkdwn", "text": "*Branch:*\n`${{ github.ref_name }}`" },
+                    { "type": "mrkdwn", "text": "*Commit:*\n<${{ github.event.head_commit.url }}|`${{ github.sha_short || github.sha }}`>" },
+                    { "type": "mrkdwn", "text": "*Author:*\n${{ github.event.head_commit.author.name }}" }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*What failed:* Environment validation before Fly.io deploy.\nPossible causes:\n• A required secret is missing from GitHub Actions Secrets\n• `DATABASE_URL` is invalid or Neon is unreachable\n• `next.config.ts` has a deprecated key\n• Prisma schema failed validation"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": { "type": "plain_text", "text": "View Failed Run", "emoji": true },
+                      "style": "danger",
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": { "type": "plain_text", "text": "Runbook", "emoji": true },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/blob/main/docs/RUNBOOK-build-failures.md"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
