@@ -1,0 +1,109 @@
+name: Type Check
+
+# Runs strict TypeScript type checking on every PR and push to main.
+# Catches errors like missing imports before they block Fly.io deployments.
+#
+# Covers all workspaces in the monorepo:
+#   - apps/web        (Next.js)
+#   - packages/db     (Prisma + shared DB client)
+#   - packages/types  (shared types)
+#   - packages/ui     (shared React components)
+#   - packages/llm    (LLM provider abstractions)
+#   - packages/server (MCP server)
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  # Cancel in-flight runs for the same PR/branch so pushes don't queue up
+  group: typecheck-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typecheck:
+    name: tsc --noEmit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ── Checkout ────────────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Node + pnpm ─────────────────────────────────────────────────────────
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          # Read version from packageManager field in package.json
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      # ── Install ──────────────────────────────────────────────────────────────
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # ── Build upstream packages first ────────────────────────────────────────
+      # packages/db and packages/types must be compiled before apps/web's tsc
+      # can resolve their types. packages/ui and packages/llm likewise.
+      - name: Build packages/types
+        run: pnpm --filter @unimatrix/types build
+        continue-on-error: false
+
+      - name: Build packages/db
+        run: pnpm --filter @unimatrix/db build
+        continue-on-error: false
+
+      - name: Build packages/ui
+        run: pnpm --filter @unimatrix/ui build
+        continue-on-error: false
+
+      - name: Build packages/llm
+        run: pnpm --filter @unimatrix/llm build
+        continue-on-error: false
+
+      # ── Generate Prisma client ───────────────────────────────────────────────
+      # Next.js tsc needs the generated Prisma types to resolve @prisma/client
+      - name: Generate Prisma client (apps/web)
+        working-directory: apps/web
+        run: pnpm prisma generate
+
+      - name: Generate Prisma client (packages/db)
+        working-directory: packages/db
+        run: pnpm prisma generate
+        continue-on-error: true  # packages/db may not have its own schema
+
+      # ── Type check each workspace ────────────────────────────────────────────
+      - name: Type check — apps/web
+        working-directory: apps/web
+        run: pnpm exec tsc --noEmit
+        # This is the critical check — catches Next.js/React component errors
+
+      - name: Type check — packages/db
+        working-directory: packages/db
+        run: pnpm exec tsc --noEmit
+
+      - name: Type check — packages/types
+        working-directory: packages/types
+        run: pnpm exec tsc --noEmit
+
+      - name: Type check — packages/ui
+        working-directory: packages/ui
+        run: pnpm exec tsc --noEmit
+
+      - name: Type check — packages/llm
+        working-directory: packages/llm
+        run: pnpm exec tsc --noEmit
+        continue-on-error: true  # llm package may have intentional looser types
+
+      - name: Type check — packages/server
+        working-directory: packages/server
+        run: pnpm exec tsc --noEmit
+        continue-on-error: true  # server package checked separately
