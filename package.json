@@ -8,8 +8,8 @@
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
     "test": "turbo run test",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "lint": "eslint . --ext .js,.ts,.jsx,.tsx",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
     "clean": "turbo run clean && rm -rf node_modules .turbo dist",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
@@ -22,7 +22,8 @@
     "mobile:build:all": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform all --profile production --non-interactive --no-wait",
     "mobile:build:ios": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform ios --profile preview --non-interactive --no-wait",
     "mobile:build:android": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --platform android --profile production --non-interactive --no-wait",
-    "mobile:build:preview": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --profile preview --non-interactive --no-wait"
+    "mobile:build:preview": "cd apps/mobile && PATH=$(pwd)/node_modules/.bin:$(pwd)/../node_modules/.bin:$PATH EAS_BUILD_NO_EXPO_GO_WARNING=true EXPO_NO_TELEMETRY=1 eas build --profile preview --non-interactive --no-wait",
+    "ci": "npm run lint && npm run test"
   },
   "_eas_mobile_note": "Use these for the React Native / Expo app (apps/mobile). They guarantee the correct working directory. See apps/mobile/README.md and ACCOUNTS_AND_SECRETS.md for details. Direct npx eas-cli from here is the #1 cause of 'expo-modules-autolinking' errors and huge uploads. NOTE: iOS production requires $99/yr Apple Developer membership (currently unaffordable for user) - :ios alias uses preview/simulator (free). Android full prod ok.",
   "dependencies": {
@@ -54,5 +55,15 @@
         }
       }
     }
+  },
+  "husky": {
+    // ...existing code...
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "npm run lint -- --fix",
+      "npm run format",
+      "git add"
+    ]
   }
 }

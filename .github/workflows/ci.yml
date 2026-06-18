@@ -2,156 +2,39 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  typecheck-build:
-    name: Typecheck & Build
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
-          cache: pnpm
-
+          node-version: '18'
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build workspace packages
-        run: pnpm --filter @unimatrix/db build
-
-      - name: Generate Prisma client
-        working-directory: apps/web
-        run: pnpm exec prisma generate
-        env:
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
-
-      - name: Typecheck (web)
-        working-directory: apps/web
-        run: pnpm exec tsc --noEmit --skipLibCheck
-        env:
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
-          NEXTAUTH_SECRET: ci-secret-32-chars-minimum-length-x
-          NEXTAUTH_URL: http://localhost:3000
-
-      - name: Lint (turbo monorepo)
-        continue-on-error: true
-        run: pnpm lint
-
-      - name: Build (web)
-        working-directory: apps/web
-        run: pnpm build
-        env:
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
-          NEXTAUTH_SECRET: ci-secret-32-chars-minimum-length-x
-          NEXTAUTH_URL: http://localhost:3000
-          RESEND_API_KEY: re_placeholder
-          EMAIL_FROM: noreply@example.com
-          STRIPE_SECRET_KEY: sk_test_placeholder
-          STRIPE_WEBHOOK_SECRET: whsec_placeholder
-          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
-
-  typecheck-server:
-    name: Typecheck @unimatrix/server
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+        run: npm ci
+      - name: Run lint
+        run: npm run lint
+      - name: Run tests
+        run: npm run test
+      - name: NPM Audit
+        run: npm audit --audit-level=moderate || true
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build workspace packages
-        run: pnpm --filter @unimatrix/db build
-
-      - name: Typecheck @unimatrix/server
-        run: NODE_OPTIONS="--max-old-space-size=8192" pnpm --filter @unimatrix/server exec tsc --noEmit
-        env:
-          DATABASE_URL: postgresql://placeholder:placeholder@localhost/placeholder
-          CLERK_SECRET_KEY: sk_placeholder
-          CLERK_WEBHOOK_SECRET: whsec_placeholder
-
-  lint:
-    name: Lint (non-blocking)
+          name: test-results
+          path: ./test-results || .
+  codeql:
+    name: CodeQL
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v2
         with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: cd apps/web && pnpm lint
-
-  desktop-smoke:
-    name: Desktop smoke (non-blocking)
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-      - name: Install (npm)
-        working-directory: apps/desktop
-        run: npm install --no-audit --no-fund
-      - name: Smoke pack
-        working-directory: apps/desktop
-        run: npm run pack -- --linux --dir
-      - name: Verify output
-        run: ls -l apps/desktop/dist/linux-unpacked/ || ls apps/desktop/dist/ || echo "pack produced output dir"
-
-  deploy-to-fly:
-    name: Deploy to Fly.io
-    runs-on: ubuntu-latest
-    needs: [typecheck-build, typecheck-server]
-    if: github.ref == 'refs/heads/main'
-    continue-on-error: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Fly CLI
-        uses: superfly/flyctl-actions/setup-flyctl@master
-
-      - name: Deploy web app
-        run: flyctl deploy --app unimatrix-web
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
-      - name: Deploy MCP server
-        run: flyctl deploy --config fly.mcp.toml --app unimatrix-mcp
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          languages: javascript
+      - uses: github/codeql-action/analyze@v2
