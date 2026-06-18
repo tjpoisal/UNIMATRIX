@@ -4,8 +4,10 @@
  * Raw PostgreSQL pool for CSMTER routes that need direct SQL access
  * (pgvector HNSW, BM25 tsvector queries) that Prisma ORM can't express.
  *
- * Uses the same DATABASE_URL as Prisma. Pool is shared across requests
- * via module singleton (Next.js module caching keeps it alive across hot reloads).
+ * Lazily initialises the pool on first use so that Next.js build-time
+ * static analysis / page-data collection does NOT throw when DATABASE_URL
+ * is absent from the Docker build environment.  The error surfaces at
+ * request time, not at module-import time.
  */
 
 import { Pool } from 'pg';
@@ -15,12 +17,15 @@ declare global {
   var __pgPool: Pool | undefined;
 }
 
-function createPool(): Pool {
+function getPool(): Pool {
+  if (globalThis.__pgPool) return globalThis.__pgPool;
+
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error('DATABASE_URL environment variable is not set');
   }
-  return new Pool({
+
+  globalThis.__pgPool = new Pool({
     connectionString,
     max: 10,
     idleTimeoutMillis: 30_000,
@@ -29,8 +34,19 @@ function createPool(): Pool {
       ? { rejectUnauthorized: false }
       : undefined,
   });
+
+  return globalThis.__pgPool;
 }
 
-// Singleton: reuse pool across Next.js hot reloads in development
-export const pool: Pool =
-  globalThis.__pgPool ?? (globalThis.__pgPool = createPool());
+/**
+ * Proxy-based singleton: pool.connect() and all other Pool methods work
+ * normally, but the underlying Pool is not created until first access.
+ * This prevents module-import-time throws during `next build`.
+ */
+export const pool = new Proxy({} as Pool, {
+  get(_target, prop) {
+    const p = getPool();
+    const val = (p as unknown as Record<string | symbol, unknown>)[prop];
+    return typeof val === 'function' ? val.bind(p) : val;
+  },
+});
