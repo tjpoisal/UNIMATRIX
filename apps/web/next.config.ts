@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Skip TS/ESLint errors during Docker build — CI handles type checking separately
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   poweredByHeader: false,
   images: {
     remotePatterns: [
