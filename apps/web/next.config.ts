@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Skip TS errors during Docker build — CI handles strict type checking on every PR
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  // eslint key removed: no longer a valid Next.js 16 config option (generates build warning).
+  // ESLint is run separately in CI; not via next build.
   poweredByHeader: false,
   images: {
     remotePatterns: [

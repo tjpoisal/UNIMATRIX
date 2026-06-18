@@ -1,82 +1,119 @@
 # Multi-stage Dockerfile for the Unimatrix Web Portal + Collab WS Server
 # Uses custom server.ts for persistent WebSocket support (Collab Room)
+#
+# System-dep notes (Prisma 6.x on node:20-slim / Debian Bookworm):
+#   - openssl          → Prisma query-engine TLS (PRISMA_CLI_BINARY_TARGETS=debian-openssl-3.0.x)
+#   - libssl-dev       → runtime TLS for pg connections over SSL
+#   - ca-certificates  → validates TLS certs (Neon, Resend, Stripe, etc.)
+#   - curl             → Fly.io health probes & debugging
+#   - git              → pnpm may need it for git-dep resolution in some workspaces
+# Installed once in base; production stage inherits the system layer via multi-stage copy.
 
+# ─── Base / build stage ───────────────────────────────────────────────────────
 FROM node:20-slim AS base
+
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+
+# Install system dependencies required by Prisma 6.x and OpenSSL-based pg TLS
+# This eliminates the "Prisma failed to detect libssl/openssl version" warnings
+# and ensures the query engine binary works at runtime on Fly.io (Debian Bookworm).
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+      openssl \
+      libssl-dev \
+      ca-certificates \
+      curl \
+      git \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN corepack enable
 
 WORKDIR /app
 
-# Root workspace manifests
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+# ── Dependency manifests (separate layer for better cache hit rate) ───────────
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma
 
-# Install dependencies for web workspace
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter web --frozen-lockfile
+# Install web workspace deps (cache mounted so repeated builds are fast)
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --filter web --frozen-lockfile
 
-# Copy source (full packages for workspace deps like @unimatrix/db)
+# ── Source copy ───────────────────────────────────────────────────────────────
 COPY apps/web ./apps/web
 COPY packages ./packages
 
-# Install db package deps (for prisma cli in its build)
+# Install @unimatrix/db deps (Prisma CLI needed for its build)
 RUN pnpm install --filter @unimatrix/db --frozen-lockfile
 
-# Build shared @unimatrix/db first (monorepo workspace dep for future unification / bridge)
+# ── Build shared packages first ───────────────────────────────────────────────
 WORKDIR /app/packages/db
 RUN pnpm build
 
+# ── Build the web app ─────────────────────────────────────────────────────────
 WORKDIR /app/apps/web
 
-# Generate Prisma (web's local schema) + build Next.js + custom server
+# Generate Prisma client (uses the openssl binary we installed above)
 RUN pnpm prisma generate
+
+# Next.js production build + custom WebSocket server compilation
 RUN pnpm build
 
-# --- Production runner ---
+
+# ─── Production runner stage ─────────────────────────────────────────────────
 FROM node:20-slim AS production
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+ENV NODE_ENV=production
+# PORT is injected by Fly.io at runtime; our server.ts reads process.env.PORT
+ENV PORT=8080
+
+# Install the same system deps as base so Prisma's query engine runs correctly
+# at runtime (not just at build time). node:20-slim has no openssl by default.
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+      openssl \
+      libssl-dev \
+      ca-certificates \
+      curl \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN corepack enable
 
 WORKDIR /app
 
-ENV NODE_ENV=production
-# PORT matches the internal_port and [env] in fly.web.toml (Fly routes to it)
-ENV PORT=8080
-
-# Copy manifests for a prod-only install in this stage (to get clean node_modules without pnpm virtual store symlink issues from base layers)
-COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+# ── Prod-only install (clean node_modules, no dev deps) ───────────────────────
+# Copy manifests including .npmrc so hoisting rules are respected here too
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma
 COPY packages/db/package.json ./packages/db/
 
-# Prod install for web to get self-contained node_modules with 'next', 'ws' etc (ignore scripts to avoid prisma CLI which isn't in --prod)
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --filter web --prod --frozen-lockfile --ignore-scripts --shamefully-hoist
+# --shamefully-hoist ensures Next.js, ws, etc. are in a flat node_modules
+# --ignore-scripts skips prisma generate (we copy the built client from base)
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --filter web --prod --frozen-lockfile --ignore-scripts --shamefully-hoist
 
-# Copy only what is needed at runtime (built artifacts)
-COPY --from=base /app/apps/web/.next ./.next
-COPY --from=base /app/apps/web/dist ./dist
-COPY --from=base /app/apps/web/public ./public
-COPY --from=base /app/apps/web/package.json ./
-COPY --from=base /app/apps/web/prisma ./prisma
-
-# Ensure @unimatrix/db built output + its isolated generated client (rich models) are present
-COPY --from=base /app/packages/db/dist /app/packages/db/dist
-COPY --from=base /app/packages/db/generated /app/packages/db/generated
-COPY --from=base /app/packages/db/package.json /app/packages/db/package.json
-
-# Copy server.ts compiled output (dist/server.js)
-# Also bring in any runtime config
+# ── Copy built artifacts from base ───────────────────────────────────────────
+COPY --from=base /app/apps/web/.next          ./.next
+COPY --from=base /app/apps/web/dist           ./dist
+COPY --from=base /app/apps/web/public         ./public
+COPY --from=base /app/apps/web/package.json   ./
+COPY --from=base /app/apps/web/prisma         ./prisma
 COPY --from=base /app/apps/web/next.config.ts ./
+
+# @unimatrix/db built output + its generated Prisma client
+COPY --from=base /app/packages/db/dist                  /app/packages/db/dist
+COPY --from=base /app/packages/db/generated             /app/packages/db/generated
+COPY --from=base /app/packages/db/package.json          /app/packages/db/package.json
 
 EXPOSE 8080
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:8080/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"
+# Fly.io health check — must return 200 before machine is marked healthy
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -sf http://localhost:8080/api/health || exit 1
 
-# Run the custom server (Next.js + WebSocket)
-# PORT handled via env from fly.toml (8080)
+# Run the custom Next.js + WebSocket server
 CMD ["node", "dist/server.js"]
