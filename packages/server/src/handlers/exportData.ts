@@ -132,3 +132,6 @@ async function exportJSON(
     cleanup();
   }
 }
+
+// Use CommonJS __dirname when available; otherwise fall back to process.cwd().
+const __dirname = typeof __dirname !== 'undefined' ? __dirname : process.cwd();

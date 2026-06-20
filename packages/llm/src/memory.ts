@@ -58,11 +58,9 @@ export async function autoLogInteraction(
 
         type MemoryCreateResponse = { id?: string; locationId?: string };
 
-        const body = await res.json().catch(() => ({} as MemoryCreateResponse));
-        return {
-          memoryId: (body as MemoryCreateResponse)?.id,
-          locationId: (body as MemoryCreateResponse)?.locationId,
-        };
+        const body = await res.json().catch(() => ({} as MemoryCreateResponse)) as MemoryCreateResponse;
+
+        return { memoryId: body.id, locationId: body.locationId };
     } catch (err: any) {
         return { error: err?.message ?? String(err) };
     }

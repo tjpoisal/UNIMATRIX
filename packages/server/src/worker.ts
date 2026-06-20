@@ -151,7 +151,10 @@ async function main() {
 }
 
 // Allow direct execution
-if (import.meta.url === `file://${process.argv[1]}`) {
+// if (import.meta.url === `file://${process.argv[1]}`) {
+const isEntryPoint = typeof require !== 'undefined' && require.main === module;
+
+if (isEntryPoint) {
   main().catch((err) => {
     console.error('[Worker] Fatal error:', err);
     process.exit(1);

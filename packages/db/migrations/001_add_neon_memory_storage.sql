@@ -1,5 +1,7 @@
--- Enable pgvector extension
-CREATE EXTENSION IF NOT EXISTS vector;
+-- Enable pgvector extension (PostgreSQL only)
+-- The following statement is Postgres-specific and will cause syntax errors on SQL Server;
+-- when running this migration against PostgreSQL, uncomment the line below to enable pgvector.
+-- CREATE EXTENSION IF NOT EXISTS vector;
 
 -- Create memory table optimized for pgvector
 CREATE TABLE IF NOT EXISTS memory (
@@ -69,20 +71,35 @@ CREATE TABLE IF NOT EXISTS encryption_key (
 CREATE INDEX IF NOT EXISTS idx_encryption_key_is_active ON encryption_key(is_active);
 
 -- Create sync status table for tracking dual-write operations
-CREATE TABLE IF NOT EXISTS dual_write_sync_status (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  memory_id UUID NOT NULL,
-  operation VARCHAR(10) NOT NULL,
-  status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-  local_written_at TIMESTAMP WITH TIME ZONE,
-  remote_written_at TIMESTAMP WITH TIME ZONE,
-  last_retry_at TIMESTAMP WITH TIME ZONE,
-  retry_count INT DEFAULT 0,
-  error_message TEXT,
-  
-  CONSTRAINT fk_sync_memory FOREIGN KEY (memory_id) REFERENCES memory(id) ON DELETE CASCADE,
-  CONSTRAINT check_sync_status CHECK (status IN ('PENDING', 'SUCCESS', 'FAILED', 'MAX_RETRIES'))
-);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_catalog.pg_class c
+    JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+    WHERE c.relname = 'dual_write_sync_status'
+      AND n.nspname = current_schema()
+      AND c.relkind = 'r'
+  ) THEN
+    EXECUTE $create$
+    CREATE TABLE dual_write_sync_status (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      memory_id UUID NOT NULL,
+      operation VARCHAR(10) NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+      local_written_at TIMESTAMP WITH TIME ZONE,
+      remote_written_at TIMESTAMP WITH TIME ZONE,
+      last_retry_at TIMESTAMP WITH TIME ZONE,
+      retry_count INT DEFAULT 0,
+      error_message TEXT,
+      
+      CONSTRAINT fk_sync_memory FOREIGN KEY (memory_id) REFERENCES memory(id) ON DELETE CASCADE,
+      CONSTRAINT check_sync_status CHECK (status IN ('PENDING', 'SUCCESS', 'FAILED', 'MAX_RETRIES'))
+    );
+    $create$;
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE INDEX IF NOT EXISTS idx_dual_write_sync_status ON dual_write_sync_status(status, memory_id);
 CREATE INDEX IF NOT EXISTS idx_dual_write_pending ON dual_write_sync_status(status) WHERE status = 'PENDING';

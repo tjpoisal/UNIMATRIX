@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import Database from 'better-sqlite3';
 import { Pool, QueryResult } from 'pg';
 import { createId } from '@paralleldrive/cuid2';
+import path from 'path';
 
 interface DualWriteConfig {
   enableDualWrite: boolean;
@@ -258,4 +259,11 @@ export class DualWriteStorage extends EventEmitter {
   resetStats() {
     this.shadowErrorCount = 0;
   }
+}
+
+// Prefer __dirname when available (CommonJS). Fallback to process.cwd().
+const baseDir = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
+
+export function getBaseDir() {
+  return baseDir;
 }
