@@ -5,16 +5,19 @@ import { BaseLLMProvider } from './base';
 export class GeminiProvider extends BaseLLMProvider {
   private genAI: GoogleGenerativeAI;
   private genModel: any;
+  private apiKey: string;
 
-  constructor(model: string, apiKey: string) {
-    super('gemini', model, apiKey, 0.00015, 0.0006);
+  constructor(apiKey: string, model: string = 'gemini-pro') {
+    // BaseLLMProvider(name, model, costInput, costOutput, contextWindow, supportsStreaming)
+    super('gemini', model, 0.00015, 0.0006, 32000, true);
+    this.apiKey = apiKey;
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.genModel = this.genAI.getGenerativeModel({ model });
   }
 
   async complete(messages: Message[], options?: CompletionOptions): Promise<CompletionResult> {
     const response = await this.genModel.generateContent({
-      contents: messages.map((m) => ({
+      contents: messages.map((m: any) => ({
         role: m.role === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }]
       }))
@@ -32,7 +35,7 @@ export class GeminiProvider extends BaseLLMProvider {
 
   async *stream(messages: Message[], options?: CompletionOptions): AsyncIterableIterator<string> {
     const result = await this.genModel.generateContentStream({
-      contents: messages.map((m) => ({
+      contents: messages.map((m: any) => ({
         role: m.role === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }]
       }))

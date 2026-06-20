@@ -1,5 +1,7 @@
 import { EventEmitter } from 'events';
-import type { PrismaClient } from '@prisma/client';
+import type { prisma } from '@unimatrix/db';
+
+type PrismaClient = typeof prisma;
 
 interface WriteOperation {
   id: string;
