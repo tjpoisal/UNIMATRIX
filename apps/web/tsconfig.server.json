@@ -1,11 +1,11 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "NodeNext",
     "target": "ES2022",
     "lib": ["ES2022", "DOM"],
     "jsx": "react-jsx",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "NodeNext",
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*", "./app/*", "./lib/*", "./components/*"]
@@ -13,7 +13,6 @@
     "skipLibCheck": true,
     "noEmit": true,
     "noImplicitAny": false,
-    "suppressImplicitAnyIndexErrors": true,
     "resolveJsonModule": true,
     "allowJs": true
   },
