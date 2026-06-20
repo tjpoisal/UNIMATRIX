@@ -1,7 +1,28 @@
-import { PrismaClient } from '@unimatrix/db';
+import { DualWriteStorage } from './storage/dualWriteStorage';
+import { PrismaClient } from '@prisma/client';
 import { Message, CompletionResult } from '@unimatrix/types';
 
 const prisma = new PrismaClient();
+
+// Initialize with circuit breaker enabled
+const storage = new DualWriteStorage(prisma, {
+  remoteEnabled: process.env.ENABLE_REMOTE_WRITES === 'true',
+  circuitBreakerThreshold: 500,
+  maxRetries: 3,
+  retryDelayMs: 5000
+});
+
+// Start background sync job
+storage.startSyncJob(30000);
+
+// Monitor events
+storage.on('circuit-breaker-open', (evt) => {
+  console.error('⚠️  Circuit breaker open:', evt);
+});
+
+storage.on('remote-write-failed', (evt) => {
+  console.warn('📝 Remote write failed, queued:', evt);
+});
 
 /**
  * Configuration for Unimatrix memory logging.
@@ -286,3 +307,17 @@ export function prepareUnimatrixToolCall(
     sourceLlm: sourceLlm.toLowerCase(),
   };
 }
+
+export async function createMemory(data: any) {
+  return await storage.createMemory(data);
+}
+
+export async function updateMemory(id: string, data: any) {
+  return await storage.updateMemory(id, data);
+}
+
+export async function deleteMemory(id: string) {
+  return await storage.deleteMemory(id);
+}
+
+export { storage }; // Export for monitoring
