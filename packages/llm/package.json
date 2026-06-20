@@ -14,7 +14,7 @@
     "@google/generative-ai": "^0.24.1",
     "@huggingface/transformers": "^3.8.1",
     "@prisma/client": "^6.19.3",
-    "groq": "^6.1.0",
+    "groq-sdk": "^0.7.0",
     "onnxruntime-node": "^1.27.0",
     "openai": "^4.104.0"
   }

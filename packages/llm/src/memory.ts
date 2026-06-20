@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@unimatrix/db';
 import { Message, CompletionResult } from '@unimatrix/types';
 
 const prisma = new PrismaClient();
