@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   // Skip TS errors during Docker build — CI handles strict type checking on every PR
@@ -44,6 +45,10 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
+  },
+  turbopack: {
+    // point Turbopack at the monorepo root to avoid workspace-root inference warnings
+    root: path.resolve(__dirname, "../../"),
   },
 };
 
