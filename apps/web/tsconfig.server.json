@@ -16,6 +16,6 @@
     "resolveJsonModule": true,
     "allowJs": true
   },
-  "include": ["."],
-  "exclude": ["node_modules", ".next"]
+  "include": ["next-env.d.ts"],
+  "exclude": ["node_modules", ".next", "**/*.test.*", "**/__tests__/**"]
 }
