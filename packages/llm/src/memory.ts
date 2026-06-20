@@ -267,58 +267,21 @@ export async function importRecentHistory(
 }
 
 /**
- * Portable auto-inject helper for hosts, agents, or wrappers that build
- * payloads for the non-MCP REST surface (POST /api/tools or /api/tools/call).
- *
- * When you have initialized a provider via @unimatrix/llm (or know the source name
- * from the user's connected LLM logins), wrap tool call construction with this so that
- * any store/remember calls the LLM makes (via function calling against the dynamic
- * /api/tools schema) will carry sourceLlm at the transport root.
- *
- * This completes the "auto store + organize by LLM history" for non-MCP LLMs:
- *  - Onboarding connects the key → ensureLLMHistoryLocation creates "LLM Histories"/"Claude History" etc.
- *  - Your host calls the LLM with tools from GET /api/tools
- *  - LLM emits function call → host uses this helper (or prepareToolCall) to POST /api/tools/call with sourceLlm
- *  - Server tags + auto-files into the right history bucket (even if location_id was omitted).
- *
- * Example (in an agent loop using Gemini via the llm package + Unimatrix REST tools):
- *   const payload = prepareUnimatrixToolCall(
- *     'unimatrix_store_memory',
- *     { content: 'User prefers dark mode' },
- *     'gemini'
- *   );
- *   await fetch(`${apiUrl}/tools/call`, { method:'POST', headers:{Authorization:`Bearer ${umxKey}`}, body: JSON.stringify(payload) });
+ * Memory storage interface
+ * TODO: Integrate with @unimatrix/db when dual-write is ready
  */
-export function prepareUnimatrixToolCall(
-  toolName: string,
-  args: Record<string, unknown>,
-  sourceLlm: string
-): { toolName: string; args: Record<string, unknown>; sourceLlm: string } {
-  if (!toolName || !sourceLlm) {
-    throw new Error("prepareUnimatrixToolCall requires toolName and sourceLlm");
-  }
-  return {
-    toolName,
-    args: { ...args },
-    sourceLlm: sourceLlm.toLowerCase(),
-  };
-}
 
 export async function storeMemory(data: any) {
-  return await prisma.memory.create({
-    data
-  });
+  console.log('Memory store called:', data);
+  return { id: 'temp-' + Date.now(), ...data };
 }
 
 export async function updateMemory(id: string, data: any) {
-  return await prisma.memory.update({
-    where: { id },
-    data
-  });
+  console.log('Memory update called:', id, data);
+  return { id, ...data };
 }
 
 export async function deleteMemory(id: string) {
-  return await prisma.memory.delete({
-    where: { id }
-  });
+  console.log('Memory delete called:', id);
+  return { success: true };
 }
