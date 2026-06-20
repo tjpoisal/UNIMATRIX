@@ -1,8 +1,7 @@
-import { DualWriteStorage } from './storage/dualWriteStorage';
-import { PrismaClient } from '@prisma/client';
+import { getPrisma } from '@unimatrix/db';
 import { Message, CompletionResult } from '@unimatrix/types';
 
-const prisma = new PrismaClient();
+const prisma = getPrisma();
 
 // Initialize with circuit breaker enabled
 const storage = new DualWriteStorage(prisma, {

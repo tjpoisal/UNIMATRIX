@@ -13,11 +13,15 @@ app = "unimatrix-worker"
 primary_region = "iad"
 
 [build]
+  builder = "docker"
   dockerfile = "Dockerfile.server"
 
 [env]
   NODE_ENV = "production"
   PORT = "8080"
+
+[processes]
+  app = "node dist/index.js"
 
 [[vm]]
   cpu_kind = "shared"

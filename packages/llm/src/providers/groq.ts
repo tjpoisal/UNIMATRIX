@@ -1,4 +1,4 @@
-import Groq from 'groq-sdk';
+import { default as Groq } from 'groq-sdk';
 import { BaseLLMProvider } from './base.js';
 import { Message, CompletionOptions, CompletionResult } from '@unimatrix/types';
 
