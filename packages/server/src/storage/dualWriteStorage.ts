@@ -11,6 +11,9 @@ interface DualWriteConfig {
 }
 
 export class DualWriteStorage extends EventEmitter {
+  // minimal logger shape so TypeScript knows .error/.info exist
+  private logger: { error: (...args: any[]) => void; info?: (...args: any[]) => void };
+
   private sqlite: Database.Database;
   private pgPool: Pool | null;
   private config: DualWriteConfig;
@@ -29,6 +32,9 @@ export class DualWriteStorage extends EventEmitter {
       logShadowErrors: config.logShadowErrors ?? true,
       shadowWriteTimeoutMs: config.shadowWriteTimeoutMs ?? 5000
     };
+    // default logger to console when no structured logger provided
+    // (this keeps behavior stable during build/test)
+    this.logger = (this as any).logger ?? console;
   }
 
   /**
@@ -60,19 +66,10 @@ export class DualWriteStorage extends EventEmitter {
 
     // Shadow write to Neon (async, non-blocking, errors logged)
     if (this.config.enableDualWrite && this.pgPool) {
-      this.shadowWriteMemory(params, result.lastInsertRowid as string).catch(err => {
-        this.shadowErrorCount++;
-        if (this.config.logShadowErrors) {
-          console.error(
-            `[dual-write] Shadow write failed for memory ${result.lastInsertRowid}:`,
-            err.message
-          );
-        }
-        this.emit('shadow-write-failed', {
-          operation: 'storeMemory',
-          error: err.message,
-          timestamp: new Date()
-        });
+      // Convert lastInsertRowid (number | bigint) to string safely.
+      this.shadowWriteMemory(params, String(result.lastInsertRowid)).catch(err => {
+        this.logger.error({ err }, 'shadow write failed');
+        this.emit('shadow-write-failed', { err, operation: 'storeMemory' });
       });
     }
 

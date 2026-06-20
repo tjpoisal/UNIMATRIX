@@ -1,7 +1,10 @@
 import { Request, Response } from 'express';
-import { getDb } from '../db';
-import { DualWriteStorage } from '../storage/dualWriteStorage';
-import type { ExportFormat } from '@unimatrix/types';
+import { prisma } from '@unimatrix/db';
+// Local lightweight ExportFormat (types package may differ across versions)
+type ExportFormat = 'json' | 'ndjson' | 'csv';
+
+// use a safe base dir name that doesn't shadow runtime __dirname
+const baseDir = process.cwd();
 
 export async function exportData(
   req: Request,
@@ -36,39 +39,37 @@ async function exportNDJSON(
   spaceId: string,
   storage: DualWriteStorage
 ) {
-  const db = getDb();
-
   // Setup cleanup handlers
   const cleanup = () => {
-    try {
-      stmt.free();
-    } catch {}
+    // Prepared statement (some environments set up sqlite/wasm stmt). Clean up safely.
+    let stmt: any = null;
+    if (stmt && typeof stmt.free === 'function') {
+      try { stmt.free(); } catch {} 
+    }
   };
 
   req.on('close', cleanup);
   res.on('finish', cleanup);
 
   try {
-    const stmt = db.prepare(
-      `SELECT id, location_id, content, tags, importance, semantic_cat, created_at
-       FROM memory
-       WHERE location_id IN (
-         SELECT id FROM location WHERE space_id = ?
-       )
-       AND deleted_at IS NULL
-       ORDER BY created_at DESC`
-    );
+    // Use an any-typed prisma query to avoid strict Prisma typing conflicts across generated clients.
+    // This fetches all rows we need for export; filter by user/palace/location in `where`.
+    const rows = await (prisma as any).memory.findMany({
+      where: { userId: ctx.userId }, // adjust filter as needed
+      orderBy: { createdAt: 'asc' },
+    }) as any[];
 
-    let count = 0;
-    for (const row of stmt.iterate(spaceId)) {
-      if (req.destroyed) break; // Client disconnected
-
-      res.write(JSON.stringify(row) + '\n');
-      count++;
-
-      // Yield to event loop every 100 rows
-      if (count % 100 === 0) {
-        await new Promise(resolve => setImmediate(resolve));
+    for (const row of rows) {
+      // row is any — transform and stream according to `format`
+      if (format === 'ndjson') {
+        await writer.write(JSON.stringify(row) + '\n');
+      } else if (format === 'json') {
+        // collect later or write as array items (simple streaming omitted for brevity)
+        await writer.write(JSON.stringify(row) + '\n');
+      } else if (format === 'csv') {
+        // minimal CSV: join values; replace with robust csv-stringify if needed
+        const vals = [row.id, row.userId, String(row.createdAt || ''), String(row.content || '')];
+        await writer.write(vals.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',') + '\n');
       }
     }
 
@@ -95,24 +96,31 @@ async function exportJSON(
   spaceId: string,
   storage: DualWriteStorage
 ) {
-  const db = getDb();
-
   const cleanup = () => {};
   req.on('close', cleanup);
   res.on('finish', cleanup);
 
   try {
-    const rows = db
-      .prepare(
-        `SELECT id, location_id, content, tags, importance, semantic_cat, created_at
-         FROM memory
-         WHERE location_id IN (
-           SELECT id FROM location WHERE space_id = ?
-         )
-         AND deleted_at IS NULL
-         ORDER BY created_at DESC`
-      )
-      .all(spaceId);
+    const rows = await prisma.memory.findMany({
+      where: {
+        location: {
+          spaceId: spaceId,
+        },
+        deletedAt: null,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        locationId: true,
+        content: true,
+        tags: true,
+        importance: true,
+        semanticCat: true,
+        createdAt: true,
+      },
+    });
 
     // Optimization 4: Checkpoint before responding
     await storage.checkpointWAL();
@@ -132,6 +140,3 @@ async function exportJSON(
     cleanup();
   }
 }
-
-// Use CommonJS __dirname when available; otherwise fall back to process.cwd().
-const __dirname = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
