@@ -1,17 +1,21 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "noEmit": false,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "./dist",
-    "rootDir": ".",
-    "esModuleInterop": true,
+    "module": "NodeNext",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "jsx": "react-jsx",
+    "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*", "./app/*", "./lib/*", "./components/*"]
+    },
     "skipLibCheck": true,
-    "declaration": false,
-    "sourceMap": true,
-    "target": "ES2022"
+    "noEmit": true,
+    "noImplicitAny": false,
+    "resolveJsonModule": true,
+    "allowJs": true
   },
-  "include": ["server.ts", "lib/realtime/redis-pubsub.ts", "next-env.d.ts"],
-  "exclude": ["node_modules", ".next", "dist"]
+  "include": ["next-env.d.ts"],
+  "exclude": ["node_modules", ".next", "**/*.test.*", "**/__tests__/**"]
 }

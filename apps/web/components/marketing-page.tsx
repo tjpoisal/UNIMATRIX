@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowRight, Zap, Shield, Cloud, Smartphone, Code2, Lock, Check } from 'lucide-react';
+import React from 'react';
+import { ArrowRight } from 'lucide-react';
 
 export function MarketingPage() {
   return (

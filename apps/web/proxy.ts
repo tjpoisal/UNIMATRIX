@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+/* Public paths that don't require session auth */
 const publicPaths = [
   "/auth/login",
   "/auth/register",
@@ -14,7 +15,7 @@ const publicPaths = [
   "/api/openapi.json",
 ];
 
-// Routes that support both session auth AND API key auth
+/* API routes that allow API-key auth instead of session cookie */
 const apiKeySupportedPaths = [
   "/api/palaces",
   "/api/locations",
@@ -28,17 +29,22 @@ const apiKeySupportedPaths = [
 ];
 
 function supportsApiKeys(pathname: string): boolean {
-  return apiKeySupportedPaths.some((path) => 
+  return apiKeySupportedPaths.some((path) =>
     pathname === path || pathname.startsWith(path + "/")
   );
 }
 
 function isPublicPath(pathname: string): boolean {
   return publicPaths.some((pattern) => {
-    return pathname === pattern || pathname.startsWith(pattern + "/") || pathname.startsWith(pattern + "?");
+    return (
+      pathname === pattern ||
+      pathname.startsWith(pattern + "/") ||
+      pathname.startsWith(pattern + "?")
+    );
   });
 }
 
+/* middleware used by Next.js for session redirect logic */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -46,7 +52,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow routes that support API keys to proceed (they handle auth themselves)
   if (supportsApiKeys(pathname)) {
     const authHeader = request.headers.get("authorization") ?? "";
     if (authHeader.startsWith("Bearer umx_")) {
@@ -54,7 +59,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // NextAuth session cookie (works in both dev and prod)
   const sessionToken =
     request.cookies.get("next-auth.session-token")?.value ||
     request.cookies.get("__Secure-next-auth.session-token")?.value;
@@ -73,3 +77,38 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.png|.*\\.svg|.*\\.jpg|.*\\.ico).*)",
   ],
 };
+
+/**
+ * Minimal proxy handler required by Next/Turbopack:
+ * - Exports a named `proxy` function
+ * - Avoids server-only imports so Turbopack won't trace the whole monorepo
+ * - Forwards requests to PROXY_TARGET (if configured), otherwise returns 204
+ */
+export async function proxy(request: Request) {
+  const target = process.env.PROXY_TARGET;
+  if (!target) {
+    return new Response(null, { status: 204 });
+  }
+
+  try {
+    const url = new URL(request.url);
+    const path = url.pathname + url.search;
+    const upstream = new URL(path, target).toString();
+
+    const res = await fetch(upstream, {
+      method: request.method,
+      headers: request.headers,
+      body: request.body,
+      redirect: "manual",
+    });
+
+    // Mirror upstream headers (create a new Headers to avoid prototype issues)
+    const headers = new Headers();
+    res.headers.forEach((v, k) => headers.set(k, v));
+
+    return new Response(res.body, { status: res.status, headers });
+  } catch (err) {
+    // Fail safe for builds / runtime errors
+    return new Response("proxy error", { status: 502 });
+  }
+}

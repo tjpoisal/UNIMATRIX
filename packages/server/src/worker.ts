@@ -21,6 +21,7 @@
 import { processLibrarianJob } from './librarian/processJob.js';
 import type { LibrarianJob } from './types/domain.js';
 import { prisma, pool } from './db/client.js';
+const __repoDir = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
 
 const POLL_INTERVAL_MS = 15_000; // 15 seconds
 const BATCH_SIZE = 10;
@@ -151,7 +152,10 @@ async function main() {
 }
 
 // Allow direct execution
-if (import.meta.url === `file://${process.argv[1]}`) {
+// if (__repoDir /* import.meta.url */ === `file://${process.argv[1]}`) {
+const isEntryPoint = typeof require !== 'undefined' && require.main === module;
+
+if (isEntryPoint) {
   main().catch((err) => {
     console.error('[Worker] Fatal error:', err);
     process.exit(1);

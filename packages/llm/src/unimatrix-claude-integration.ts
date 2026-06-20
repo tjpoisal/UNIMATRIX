@@ -17,7 +17,6 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk';
-import * as AWS from 'aws-sdk';
 
 interface UnimatrixConfig {
   apiKey: string;  // AppSync API Key
