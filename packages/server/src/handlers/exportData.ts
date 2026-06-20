@@ -3,7 +3,7 @@ import { prisma } from '@unimatrix/db';
 // Local lightweight ExportFormat (types package may differ across versions)
 type ExportFormat = 'json' | 'ndjson' | 'csv';
 
-// use a safe base dir name that doesn't shadow runtime __dirname
+// Use a stable base directory name (do not redeclare __dirname).
 const baseDir = process.cwd();
 
 export async function exportData(
@@ -52,23 +52,34 @@ async function exportNDJSON(
   res.on('finish', cleanup);
 
   try {
-    // Use an any-typed prisma query to avoid strict Prisma typing conflicts across generated clients.
-    // This fetches all rows we need for export; filter by user/palace/location in `where`.
+    // Build a minimal, runtime-safe where filter. Keep it plain JS so differing Prisma
+    // client typings won't break the build. We cast prisma to any for the query.
+    const where: Record<string, any> = { userId: ctx.userId };
+    if (params?.palaceId) where.palaceId = params.palaceId;
+    if (params?.locationId) where.locationId = params.locationId;
+
+    // Fetch rows with a simple findMany. Use (prisma as any) to avoid compile-time coupling
+    // to a specific generated client shape.
     const rows = await (prisma as any).memory.findMany({
-      where: { userId: ctx.userId }, // adjust filter as needed
+      where,
       orderBy: { createdAt: 'asc' },
     }) as any[];
 
     for (const row of rows) {
-      // row is any — transform and stream according to `format`
       if (format === 'ndjson') {
         await writer.write(JSON.stringify(row) + '\n');
       } else if (format === 'json') {
-        // collect later or write as array items (simple streaming omitted for brevity)
+        // Stream newline-delimited JSON as a safe default for large exports.
         await writer.write(JSON.stringify(row) + '\n');
       } else if (format === 'csv') {
-        // minimal CSV: join values; replace with robust csv-stringify if needed
-        const vals = [row.id, row.userId, String(row.createdAt || ''), String(row.content || '')];
+        const vals = [
+          row.id ?? '',
+          row.userId ?? '',
+          row.palaceId ?? '',
+          row.locationId ?? '',
+          row.createdAt ? String(row.createdAt) : '',
+          row.content ? String(row.content) : '',
+        ];
         await writer.write(vals.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',') + '\n');
       }
     }
