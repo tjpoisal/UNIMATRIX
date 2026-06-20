@@ -1,15 +1,7 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma as sharedPrisma } from "@unimatrix/db";
 
-// During schema unification (see packages/db + SCHEMA_ALIGNMENT.md) we keep the
-// web-specific client for legacy Palace/Location models + NextAuth tables.
-// McpToken (and other cross models) are now ONLY in the rich @unimatrix/db client;
-// bridge (mcp-bridge.ts) writes MCP tokens via rich client to shared mcp_tokens table.
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+// Re-export the shared Prisma proxy from @unimatrix/db to avoid duplicate clients
+// and version/hoisting mismatches during install/build.
+export const prisma = sharedPrisma;
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: ["query"],
-  });
-
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+// (No global caching needed here — packages/db implements lazy singleton caching.)

@@ -7,6 +7,7 @@
  */
 
 import type { Message, CompletionResult } from '@unimatrix/types';
+import { prisma as sharedPrisma } from "@unimatrix/db";
 
 export interface UnimatrixMemoryConfig {
     apiUrl: string;           // e.g. https://deployunimatrix.com/api or self-hosted
@@ -55,8 +56,13 @@ export async function autoLogInteraction(
             return { error: `Failed to store memory: ${res.status} ${text}` };
         }
 
-        const body = await res.json().catch(() => ({} as any));
-        return { memoryId: body?.id, locationId: body?.locationId };
+        type MemoryCreateResponse = { id?: string; locationId?: string };
+
+        const body = await res.json().catch(() => ({} as MemoryCreateResponse));
+        return {
+          memoryId: (body as MemoryCreateResponse)?.id,
+          locationId: (body as MemoryCreateResponse)?.locationId,
+        };
     } catch (err: any) {
         return { error: err?.message ?? String(err) };
     }
