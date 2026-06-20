@@ -4093,6 +4093,7 @@ export namespace Prisma {
     source: $Enums.MemorySource | null
     hint: string | null
     indexedAt: Date | null
+    expiresAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
@@ -4113,6 +4114,7 @@ export namespace Prisma {
     source: $Enums.MemorySource | null
     hint: string | null
     indexedAt: Date | null
+    expiresAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
@@ -4133,6 +4135,7 @@ export namespace Prisma {
     source: number
     hint: number
     indexedAt: number
+    expiresAt: number
     createdAt: number
     updatedAt: number
     deletedAt: number
@@ -4163,6 +4166,7 @@ export namespace Prisma {
     source?: true
     hint?: true
     indexedAt?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -4183,6 +4187,7 @@ export namespace Prisma {
     source?: true
     hint?: true
     indexedAt?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -4203,6 +4208,7 @@ export namespace Prisma {
     source?: true
     hint?: true
     indexedAt?: true
+    expiresAt?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -4310,6 +4316,7 @@ export namespace Prisma {
     source: $Enums.MemorySource
     hint: string | null
     indexedAt: Date | null
+    expiresAt: Date | null
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -4349,6 +4356,7 @@ export namespace Prisma {
     source?: boolean
     hint?: boolean
     indexedAt?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
@@ -4373,6 +4381,7 @@ export namespace Prisma {
     source?: boolean
     hint?: boolean
     indexedAt?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
@@ -4395,6 +4404,7 @@ export namespace Prisma {
     source?: boolean
     hint?: boolean
     indexedAt?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
@@ -4417,12 +4427,13 @@ export namespace Prisma {
     source?: boolean
     hint?: boolean
     indexedAt?: boolean
+    expiresAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
   }
 
-  export type MemoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "spaceId" | "orgId" | "content" | "contentIv" | "summary" | "status" | "supersededBy" | "supersededAt" | "confidence" | "source" | "hint" | "indexedAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["memory"]>
+  export type MemoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "spaceId" | "orgId" | "content" | "contentIv" | "summary" | "status" | "supersededBy" | "supersededAt" | "confidence" | "source" | "hint" | "indexedAt" | "expiresAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["memory"]>
   export type MemoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     space?: boolean | Memory$spaceArgs<ExtArgs>
@@ -4460,6 +4471,7 @@ export namespace Prisma {
       source: $Enums.MemorySource
       hint: string | null
       indexedAt: Date | null
+      expiresAt: Date | null
       createdAt: Date
       updatedAt: Date
       deletedAt: Date | null
@@ -4903,6 +4915,7 @@ export namespace Prisma {
     readonly source: FieldRef<"Memory", 'MemorySource'>
     readonly hint: FieldRef<"Memory", 'String'>
     readonly indexedAt: FieldRef<"Memory", 'DateTime'>
+    readonly expiresAt: FieldRef<"Memory", 'DateTime'>
     readonly createdAt: FieldRef<"Memory", 'DateTime'>
     readonly updatedAt: FieldRef<"Memory", 'DateTime'>
     readonly deletedAt: FieldRef<"Memory", 'DateTime'>
@@ -9885,6 +9898,7 @@ export namespace Prisma {
     source: 'source',
     hint: 'hint',
     indexedAt: 'indexedAt',
+    expiresAt: 'expiresAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt'
@@ -10361,6 +10375,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFilter<"Memory"> | $Enums.MemorySource
     hint?: StringNullableFilter<"Memory"> | string | null
     indexedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
     createdAt?: DateTimeFilter<"Memory"> | Date | string
     updatedAt?: DateTimeFilter<"Memory"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
@@ -10384,6 +10399,7 @@ export namespace Prisma {
     source?: SortOrder
     hint?: SortOrderInput | SortOrder
     indexedAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
@@ -10410,6 +10426,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFilter<"Memory"> | $Enums.MemorySource
     hint?: StringNullableFilter<"Memory"> | string | null
     indexedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
     createdAt?: DateTimeFilter<"Memory"> | Date | string
     updatedAt?: DateTimeFilter<"Memory"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
@@ -10433,6 +10450,7 @@ export namespace Prisma {
     source?: SortOrder
     hint?: SortOrderInput | SortOrder
     indexedAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
@@ -10461,6 +10479,7 @@ export namespace Prisma {
     source?: EnumMemorySourceWithAggregatesFilter<"Memory"> | $Enums.MemorySource
     hint?: StringNullableWithAggregatesFilter<"Memory"> | string | null
     indexedAt?: DateTimeNullableWithAggregatesFilter<"Memory"> | Date | string | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"Memory"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Memory"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Memory"> | Date | string
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Memory"> | Date | string | null
@@ -10985,6 +11004,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -11008,6 +11028,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -11027,6 +11048,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11050,6 +11072,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11071,6 +11094,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -11089,6 +11113,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11109,6 +11134,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11792,6 +11818,7 @@ export namespace Prisma {
     source?: SortOrder
     hint?: SortOrder
     indexedAt?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -11816,6 +11843,7 @@ export namespace Prisma {
     source?: SortOrder
     hint?: SortOrder
     indexedAt?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -11836,6 +11864,7 @@ export namespace Prisma {
     source?: SortOrder
     hint?: SortOrder
     indexedAt?: SortOrder
+    expiresAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -13176,6 +13205,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13197,6 +13227,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13383,6 +13414,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFilter<"Memory"> | $Enums.MemorySource
     hint?: StringNullableFilter<"Memory"> | string | null
     indexedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
     createdAt?: DateTimeFilter<"Memory"> | Date | string
     updatedAt?: DateTimeFilter<"Memory"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
@@ -13608,6 +13640,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13629,6 +13662,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13978,6 +14012,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -14000,6 +14035,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -14034,6 +14070,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14056,6 +14093,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14339,6 +14377,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -14434,6 +14473,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14455,6 +14495,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14475,6 +14516,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14617,6 +14659,7 @@ export namespace Prisma {
     source?: $Enums.MemorySource
     hint?: string | null
     indexedAt?: Date | string | null
+    expiresAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -14675,6 +14718,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14696,6 +14740,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14716,6 +14761,7 @@ export namespace Prisma {
     source?: EnumMemorySourceFieldUpdateOperationsInput | $Enums.MemorySource
     hint?: NullableStringFieldUpdateOperationsInput | string | null
     indexedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

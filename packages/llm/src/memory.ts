@@ -1,4 +1,7 @@
+import { PrismaClient } from '@prisma/client';
 import { Message, CompletionResult } from '@unimatrix/types';
+
+const prisma = new PrismaClient();
 
 /**
  * Configuration for Unimatrix memory logging.
@@ -102,8 +105,10 @@ export async function autoLogInteraction(
         }),
       });
       if (createRes.ok) {
-        const created = await createRes.json();
-        locationId = created.id;
+        const created = await prisma.location.create({
+          data: { palaceId, name: 'memory-folder' }
+        });
+        locationId = (created as any).id;
       }
     }
 
@@ -136,8 +141,10 @@ export async function autoLogInteraction(
       return { error: `Failed to store memory: ${err}` };
     }
 
-    const memory = await storeRes.json();
-    return { memoryId: memory.id, locationId };
+    const memory = await prisma.memory.create({
+      data: { locationId, content, tags: [] }
+    });
+    return { memoryId: (memory as any).id, locationId };
   } catch (err: any) {
     return { error: err.message || 'Unknown error in autoLogInteraction' };
   }

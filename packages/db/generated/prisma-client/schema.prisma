@@ -126,6 +126,7 @@ model Memory {
   hint       String?
 
   indexedAt DateTime? @map("indexed_at")
+  expiresAt DateTime? @map("expires_at") // TTL — null = never expires
 
   // Relations
   tags MemoryTag[]
@@ -138,6 +139,7 @@ model Memory {
   @@index([spaceId])
   @@index([status])
   @@index([indexedAt])
+  @@index([expiresAt])
   @@map("memories")
 }
 
