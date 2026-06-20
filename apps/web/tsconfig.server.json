@@ -5,9 +5,17 @@
     "target": "ES2022",
     "lib": ["ES2022", "DOM"],
     "jsx": "react-jsx",
-    "moduleResolution": "Node",
+    "moduleResolution": "nodenext",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*", "./app/*", "./lib/*", "./components/*"]
+    },
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "noImplicitAny": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "resolveJsonModule": true,
+    "allowJs": true
   },
   "include": ["."],
   "exclude": ["node_modules", ".next"]
