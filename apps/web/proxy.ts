@@ -73,3 +73,31 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.png|.*\\.svg|.*\\.jpg|.*\\.ico).*)",
   ],
 };
+
+/**
+ * Minimal proxy handler for Next/Turbopack.
+ * - Exports a function named `proxy` (required by Next.js).
+ * - Avoids importing server-only modules here so Turbopack doesn't trace the whole repo.
+ * - Forwards requests to PROXY_TARGET if set, otherwise returns a simple 204.
+ */
+export async function proxy(request: Request) {
+  const target = process.env.PROXY_TARGET;
+  if (!target) {
+    // No proxy configured — return no-content quickly so builds/tests pass.
+    return new Response(null, { status: 204 });
+  }
+
+  const url = new URL(request.url);
+  const path = url.pathname + url.search;
+  const upstream = new URL(path, target).toString();
+
+  const res = await fetch(upstream, {
+    method: request.method,
+    headers: request.headers,
+    body: request.body,
+    redirect: 'manual',
+  });
+
+  const headers = new Headers(res.headers);
+  return new Response(res.body, { status: res.status, headers });
+}
