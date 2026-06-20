@@ -1,9 +1,6 @@
-import { getPrisma } from '@unimatrix/db';
+import { getPrisma, prisma } from '@unimatrix/db';
 import { Message, CompletionResult } from '@unimatrix/types';
 
-const prisma = getPrisma();
-
-// Initialize with circuit breaker enabled
 const storage = new DualWriteStorage(prisma, {
   remoteEnabled: process.env.ENABLE_REMOTE_WRITES === 'true',
   circuitBreakerThreshold: 500,
@@ -307,16 +304,21 @@ export function prepareUnimatrixToolCall(
   };
 }
 
-export async function createMemory(data: any) {
-  return await storage.createMemory(data);
+export async function storeMemory(data: any) {
+  return await prisma.memory.create({
+    data
+  });
 }
 
 export async function updateMemory(id: string, data: any) {
-  return await storage.updateMemory(id, data);
+  return await prisma.memory.update({
+    where: { id },
+    data
+  });
 }
 
 export async function deleteMemory(id: string) {
-  return await storage.deleteMemory(id);
+  return await prisma.memory.delete({
+    where: { id }
+  });
 }
-
-export { storage }; // Export for monitoring

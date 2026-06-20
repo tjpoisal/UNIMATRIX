@@ -6,7 +6,7 @@ export class GeminiProvider extends BaseLLMProvider {
   private genAI: GoogleGenerativeAI;
   private genModel: any;
 
-  constructor(apiKey: string, model: string = 'gemini-pro') {
+  constructor(model: string, apiKey: string) {
     super('gemini', model, apiKey, 0.00015, 0.0006);
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.genModel = this.genAI.getGenerativeModel({ model });

@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { PrismaClient } from '@prisma/client';
+import type { PrismaClient } from '@prisma/client';
 
 interface WriteOperation {
   id: string;
@@ -21,7 +21,7 @@ export class DualWriteStorage extends EventEmitter {
   private failedWriteQueue: WriteOperation[] = [];
   private circuitOpen = false;
   private lastRemoteLatency = 0;
-  private syncJobInterval: NodeJS.Timer | null = null;
+  private syncJobInterval: NodeJS.Timeout | null = null;
   private config: StorageConfig;
 
   constructor(localDb: PrismaClient, config: Partial<StorageConfig> = {}) {
@@ -200,7 +200,6 @@ export class DualWriteStorage extends EventEmitter {
 
       try {
         // TODO: Retry remote write
-        // await this.retryRemoteWrite(op);
         this.emit('write-retry-success', op);
       } catch (error) {
         op.retries++;
