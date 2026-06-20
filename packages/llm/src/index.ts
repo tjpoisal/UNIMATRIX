@@ -7,12 +7,7 @@
 export * from '@unimatrix/types';
 
 // Providers
-export { BaseLLMProvider } from './providers/base.js';
-export { ClaudeProvider } from './providers/claude.js';
-export { OpenAIProvider } from './providers/openai.js';
-export { GeminiProvider } from './providers/gemini.js';
-export { GroqProvider } from './providers/groq.js';
-export { OllamaProvider } from './providers/ollama.js';
+export * from './providers/index.js';
 
 // Registry
 export { LLMProviderRegistry } from './registry.js';
@@ -28,7 +23,7 @@ export { initializeLLMSystem, initializeLLMSystemFromConfig, parseEnvConfig, get
 export type { LLMConfig } from './config.js';
 
 // Automatic memory logging (auto-stores and organizes interactions by LLM source)
-export { autoLogInteraction, withAutoLog, importRecentHistory, prepareUnimatrixToolCall } from './memory.js';
+export * from './memory.js';
 export type { UnimatrixMemoryConfig } from './memory.js';
 
 /**
