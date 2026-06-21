@@ -1,0 +1,278 @@
+app/api/agent-config/[id]/route.ts(25,32): error TS2339: Property 'agentConfig' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/agent-config/route.ts(11,32): error TS2339: Property 'agentConfig' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/agent/run/route.ts(46,7): error TS2561: Object literal may only specify known properties, but 'mode' does not exist in type 'Without<AgentRunCreateInput, AgentRunUncheckedCreateInput> & AgentRunUncheckedCreateInput'. Did you mean to write 'model'?
+app/api/agent/run/route.ts(67,9): error TS2820: Type '"complete"' is not assignable to type 'AgentRunStatus | EnumAgentRunStatusFieldUpdateOperationsInput | undefined'. Did you mean '"completed"'?
+app/api/agent/run/route.ts(94,15): error TS2322: Type '"error"' is not assignable to type 'AgentRunStatus | EnumAgentRunStatusFieldUpdateOperationsInput | undefined'.
+app/api/agent/run/route.ts(114,7): error TS2561: Object literal may only specify known properties, but 'mode' does not exist in type 'AgentRunSelect<DefaultArgs>'. Did you mean to write 'model'?
+app/api/apikeys/[id]/route.ts(17,28): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/apikeys/[id]/route.ts(25,16): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/apikeys/route.ts(14,29): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/apikeys/route.ts(40,37): error TS2339: Property 'organizationMember' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/apikeys/route.ts(53,31): error TS2339: Property 'organization' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/apikeys/route.ts(66,31): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/create-mobile-connect-token/route.ts(20,16): error TS2339: Property 'verificationToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/exchange-mobile-connect-token/route.ts(15,39): error TS2339: Property 'verificationToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/exchange-mobile-connect-token/route.ts(35,18): error TS2339: Property 'verificationToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/exchange-mobile-connect-token/route.ts(44,33): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/forgot-password/route.ts(23,20): error TS2339: Property 'verificationToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/forgot-password/route.ts(31,20): error TS2339: Property 'verificationToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/mfa/disable/route.ts(28,15): error TS2353: Object literal may only specify known properties, and 'password' does not exist in type 'UserSelect<DefaultArgs>'.
+app/api/auth/mfa/disable/route.ts(33,14): error TS2339: Property 'password' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/disable/route.ts(33,64): error TS2339: Property 'password' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/disable/route.ts(46,7): error TS2353: Object literal may only specify known properties, and 'mfaEnabled' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+app/api/auth/mfa/enable/route.ts(30,7): error TS2353: Object literal may only specify known properties, and 'mfaSecret' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+app/api/auth/mfa/recovery-codes/route.ts(29,15): error TS2353: Object literal may only specify known properties, and 'mfaSecret' does not exist in type 'UserSelect<DefaultArgs>'.
+app/api/auth/mfa/recovery-codes/route.ts(32,14): error TS2339: Property 'mfaEnabled' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/recovery-codes/route.ts(32,34): error TS2339: Property 'mfaSecret' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/recovery-codes/route.ts(32,53): error TS2339: Property 'mfaIv' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/recovery-codes/route.ts(38,33): error TS2339: Property 'mfaSecret' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/recovery-codes/route.ts(38,56): error TS2339: Property 'mfaIv' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/trusted-person/route.ts(21,15): error TS2353: Object literal may only specify known properties, and 'trustedPersonEmail' does not exist in type 'UserSelect<DefaultArgs>'.
+app/api/auth/mfa/trusted-person/route.ts(25,21): error TS2339: Property 'trustedPersonEmail' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/trusted-person/route.ts(53,14): error TS2353: Object literal may only specify known properties, and 'trustedPersonEmail' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+app/api/auth/mfa/verify/route.ts(29,15): error TS2353: Object literal may only specify known properties, and 'mfaSecret' does not exist in type 'UserSelect<DefaultArgs>'.
+app/api/auth/mfa/verify/route.ts(32,14): error TS2339: Property 'mfaSecret' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/verify/route.ts(32,34): error TS2339: Property 'mfaIv' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/verify/route.ts(41,33): error TS2339: Property 'mfaSecret' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/verify/route.ts(41,56): error TS2339: Property 'mfaIv' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+app/api/auth/mfa/verify/route.ts(56,14): error TS2353: Object literal may only specify known properties, and 'mfaEnabled' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+app/api/auth/register/route.ts(37,9): error TS2353: Object literal may only specify known properties, and 'password' does not exist in type '(Without<UserCreateInput, UserUncheckedCreateInput> & UserUncheckedCreateInput) | (Without<...> & UserCreateInput)'.
+app/api/auth/reset-password/route.ts(27,33): error TS2339: Property 'verificationToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/reset-password/route.ts(40,20): error TS2339: Property 'verificationToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/auth/reset-password/route.ts(53,15): error TS2353: Object literal may only specify known properties, and 'password' does not exist in type '(Without<UserUpdateManyMutationInput, UserUncheckedUpdateManyInput> & UserUncheckedUpdateManyInput) | (Without<...> & UserUpdateManyMutationInput)'.
+app/api/auth/reset-password/route.ts(64,18): error TS2339: Property 'verificationToken' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/cron/reset-spend/route.ts(29,33): error TS2339: Property 'agentConfig' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/export/route.ts(81,33): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/[id]/route.ts(23,35): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/[id]/route.ts(32,18): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/[id]/route.ts(36,32): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/[id]/route.ts(60,35): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/[id]/route.ts(74,16): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/route.ts(14,12): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/route.ts(28,12): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/route.ts(35,12): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/route.ts(44,35): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(53,43): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(58,35): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(92,33): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/friends/route.ts(110,35): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/[id]/route.ts(17,31): error TS2339: Property 'lLMProvider' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/[id]/route.ts(22,16): error TS2339: Property 'lLMProvider' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/route.ts(17,34): error TS2339: Property 'lLMProvider' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/route.ts(60,31): error TS2339: Property 'lLMProvider' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/route.ts(97,40): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/route.ts(102,32): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/route.ts(110,13): error TS2322: Type 'string' is not assignable to type 'Uint8Array<ArrayBuffer>'.
+app/api/llm-providers/route.ts(111,13): error TS2322: Type 'any[]' is not assignable to type 'MemoryTagUncheckedCreateNestedManyWithoutMemoryInput | MemoryTagCreateNestedManyWithoutMemoryInput | undefined'.
+app/api/llm-providers/route.ts(142,31): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/route.ts(147,29): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/route.ts(157,33): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/llm-providers/route.ts(162,31): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/locations/route.ts(23,33): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/locations/route.ts(34,35): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/locations/route.ts(47,35): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/locations/route.ts(85,35): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/locations/route.ts(94,34): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/locations/route.ts(131,35): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/locations/route.ts(141,18): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(35,29): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(44,14): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(194,36): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(200,26): error TS7006: Parameter 'p' implicitly has an 'any' type.
+app/api/mcp/route.ts(208,35): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(253,26): error TS2353: Object literal may only specify known properties, and 'contains' does not exist in type 'Uint8Array<ArrayBuffer> | BytesFilter<"Memory">'.
+app/api/mcp/route.ts(254,23): error TS2353: Object literal may only specify known properties, and 'has' does not exist in type 'MemoryTagListRelationFilter'.
+app/api/mcp/route.ts(259,20): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryInclude<DefaultArgs>'.
+app/api/mcp/route.ts(264,17): error TS2339: Property 'location' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/mcp/route.ts(264,45): error TS2339: Property 'location' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/mcp/route.ts(264,100): error TS2339: Property 'tags' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/mcp/route.ts(264,125): error TS2339: Property 'tags' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/mcp/route.ts(288,48): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(292,42): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(301,47): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(305,47): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(321,37): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(328,29): error TS2322: Type 'string' is not assignable to type 'Uint8Array<ArrayBuffer>'.
+app/api/mcp/route.ts(328,38): error TS2322: Type 'string[]' is not assignable to type 'MemoryTagUncheckedCreateNestedManyWithoutMemoryInput | MemoryTagCreateNestedManyWithoutMemoryInput | undefined'.
+app/api/mcp/route.ts(339,37): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(347,20): error TS2353: Object literal may only specify known properties, and 'locationId' does not exist in type 'MemoryWhereInput'.
+app/api/mcp/route.ts(352,40): error TS2353: Object literal may only specify known properties, and 'locationId' does not exist in type 'MemoryWhereInput'.
+app/api/mcp/route.ts(359,15): error TS2339: Property 'tags' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/mcp/route.ts(359,50): error TS2339: Property 'tags' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/mcp/route.ts(369,36): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(372,35): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(380,35): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(386,37): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/mcp/route.ts(402,32): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryWhereInput'.
+app/api/mcp/route.ts(409,9): error TS2322: Type '{ tags?: string[] | undefined; content?: string | undefined; }' is not assignable to type '(Without<MemoryUpdateInput, MemoryUncheckedUpdateInput> & MemoryUncheckedUpdateInput) | (Without<...> & MemoryUpdateInput)'.
+  Type '{ tags?: string[] | undefined; content?: string | undefined; }' is not assignable to type 'Without<MemoryUncheckedUpdateInput, MemoryUpdateInput> & MemoryUpdateInput'.
+    Types of property 'content' are incompatible.
+      Type 'string | undefined' is not assignable to type 'Uint8Array<ArrayBuffer> | BytesFieldUpdateOperationsInput | undefined'.
+        Type 'string' is not assignable to type 'Uint8Array<ArrayBuffer> | BytesFieldUpdateOperationsInput | undefined'.
+app/api/mcp/route.ts(421,35): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryWhereInput'.
+app/api/mcp/route.ts(422,20): error TS2353: Object literal may only specify known properties, and 'lastAccessed' does not exist in type 'MemoryOrderByWithRelationInput | MemoryOrderByWithRelationInput[]'.
+app/api/mcp/route.ts(424,20): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryInclude<DefaultArgs>'.
+app/api/mcp/route.ts(428,16): error TS2339: Property 'location' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/mcp/route.ts(428,44): error TS2339: Property 'location' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/mcp/route.ts(428,154): error TS2339: Property 'lastAccessed' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/memories/[id]/route.ts(11,7): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryWhereInput'.
+app/api/memories/[id]/route.ts(17,7): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryInclude<DefaultArgs>'.
+app/api/memories/[id]/route.ts(54,9): error TS2353: Object literal may only specify known properties, and 'lastAccessed' does not exist in type '(Without<MemoryUpdateInput, MemoryUncheckedUpdateInput> & MemoryUncheckedUpdateInput) | (Without<...> & MemoryUpdateInput)'.
+app/api/memories/route.ts(35,33): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/memories/route.ts(37,35): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/memories/route.ts(41,35): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/memories/route.ts(43,37): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/memories/route.ts(55,35): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/memories/route.ts(66,9): error TS2353: Object literal may only specify known properties, and 'locationId' does not exist in type '(Without<MemoryCreateInput, MemoryUncheckedCreateInput> & MemoryUncheckedCreateInput) | (Without<...> & MemoryCreateInput)'.
+app/api/memories/route.ts(103,9): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryInclude<DefaultArgs>'.
+app/api/memories/route.ts(109,27): error TS2339: Property 'location' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/memories/route.ts(153,9): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryInclude<DefaultArgs>'.
+app/api/memories/route.ts(159,27): error TS2339: Property 'location' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+app/api/palaces/[id]/route.ts(22,33): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/route.ts(72,33): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/route.ts(81,34): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/route.ts(114,33): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/route.ts(124,18): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/[userId]/route.ts(23,31): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/[userId]/route.ts(31,30): error TS2339: Property 'palaceShare' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/[userId]/route.ts(39,32): error TS2339: Property 'palaceShare' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/[userId]/route.ts(67,31): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/[userId]/route.ts(75,30): error TS2339: Property 'palaceShare' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/[userId]/route.ts(83,16): error TS2339: Property 'palaceShare' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/route.ts(18,31): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/route.ts(26,31): error TS2339: Property 'palaceShare' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/route.ts(35,17): error TS7006: Parameter 's' implicitly has an 'any' type.
+app/api/palaces/[id]/share/route.ts(70,31): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/route.ts(79,35): error TS2339: Property 'friendship' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/[id]/share/route.ts(94,30): error TS2339: Property 'palaceShare' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/route.ts(13,34): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/route.ts(58,40): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/palaces/route.ts(70,33): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/pending-actions/[id]/approve/route.ts(22,35): error TS2339: Property 'organizationMember' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/pending-actions/[id]/approve/route.ts(41,9): error TS2353: Object literal may only specify known properties, and 'organizationId' does not exist in type '(Without<AuditLogCreateInput, AuditLogUncheckedCreateInput> & AuditLogUncheckedCreateInput) | (Without<...> & AuditLogCreateInput)'.
+app/api/pending-actions/[id]/reject/route.ts(20,35): error TS2339: Property 'organizationMember' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/pending-actions/[id]/reject/route.ts(38,9): error TS2353: Object literal may only specify known properties, and 'organizationId' does not exist in type '(Without<AuditLogCreateInput, AuditLogUncheckedCreateInput> & AuditLogUncheckedCreateInput) | (Without<...> & AuditLogCreateInput)'.
+app/api/search/route.ts(43,28): error TS2353: Object literal may only specify known properties, and 'contains' does not exist in type 'Uint8Array<ArrayBuffer> | BytesFilter<"Memory">'.
+app/api/search/route.ts(44,25): error TS2353: Object literal may only specify known properties, and 'hasSome' does not exist in type 'MemoryTagListRelationFilter'.
+app/api/search/route.ts(50,9): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryInclude<DefaultArgs>'.
+app/api/search/route.ts(58,18): error TS2353: Object literal may only specify known properties, and 'lastAccessed' does not exist in type 'MemoryOrderByWithRelationInput | MemoryOrderByWithRelationInput[]'.
+app/api/stripe/webhook/route.ts(40,13): error TS2353: Object literal may only specify known properties, and 'stripeSubscriptionId' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+app/api/stripe/webhook/route.ts(55,33): error TS2353: Object literal may only specify known properties, and 'stripeSubscriptionId' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+app/api/sync/route.ts(48,18): error TS2339: Property 'syncState' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/sync/route.ts(77,43): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/sync/route.ts(86,28): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/sync/route.ts(92,28): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/sync/route.ts(102,45): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/sync/route.ts(113,28): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/sync/route.ts(119,28): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+app/api/sync/route.ts(132,19): error TS2322: Type 'string' is not assignable to type 'Uint8Array<ArrayBuffer>'.
+app/api/sync/route.ts(133,19): error TS2322: Type 'string[]' is not assignable to type 'MemoryTagUncheckedCreateNestedManyWithoutMemoryInput | MemoryTagCreateNestedManyWithoutMemoryInput | undefined'.
+app/api/sync/route.ts(140,25): error TS2322: Type 'string' is not assignable to type 'Uint8Array<ArrayBuffer> | BytesFieldUpdateOperationsInput | undefined'.
+app/api/sync/route.ts(140,50): error TS2322: Type 'string[]' is not assignable to type 'MemoryTagUncheckedUpdateManyWithoutMemoryNestedInput | MemoryTagUpdateManyWithoutMemoryNestedInput | undefined'.
+components/marketing-page.tsx(73,16): error TS2304: Cannot find name 'Zap'.
+components/marketing-page.tsx(81,16): error TS2304: Cannot find name 'Shield'.
+components/marketing-page.tsx(89,16): error TS2304: Cannot find name 'Cloud'.
+components/marketing-page.tsx(97,16): error TS2304: Cannot find name 'Smartphone'.
+components/marketing-page.tsx(105,16): error TS2304: Cannot find name 'Code2'.
+components/marketing-page.tsx(113,15): error TS2607: JSX element class does not support attributes because it does not have a 'props' property.
+components/marketing-page.tsx(113,16): error TS2786: 'Lock' cannot be used as a JSX component.
+  Its type '{ new (): Lock; prototype: Lock; }' is not a valid JSX element type.
+    Type '{ new (): Lock; prototype: Lock; }' is not assignable to type 'new (props: any, context: any) => Component<any, any, any>'.
+      Type 'Lock' is missing the following properties from type 'Component<any, any, any>': context, setState, forceUpdate, render, and 2 more.
+components/marketing-page.tsx(176,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(177,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(178,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(179,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(180,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(195,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(196,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(197,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(198,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(199,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(211,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(212,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(213,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(214,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(215,51): error TS2304: Cannot find name 'Check'.
+lib/agent.ts(64,7): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemoryWhereInput'.
+lib/agent.ts(73,16): error TS2353: Object literal may only specify known properties, and 'lastAccessed' does not exist in type 'MemoryOrderByWithRelationInput | MemoryOrderByWithRelationInput[]'.
+lib/agent.ts(79,7): error TS2353: Object literal may only specify known properties, and 'location' does not exist in type 'MemorySelect<DefaultArgs>'.
+lib/agent.ts(86,41): error TS2339: Property 'tags' does not exist on type '{ status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+lib/agent.ts(97,11): error TS2339: Property 'location' does not exist on type '{ score: number; status: MemoryStatus; userId: string; id: string; createdAt: Date; updatedAt: Date; deletedAt: Date | null; content: Uint8Array<ArrayBuffer>; ... 10 more ...; expiresAt: Date | null; }'.
+lib/agent.ts(377,40): error TS2339: Property 'lLMProvider' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/agent.ts(386,41): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/agent.ts(415,33): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/agent.ts(419,31): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/agent.ts(429,41): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/agent.ts(433,9): error TS2322: Type 'string' is not assignable to type 'Uint8Array<ArrayBuffer>'.
+lib/agent.ts(434,9): error TS2322: Type 'any[]' is not assignable to type 'MemoryTagUncheckedCreateNestedManyWithoutMemoryInput | MemoryTagCreateNestedManyWithoutMemoryInput | undefined'.
+lib/agent.ts(434,48): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/agent.ts(449,44): error TS2339: Property 'palace' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/agent.ts(455,38): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/agent.ts(461,36): error TS2339: Property 'location' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/agent.ts(473,15): error TS2322: Type 'string' is not assignable to type 'Uint8Array<ArrayBuffer>'.
+lib/agent.ts(474,15): error TS2322: Type 'string[]' is not assignable to type 'MemoryTagUncheckedCreateNestedManyWithoutMemoryInput | MemoryTagCreateNestedManyWithoutMemoryInput | undefined'.
+lib/api-auth.ts(31,31): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/api-auth.ts(47,16): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/api-auth.ts(83,33): error TS2339: Property 'apiKey' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/audit.ts(31,38): error TS2339: Property 'organizationMember' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/audit.ts(38,9): error TS2353: Object literal may only specify known properties, and 'organizationId' does not exist in type '(Without<AuditLogCreateInput, AuditLogUncheckedCreateInput> & AuditLogUncheckedCreateInput) | (Without<...> & AuditLogCreateInput)'.
+lib/auth.ts(63,47): error TS2339: Property 'authAttempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/auth.ts(82,28): error TS2339: Property 'password' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/auth.ts(83,24): error TS2339: Property 'authAttempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/auth.ts(91,16): error TS2339: Property 'password' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/auth.ts(95,24): error TS2339: Property 'authAttempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/auth.ts(108,22): error TS2339: Property 'authAttempt' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/auth.ts(113,18): error TS2339: Property 'mfaEnabled' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/auth.ts(113,37): error TS2339: Property 'mfaSecret' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/auth.ts(123,46): error TS2339: Property 'mfaSecret' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/auth.ts(183,9): error TS2322: Type '{ email: string; name: string | null | undefined; image: string | null | undefined; }' is not assignable to type '(Without<UserCreateInput, UserUncheckedCreateInput> & UserUncheckedCreateInput) | (Without<...> & UserCreateInput)'.
+  Type '{ email: string; name: string | null | undefined; image: string | null | undefined; }' is not assignable to type 'Without<UserUncheckedCreateInput, UserCreateInput> & UserCreateInput'.
+    Property 'clerk_id' is missing in type '{ email: string; name: string | null | undefined; image: string | null | undefined; }' but required in type 'UserCreateInput'.
+lib/auth.ts(212,39): error TS2339: Property 'mfaEnabled' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/auth.ts(214,40): error TS2339: Property 'mfaEnabled' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/collab/service.ts(66,29): error TS2339: Property 'collabRoom' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/collab/service.ts(110,32): error TS2339: Property 'collabMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/collab/service.ts(179,33): error TS2339: Property 'collabMessage' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/collab/service.ts(185,24): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/collab/service.ts(218,37): error TS2339: Property 'webhookSubscription' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/collab/service.ts(260,29): error TS2339: Property 'collabRoom' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/collab/service.ts(295,30): error TS2339: Property 'collabRoom' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/collab/service.ts(308,21): error TS7006: Parameter 'r' implicitly has an 'any' type.
+lib/collab/service.ts(327,38): error TS2339: Property 'webhookSubscription' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/collab/service.ts(355,30): error TS7006: Parameter 'sub' implicitly has an 'any' type.
+lib/collab/service.ts(383,16): error TS2339: Property 'webhookSubscription' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/mfa.ts(104,14): error TS2353: Object literal may only specify known properties, and 'recoveryCodes' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+lib/mfa.ts(113,80): error TS2353: Object literal may only specify known properties, and 'recoveryCodes' does not exist in type 'UserSelect<DefaultArgs>'.
+lib/mfa.ts(114,22): error TS2339: Property 'recoveryCodes' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/mfa.ts(118,28): error TS2339: Property 'recoveryCodes' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/mfa.ts(119,57): error TS2339: Property 'recoveryCodes' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/mfa.ts(122,34): error TS2339: Property 'recoveryCodes' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/mfa.ts(126,18): error TS2353: Object literal may only specify known properties, and 'recoveryCodes' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+lib/mfa.ts(145,15): error TS2353: Object literal may only specify known properties, and 'trustedPersonEmail' does not exist in type 'UserSelect<DefaultArgs>'.
+lib/mfa.ts(148,14): error TS2339: Property 'trustedPersonEmail' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/mfa.ts(156,16): error TS2339: Property 'mfaRecoveryRequest' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/mfa.ts(168,19): error TS2339: Property 'trustedPersonEmail' does not exist on type '{ name: string | null; id: string; createdAt: Date; clerk_id: string; email: string; stripeCustomerId: string | null; image: string | null; tier: string; updatedAt: Date; deletedAt: Date | null; }'.
+lib/mfa.ts(189,31): error TS2339: Property 'mfaRecoveryRequest' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/mfa.ts(201,9): error TS2353: Object literal may only specify known properties, and 'mfaEnabled' does not exist in type '(Without<UserUpdateInput, UserUncheckedUpdateInput> & UserUncheckedUpdateInput) | (Without<...> & UserUpdateInput)'.
+lib/mfa.ts(207,12): error TS2339: Property 'mfaRecoveryRequest' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/organizations.ts(10,43): error TS2339: Property 'organizationMember' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/organizations.ts(25,37): error TS2339: Property 'organization' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/organizations.ts(42,17): error TS2339: Property 'organization' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(43,12): error TS2339: Property 'tokenLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(53,12): error TS2339: Property 'agentConfig' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(65,31): error TS2339: Property 'agentConfig' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(91,31): error TS2339: Property 'agentConfig' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(137,31): error TS2339: Property 'agentConfig' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(175,17): error TS2339: Property 'pendingAction' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(190,17): error TS2339: Property 'pendingAction' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(198,17): error TS2339: Property 'pendingAction' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(209,17): error TS2339: Property 'pendingAction' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(223,31): error TS2339: Property 'pendingAction' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(256,18): error TS2339: Property 'tokenLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/agent-usage.ts(267,18): error TS2339: Property 'agentConfig' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/anomaly-detection.ts(8,35): error TS2339: Property 'tokenLog' does not exist on type 'PrismaClient<PrismaClientOptions, never, DefaultArgs>'.
+lib/telemetry/anomaly-detection.ts(22,48): error TS7006: Parameter 'log' implicitly has an 'any' type.
+undefined
+/Users/tim/UNIMATRIX/apps/web:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 1: tsc --noEmit -p /Users/tim/UNIMATRIX/apps/web/tsconfig.json --pretty false

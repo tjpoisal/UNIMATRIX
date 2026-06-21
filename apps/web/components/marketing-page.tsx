@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Cloud, Smartphone, Code2, Lock, Check } from 'lucide-react';
 
 export function MarketingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0e1030] via-[#1a1f3a] to-[#0e1030] text-white">
-      {/* Navigation */}
+      J.{/* Navigation */}
       <nav className="sticky top-0 z-50 bg-[#0e1030]/90 backdrop-blur-md border-b border-[#ff7a00]/20">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold">

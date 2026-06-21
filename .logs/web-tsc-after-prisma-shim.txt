@@ -1,0 +1,47 @@
+app/api/friends/route.ts(44,35): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(53,43): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(58,35): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/mcp/route.ts(200,26): error TS7006: Parameter 'p' implicitly has an 'any' type.
+app/api/mcp/route.ts(263,27): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/mcp/route.ts(427,27): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/palaces/[id]/share/route.ts(35,17): error TS7006: Parameter 's' implicitly has an 'any' type.
+components/marketing-page.tsx(73,16): error TS2304: Cannot find name 'Zap'.
+components/marketing-page.tsx(81,16): error TS2304: Cannot find name 'Shield'.
+components/marketing-page.tsx(89,16): error TS2304: Cannot find name 'Cloud'.
+components/marketing-page.tsx(97,16): error TS2304: Cannot find name 'Smartphone'.
+components/marketing-page.tsx(105,16): error TS2304: Cannot find name 'Code2'.
+components/marketing-page.tsx(113,15): error TS2607: JSX element class does not support attributes because it does not have a 'props' property.
+components/marketing-page.tsx(113,16): error TS2786: 'Lock' cannot be used as a JSX component.
+  Its type '{ new (): Lock; prototype: Lock; }' is not a valid JSX element type.
+    Type '{ new (): Lock; prototype: Lock; }' is not assignable to type 'new (props: any, context: any) => Component<any, any, any>'.
+      Type 'Lock' is missing the following properties from type 'Component<any, any, any>': context, setState, forceUpdate, render, and 2 more.
+components/marketing-page.tsx(176,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(177,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(178,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(179,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(180,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(195,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(196,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(197,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(198,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(199,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(211,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(212,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(213,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(214,51): error TS2304: Cannot find name 'Check'.
+components/marketing-page.tsx(215,51): error TS2304: Cannot find name 'Check'.
+lib/agent.ts(85,10): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/agent.ts(90,13): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/agent.ts(91,12): error TS7006: Parameter 'a' implicitly has an 'any' type.
+lib/agent.ts(91,15): error TS7006: Parameter 'b' implicitly has an 'any' type.
+lib/agent.ts(96,28): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/agent.ts(386,41): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/agent.ts(429,41): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/agent.ts(434,48): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/collab/service.ts(185,24): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/collab/service.ts(308,21): error TS7006: Parameter 'r' implicitly has an 'any' type.
+lib/collab/service.ts(355,30): error TS7006: Parameter 'sub' implicitly has an 'any' type.
+lib/telemetry/anomaly-detection.ts(22,48): error TS7006: Parameter 'log' implicitly has an 'any' type.
+undefined
+/Users/tim/UNIMATRIX/apps/web:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 2: tsc --noEmit -p /Users/tim/UNIMATRIX/apps/web/tsconfig.json --pretty false

@@ -14,6 +14,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { textToBytes, bytesToText } from '@/lib/prisma-utils';
 import bcrypt from "bcryptjs";
 
 // Extend NextRequest for internal org context passing (from API key auth to MCP handlers)
@@ -197,7 +198,7 @@ export async function handleTool(
         select: { id: true, name: true, description: true, isPublic: true, createdAt: true, updatedAt: true },
       });
       if (!palaces.length) return "You have no memory palaces yet. Create one with unimatrix_create_palace.";
-      return palaces.map(p =>
+      return palaces.map((p: any) =>
         `## ${p.name}\n- ID: \`${p.id}\`\n${p.description ? `- ${p.description}\n` : ""}- ${p.isPublic ? "Public" : "Private"} · Created ${new Date(p.createdAt).toLocaleDateString()}`
       ).join("\n\n");
     }
@@ -260,7 +261,7 @@ export async function handleTool(
       });
 
       if (!memories.length) return `No memories found for "${query}".`;
-      return memories.map(m =>
+      return memories.map((m: any) =>
         `## ${m.location.palace.name} › ${m.location.name}\n**ID**: \`${m.id}\`\n${m.content}\n${m.tags.length ? `Tags: ${m.tags.join(", ")}` : ""}`
       ).join("\n\n---\n\n");
     }
@@ -325,9 +326,14 @@ export async function handleTool(
       if (!location) return "Location not found or access denied.";
 
       const memory = await prisma.memory.create({
-        data: { locationId, content, tags },
+        data: {
+          locationId,
+          content: textToBytes(content) as any,
+          // Prisma expects nested create for tags; map to the shape.
+          tags: { create: tags.map(t => ({ tag: String(t) })) },
+        },
       });
-      return `Memory stored. ID: \`${memory.id}\`\n\nContent: ${memory.content}${sourceLlm ? ` (auto-filed for ${sourceLlm})` : ""}`;
+      return `Memory stored. ID: \`${memory.id}\`\n\nContent: ${bytesToText(memory.content)}${sourceLlm ? ` (auto-filed for ${sourceLlm})` : ""}`;
     }
 
     // ── list_memories ─────────────────────────────────────────────────────────
@@ -404,14 +410,14 @@ export async function handleTool(
       });
       if (!memory) return "Memory not found or access denied.";
 
-      const updated = await prisma.memory.update({
-        where: { id: memoryId },
-        data: {
-          ...(args.content ? { content: args.content as string } : {}),
-          ...(args.tags ? { tags: args.tags as string[] } : {}),
-        },
-      });
-      return `Memory updated. ID: \`${updated.id}\`\n${updated.content}`;
+      const updatedData: any = {};
+      if (args.content) updatedData.content = textToBytes(args.content as string);
+      if (args.tags) {
+        // replace tags naively — for now delete/create pattern would be better
+        updatedData.tags = { deleteMany: {}, create: (args.tags as string[]).map(t => ({ tag: String(t) })) };
+      }
+      const updated = await prisma.memory.update({ where: { id: memoryId }, data: updatedData });
+      return `Memory updated. ID: \`${updated.id}\`\n${bytesToText(updated.content)}`;
     }
 
     // ── get_recent ────────────────────────────────────────────────────────────
@@ -424,8 +430,8 @@ export async function handleTool(
         include: { location: { include: { palace: { select: { id: true, name: true } } } } },
       });
       if (!memories.length) return "No memories found.";
-      return memories.map(m =>
-        `**${m.location.palace.name} › ${m.location.name}** (\`${m.id}\`)\n${m.content.slice(0, 300)}${m.content.length > 300 ? "…" : ""}\n_${new Date(m.lastAccessed).toLocaleDateString()}_`
+      return memories.map((m: any) =>
+        `**${m.location.palace.name} › ${m.location.name}** (\`${m.id}\`)\n${String(m.content).slice(0, 300)}${String(m.content).length > 300 ? "…" : ""}\n_${new Date(m.lastAccessed).toLocaleDateString()}_`
       ).join("\n\n---\n\n");
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { textToBytes } from '@/lib/prisma-utils';
 
 interface SyncChange {
   type: "palace" | "location" | "memory";
@@ -129,15 +130,15 @@ export async function POST(request: NextRequest) {
               const memory = await prisma.memory.create({
                 data: {
                   locationId: change.locationId!,
-                  content: str(d.content),
-                  tags: Array.isArray(d.tags) ? d.tags.map(String) : [],
+                  content: textToBytes(d.content) as any,
+                  tags: { create: Array.isArray(d.tags) ? d.tags.map((t: any) => ({ tag: String(t) })) : [] },
                 },
               });
               results.push({ id: change.id ?? memory.id, cloudId: memory.id, type: "memory" });
             } else if (change.operation === "update") {
               await prisma.memory.update({
                 where: { id: change.id! },
-                data: { content: str(d.content), tags: Array.isArray(d.tags) ? d.tags.map(String) : [] },
+                data: { content: textToBytes(d.content) as any, tags: { deleteMany: {}, create: Array.isArray(d.tags) ? d.tags.map((t: any) => ({ tag: String(t) })) : [] } },
               });
               results.push({ id: change.id!, type: "memory" });
             } else if (change.operation === "delete") {

@@ -182,7 +182,7 @@ export async function getMessages(
     take: validated.limit,
   });
 
-  return messages.map((m) => ({
+  return messages.map((m: any) => ({
     id: m.id,
     room_id: m.roomId,
     sender_id: m.senderId,
@@ -305,7 +305,7 @@ export async function listRooms(
     },
   });
 
-  return rooms.map((r) => ({
+  return rooms.map((r: any) => ({
     id: r.id,
     name: r.name,
     description: r.description,
@@ -352,7 +352,7 @@ async function dispatchMessageWebhooks(
   // This gives you retries, DLQ, visibility, and avoids tying up the MCP/REST handler.
 
   await Promise.allSettled(
-    subscriptions.map(async (sub) => {
+    subscriptions.map(async (sub: any) => {
       // Per-target delivery protection
       const deliveryRl = await rateLimiters.webhookDelivery(sub.targetUrl);
       if (!deliveryRl.success) {

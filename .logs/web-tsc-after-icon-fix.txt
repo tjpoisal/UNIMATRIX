@@ -1,0 +1,22 @@
+app/api/friends/route.ts(44,35): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(53,43): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/friends/route.ts(58,35): error TS7006: Parameter 'f' implicitly has an 'any' type.
+app/api/mcp/route.ts(200,26): error TS7006: Parameter 'p' implicitly has an 'any' type.
+app/api/mcp/route.ts(263,27): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/mcp/route.ts(427,27): error TS7006: Parameter 'm' implicitly has an 'any' type.
+app/api/palaces/[id]/share/route.ts(35,17): error TS7006: Parameter 's' implicitly has an 'any' type.
+lib/agent.ts(85,10): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/agent.ts(90,13): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/agent.ts(91,12): error TS7006: Parameter 'a' implicitly has an 'any' type.
+lib/agent.ts(91,15): error TS7006: Parameter 'b' implicitly has an 'any' type.
+lib/agent.ts(96,28): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/agent.ts(386,41): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/agent.ts(429,41): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/agent.ts(434,48): error TS7006: Parameter 'p' implicitly has an 'any' type.
+lib/collab/service.ts(185,24): error TS7006: Parameter 'm' implicitly has an 'any' type.
+lib/collab/service.ts(308,21): error TS7006: Parameter 'r' implicitly has an 'any' type.
+lib/collab/service.ts(355,30): error TS7006: Parameter 'sub' implicitly has an 'any' type.
+lib/telemetry/anomaly-detection.ts(22,48): error TS7006: Parameter 'log' implicitly has an 'any' type.
+undefined
+/Users/tim/UNIMATRIX/apps/web:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with exit code 2: tsc --noEmit -p /Users/tim/UNIMATRIX/apps/web/tsconfig.json --pretty false

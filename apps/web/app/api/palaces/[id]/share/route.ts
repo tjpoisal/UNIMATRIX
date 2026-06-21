@@ -32,7 +32,7 @@ export async function GET(
   });
 
   return NextResponse.json(
-    shares.map((s) => ({
+    shares.map((s: any) => ({
       shareId: s.id,
       user: s.sharedWith,
       permission: s.permission,

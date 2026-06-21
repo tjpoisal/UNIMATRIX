@@ -82,19 +82,21 @@ async function getMemoryContext(userId: string, palaceId: string, task: string):
 
   // Score by keyword overlap
   const scored = memories
-    .map(m => {
-      const text = (m.content + ' ' + m.tags.join(' ')).toLowerCase();
+    .map((m: any) => {
+      const content = typeof m.content === 'string' ? m.content : String(m.content);
+      const tags = Array.isArray(m.tags) ? m.tags : [];
+      const text = (content + ' ' + tags.join(' ')).toLowerCase();
       const hits = keywords.filter(k => text.includes(k)).length;
       return { ...m, score: hits };
     })
-    .filter(m => m.score > 0)
-    .sort((a, b) => b.score - a.score)
+    .filter((m: any) => m.score > 0)
+    .sort((a: any, b: any) => b.score - a.score)
     .slice(0, 10);
 
   if (scored.length === 0) return '';
 
-  const lines = scored.map(m =>
-    `[${m.location.name}] ${m.content.slice(0, 300)}${m.content.length > 300 ? '…' : ''}`
+  const lines = scored.map((m: any) =>
+    `[${m.location?.name}] ${String(m.content).slice(0, 300)}${String(m.content).length > 300 ? '…' : ''}`
   );
   return `\n\nRelevant memories from your palace:\n${lines.join('\n---\n')}`;
 }
@@ -383,7 +385,7 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
   }
 
   // Decrypt keys
-  const providers = providerRecords.map(p => ({
+  const providers = providerRecords.map((p: any) => ({
     id: p.id,
     provider: p.provider,
     model: p.model,
@@ -426,12 +428,12 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
       });
     }
 
-    const providerNames = providers.map(p => p.provider).join(', ');
+  const providerNames = providers.map((p: any) => p.provider).join(', ');
     const memory = await prisma.memory.create({
       data: {
         locationId: location.id,
         content: `**Task:** ${task}\n\n**Mode:** ${mode} (${providerNames})\n\n**Synthesis:**\n${synthesis}`,
-        tags: ['agent', mode, ...providers.map(p => p.provider)],
+  tags: ['agent', mode, ...providers.map((p: any) => p.provider)],
       },
     });
     memoryId = memory.id;
