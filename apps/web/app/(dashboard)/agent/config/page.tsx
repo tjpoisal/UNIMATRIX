@@ -32,7 +32,13 @@ export default function AgentConfigPage() {
   };
 
   useEffect(() => {
-    fetchConfigs();
+    (async () => {
+      try {
+        await fetchConfigs();
+      } catch (e) {
+        console.error(e);
+      }
+    })();
   }, []);
 
   const updateConfig = async (id: string, updates: Partial<AgentConfig>) => {

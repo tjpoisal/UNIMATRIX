@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   const user = await prisma.user.findUnique({
-    where:  { id: session.user.id },
+    where: { id: session.user.id },
     select: { mfaSecret: true, mfaIv: true, mfaEnabled: true },
   });
 

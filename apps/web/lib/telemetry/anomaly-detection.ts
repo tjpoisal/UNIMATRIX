@@ -14,14 +14,14 @@ export async function detectSpendAnomalies(organizationId: string) {
     take: 200,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const anomalies: any[] = [];
+  const anomalies: Array<{ type: string; severity: 'low' | 'medium' | 'high'; message: string; value?: number }> = [];
 
   // Very simple heuristic: 5x average spend in last hour vs previous 3 hours
-  const grouped = recentLogs.reduce((acc: Record<number, number>, log: any) => {
+  type TokenLogRow = { createdAt: Date | string; cost_in_cents?: number | null };
+  const grouped = recentLogs.reduce((acc: Record<number, number>, log: TokenLogRow) => {
     const hour = Math.floor(new Date(log.createdAt).getTime() / (1000 * 60 * 60));
     if (!acc[hour]) acc[hour] = 0;
-    acc[hour] += (log.cost_in_cents || 0);
+    acc[hour] += log.cost_in_cents ? log.cost_in_cents : 0;
     return acc;
   }, {} as Record<number, number>);
 

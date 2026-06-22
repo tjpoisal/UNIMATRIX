@@ -43,9 +43,9 @@ export async function POST(request: NextRequest) {
     data: {
       userId: session.user.id,
       task: task.trim(),
-      mode,
-      providers: providerIds,
-      palaceId: palaceId || null,
+      // legacy fields like `mode` and `providers` don't exist on the canonical
+      // AgentRun model. Store the minimal required fields and keep richer
+      // metadata inside the JSON `result` field if needed.
       status: 'running',
     },
   });
@@ -64,8 +64,7 @@ export async function POST(request: NextRequest) {
     await prisma.agentRun.update({
       where: { id: run.id },
       data: {
-        status: 'complete',
-        providers: result.responses.map(r => `${r.provider}:${r.model}`),
+        status: 'completed',
         result: {
           synthesis: result.synthesis,
           responses: result.responses.map(r => ({
@@ -91,7 +90,7 @@ export async function POST(request: NextRequest) {
     const msg = error instanceof Error ? error.message : 'Agent run failed';
     await prisma.agentRun.update({
       where: { id: run.id },
-      data: { status: 'error', errorMsg: msg },
+      data: { status: 'failed', errorMsg: msg },
     });
     return NextResponse.json({ error: msg }, { status: 500 });
   }
@@ -111,8 +110,6 @@ export async function GET() {
     select: {
       id: true,
       task: true,
-      mode: true,
-      providers: true,
       status: true,
       memoryIds: true,
       createdAt: true,

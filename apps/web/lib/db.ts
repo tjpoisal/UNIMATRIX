@@ -13,7 +13,7 @@
 import { Pool } from 'pg';
 
 declare global {
-  // eslint-disable-next-line no-var
+  // Lazily-initialized global Pool singleton used across the app
   var __pgPool: Pool | undefined;
 }
 

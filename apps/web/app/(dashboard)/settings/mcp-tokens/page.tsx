@@ -34,7 +34,13 @@ export default function McpTokensPage() {
   }, []);
 
   useEffect(() => {
-    fetchTokens();
+    (async () => {
+      try {
+        await fetchTokens();
+      } catch (e) {
+        console.error('Failed to fetch tokens', e);
+      }
+    })();
   }, [fetchTokens]);
 
   const handleCreate = async () => {

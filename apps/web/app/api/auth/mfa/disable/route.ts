@@ -23,14 +23,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "password is required" }, { status: 400 });
   }
 
+  // Read only the legacy password field if it exists in this database version.
   const user = await prisma.user.findUnique({
-    where:  { id: session.user.id },
-    select: { password: true },
+    where: { id: session.user.id },
+    select: { password: true as unknown as string | null },
   });
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
 
-  if (!user?.password || !(await bcrypt.compare(password, user.password))) {
+  const storedPassword = (user && (user as { password?: string | null }).password) ?? null;
+  if (!storedPassword || !(await bcrypt.compare(password, storedPassword))) {
     await logAuthEvent({
       userId:   session.user.id,
       action:   "mfa.disable_failed",

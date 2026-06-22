@@ -12,8 +12,7 @@
 
 import { Redis } from '@upstash/redis';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MessageHandler = (channel: string, message: any) => void;
+type MessageHandler = (channel: string, message: unknown) => void;
 
 let redis: Redis | null = null;
 const subscribers = new Map<string, Set<MessageHandler>>();
@@ -35,8 +34,7 @@ function getRedis(): Redis | null {
 /**
  * Publish a message to a Collab room channel.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function publishToRoom(roomId: string, message: any) {
+export async function publishToRoom(roomId: string, message: unknown) {
   const r = getRedis();
   const channel = `collab:${roomId}`;
 
@@ -99,8 +97,7 @@ export function subscribeToRoom(roomId: string, handler: MessageHandler): () => 
 /**
  * Notify local subscribers (used internally when receiving from Redis).
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function notifyLocalSubscribers(roomId: string, message: any) {
+export function notifyLocalSubscribers(roomId: string, message: unknown) {
   const channel = `collab:${roomId}`;
   const handlers = subscribers.get(channel);
   if (!handlers) return;

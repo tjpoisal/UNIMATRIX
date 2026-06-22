@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { calculateCostInCents } from './pricing';
 
@@ -177,8 +178,7 @@ export async function createPendingAction(params: {
       roomId: params.roomId,
       agent_name: params.agentName,
       tool_name: params.toolName,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      args: params.args as any,
+  args: params.args as unknown as Prisma.JsonValue,
       requested_by: params.requestedBy,
       status: 'pending',
       expiresAt,
@@ -237,8 +237,7 @@ export async function expireOldPendingActions() {
 export async function logToolExecutionTelemetry(
   toolName: string,
   agentName: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  result: any,
+  result: unknown,
   args: Record<string, unknown>,
   provider?: string,
   model?: string,

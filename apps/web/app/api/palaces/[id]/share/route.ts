@@ -31,8 +31,9 @@ export async function GET(
     orderBy: { createdAt: "asc" },
   });
 
+  type ShareRow = { id: string; sharedWith: { id: string; name?: string | null; email?: string | null; image?: string | null }; permission: string; createdAt: Date };
   return NextResponse.json(
-    shares.map((s: any) => ({
+    (shares as ShareRow[]).map((s) => ({
       shareId: s.id,
       user: s.sharedWith,
       permission: s.permission,

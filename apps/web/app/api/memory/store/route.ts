@@ -74,7 +74,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     // Insert tags
     if (finalTags.length > 0) {
-      await prisma.memoryTag.createMany({ // eslint-disable-line @typescript-eslint/no-explicit-any
+      await prisma.memoryTag.createMany({
         data: finalTags.map(tag => ({ memoryId: memory.id, tag })),
         skipDuplicates: true,
       });

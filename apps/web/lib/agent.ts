@@ -14,6 +14,7 @@
 import { generateText } from 'ai';
 import { decryptApiKey } from './crypto';
 import { prisma } from './prisma';
+import { bytesToText, textToBytes } from './prisma-utils';
 
 // ─── AI Gateway synthesis (uses Vercel OIDC — no API key needed) ─────────────
 async function synthesizeWithGateway(system: string, prompt: string): Promise<string> {
@@ -58,7 +59,7 @@ async function getMemoryContext(userId: string, palaceId: string, task: string):
   // Pull the most recent 20 memories from the palace, filtered by basic relevance
   const keywords = task.toLowerCase().split(/\s+/).filter(w => w.length > 3);
 
-  const memories = await prisma.memory.findMany({
+  const memoriesRaw = await prisma.memory.findMany({
     where: {
       deletedAt: null,
       location: {
@@ -80,24 +81,38 @@ async function getMemoryContext(userId: string, palaceId: string, task: string):
     },
   });
 
+  // Normalize types we expect from Prisma
+  const memories = memoriesRaw as Array<{
+    id: string;
+    content: unknown;
+    tags?: Array<{ tag?: string } | string> | null;
+    location?: { name?: string } | null;
+  }>;
+
   // Score by keyword overlap
-  const scored = memories
-    .map((m: any) => {
-      const content = typeof m.content === 'string' ? m.content : String(m.content);
-      const tags = Array.isArray(m.tags) ? m.tags : [];
-      const text = (content + ' ' + tags.join(' ')).toLowerCase();
+  type MemoryItem = typeof memories[number];
+  type ScoredMemory = MemoryItem & { score: number; contentStr: string };
+
+  const scored = (memories
+    .map<ScoredMemory>(m => {
+      const contentStr = bytesToText(m.content);
+      const tagsArr = Array.isArray(m.tags)
+        ? m.tags.map(t => (typeof t === 'string' ? t : (t && (t as { tag?: string }).tag) ?? String(t)))
+        : [];
+      const text = (contentStr + ' ' + tagsArr.join(' ')).toLowerCase();
       const hits = keywords.filter(k => text.includes(k)).length;
-      return { ...m, score: hits };
+      return { ...m, score: hits, contentStr } as ScoredMemory;
     })
-    .filter((m: any) => m.score > 0)
-    .sort((a: any, b: any) => b.score - a.score)
-    .slice(0, 10);
+    .filter((m): m is ScoredMemory => m.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10));
 
   if (scored.length === 0) return '';
 
-  const lines = scored.map((m: any) =>
-    `[${m.location?.name}] ${String(m.content).slice(0, 300)}${String(m.content).length > 300 ? '…' : ''}`
-  );
+  const lines = scored.map(m => {
+    const contentStr = m.contentStr ?? bytesToText(m.content);
+    return `[${(m.location && m.location.name) || 'unknown'}] ${contentStr.slice(0, 300)}${contentStr.length > 300 ? '…' : ''}`;
+  });
   return `\n\nRelevant memories from your palace:\n${lines.join('\n---\n')}`;
 }
 
@@ -385,7 +400,7 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
   }
 
   // Decrypt keys
-  const providers = providerRecords.map((p: any) => ({
+  const providers = providerRecords.map((p: { id: string; provider: string; model: string; keyEncrypted: string; keyIv: string }) => ({
     id: p.id,
     provider: p.provider,
     model: p.model,
@@ -428,12 +443,12 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
       });
     }
 
-  const providerNames = providers.map((p: any) => p.provider).join(', ');
+  const providerNames = providers.map((p: { provider: string }) => p.provider).join(', ');
     const memory = await prisma.memory.create({
       data: {
         locationId: location.id,
-        content: `**Task:** ${task}\n\n**Mode:** ${mode} (${providerNames})\n\n**Synthesis:**\n${synthesis}`,
-  tags: ['agent', mode, ...providers.map((p: any) => p.provider)],
+        content: textToBytes(`**Task:** ${task}\n\n**Mode:** ${mode} (${providerNames})\n\n**Synthesis:**\n${synthesis}`),
+  tags: { create: ['agent', mode, ...providers.map((p: { provider: string }) => p.provider)].map(t => ({ tag: t })) },
       },
     });
     memoryId = memory.id;
@@ -472,8 +487,8 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
           await prisma.memory.create({
             data: {
               locationId: histLoc.id,
-              content: `**Task:** ${task}\n**Provider:** ${resp.provider} (${resp.model})\n\n${resp.response}`,
-              tags: ['llm-history', resp.provider, 'agent', mode],
+              content: textToBytes(`**Task:** ${task}\n**Provider:** ${resp.provider} (${resp.model})\n\n${resp.response}`),
+              tags: { create: ['llm-history', resp.provider, 'agent', mode].map(t => ({ tag: t })) },
             },
           });
         }

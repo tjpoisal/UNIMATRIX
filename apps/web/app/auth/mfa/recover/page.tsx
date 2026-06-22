@@ -24,7 +24,8 @@ function RecoverPageContent() {
   // Auto-apply when token is present (trusted person clicked the link)
   useEffect(() => {
     if (!token) return;
-    setStatus('loading');
+    // Defer setStatus to avoid synchronous setState inside effect (prevents cascading renders)
+    const t = setTimeout(() => setStatus('loading'), 0);
     fetch('/api/auth/mfa/recover', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -44,7 +45,8 @@ function RecoverPageContent() {
       .catch(() => {
         setStatus('error');
         setMessage('An error occurred. Please try again.');
-      });
+      })
+      .finally(() => clearTimeout(t));
   }, [token, router]);
 
   const handleRequest = async () => {

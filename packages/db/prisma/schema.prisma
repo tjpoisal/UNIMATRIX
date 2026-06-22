@@ -238,3 +238,31 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Stripe Subscriptions (canonical)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model StripeSubscription {
+  id                   String   @id @default(cuid())
+  userId               String?  @db.Uuid
+  user                 User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  stripeCustomerId     String   @unique
+  stripeSubscriptionId String   @unique
+  status               String
+  priceId              String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  cancelAt             DateTime?
+  cancelledAt          DateTime?
+  metadata             Json?
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([userId])
+  @@map("stripe_subscriptions")
+}

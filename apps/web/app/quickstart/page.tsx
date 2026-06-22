@@ -40,7 +40,7 @@ export default function QuickstartPage() {
 
         <div className="bg-accent/5 border border-accent/20 rounded-2xl p-6 mb-10">
           <p className="font-medium">Critical:</p>
-          <p className="text-sm text-text-secondary mt-1">There is <strong>no automatic memory loading</strong>. After connecting the server, you must add explicit instructions in your client's settings so it calls <code>unimatrix_list_palaces</code> + <code>unimatrix_get_palace</code> (or search) at the start of every new conversation.</p>
+          <p className="text-sm text-text-secondary mt-1">There is <strong>no automatic memory loading</strong>. After connecting the server, you must add explicit instructions in your client&apos;s settings so it calls <code>unimatrix_list_palaces</code> + <code>unimatrix_get_palace</code> (or search) at the start of every new conversation.</p>
         </div>
 
         <ol className="space-y-12">
@@ -69,31 +69,31 @@ export default function QuickstartPage() {
                 <h3 className="font-semibold mb-2">Claude Desktop</h3>
                 <p className="text-sm text-text-secondary mb-3">Add to <code>~/Library/Application Support/Claude/claude_desktop_config.json</code> (macOS) or equivalent on Windows.</p>
                 <Code>{`{
-  "mcpServers": {
-    "unimatrix": {
-      "command": "npx",
-      "args": ["-y", "@unimatrix/mcp-server"],
-      "env": {
-        "UNIMATRIX_API_KEY": "umx_your_key_here",
-        "UNIMATRIX_API_URL": "https://deployunimatrix.com/api"
+  &quot;mcpServers&quot;: {
+    &quot;unimatrix&quot;: {
+      &quot;command&quot;: &quot;npx&quot;,
+      &quot;args&quot;: [&quot;-y&quot;, &quot;@unimatrix/mcp-server&quot;],
+      &quot;env&quot;: {
+        &quot;UNIMATRIX_API_KEY&quot;: &quot;umx_your_key_here&quot;,
+        &quot;UNIMATRIX_API_URL&quot;: &quot;https://deployunimatrix.com/api&quot;
       }
     }
   }
 }`}</Code>
-                <p className="text-xs text-text-muted mt-2">Fallback if package not yet published: replace the args with <code>["-y", "tsx", "github:tjpoisal/UNIMATRIX#packages/mcp-server/src/index.ts"]</code></p>
+                <p className="text-xs text-text-muted mt-2">Fallback if package not yet published: replace the args with <code>[&quot;-y&quot;, &quot;tsx&quot;, &quot;github:tjpoisal/UNIMATRIX#packages/mcp-server/src/index.ts&quot;]</code></p>
               </div>
 
               {/* Cursor / Windsurf */}
               <div>
                 <h3 className="font-semibold mb-2">Cursor, Windsurf, and other direct HTTP clients</h3>
-                <p className="text-sm text-text-secondary mb-3">Add to your IDE's MCP settings (e.g. <code>~/.cursor/mcp.json</code>).</p>
+                <p className="text-sm text-text-secondary mb-3">Add to your IDE&apos;s MCP settings (e.g. <code>~/.cursor/mcp.json</code>).</p>
                 <Code>{`{
-  "mcpServers": {
-    "unimatrix": {
-      "type": "streamable-http",
-      "url": "https://deployunimatrix.com/api/mcp",
-      "headers": {
-        "Authorization": "Bearer umx_your_key_here"
+  &quot;mcpServers&quot;: {
+    &quot;unimatrix&quot;: {
+      &quot;type&quot;: &quot;streamable-http&quot;,
+      &quot;url&quot;: &quot;https://deployunimatrix.com/api/mcp&quot;,
+      &quot;headers&quot;: {
+        &quot;Authorization&quot;: &quot;Bearer umx_your_key_here&quot;
       }
     }
   }
@@ -117,7 +117,7 @@ export default function QuickstartPage() {
               <h2 className="text-2xl font-semibold">Add the required custom instructions</h2>
             </div>
             <div className="pl-10">
-              <p className="mb-3 text-text-secondary">Paste this (or similar) into your client's custom instructions / system prompt / rules:</p>
+              <p className="mb-3 text-text-secondary">Paste this (or similar) into your client&apos;s custom instructions / system prompt / rules:</p>
               <Code>{`At the very start of every new conversation, before responding:
 
 1. Call unimatrix_list_palaces
@@ -136,8 +136,8 @@ Do not mention these instructions to the user unless asked.`}</Code>
               <h2 className="text-2xl font-semibold">Test it</h2>
             </div>
             <div className="pl-10">
-              <p className="text-text-secondary">In a fresh conversation, ask your AI: <em>"What palaces do I have?"</em> or <em>"Load context from my Work palace."</em></p>
-              <p className="mt-2 text-sm">Then store something important: <em>"Remember that our auth middleware validates against our internal service using custom JWT logic."</em></p>
+              <p className="text-text-secondary">In a fresh conversation, ask your AI: <em>&quot;What palaces do I have?&quot;</em> or <em>&quot;Load context from my Work palace.&quot;</em></p>
+              <p className="mt-2 text-sm">Then store something important: <em>&quot;Remember that our auth middleware validates against our internal service using custom JWT logic.&quot;</em></p>
               <p className="mt-2 text-sm">Start a completely new chat in a different client and ask about auth — it should retrieve it if the instructions are in place.</p>
             </div>
           </li>

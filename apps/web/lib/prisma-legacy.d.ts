@@ -7,6 +7,15 @@ import { PrismaClient } from "@unimatrix/db";
 // accurate types during the full typing cleanup.
 
 export type LegacyPrisma = PrismaClient & {
+  // Common delegates that the web app still references in legacy code paths.
+  // Marking these as `any` allows an incremental migration: we'll replace
+  // with accurate generated types as we align the codebase to the canonical
+  // schema in packages/db.
+  user?: any;
+  auditLog?: any;
+  verificationToken?: any;
+  organizationMember?: any;
+  authAttempt?: any;
   palace?: any;
   palaceShare?: any;
   location?: any;

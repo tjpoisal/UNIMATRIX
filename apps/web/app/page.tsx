@@ -10,7 +10,7 @@ import {
   websiteSchema,
 } from '@/lib/homepage-schema';
 
-// eslint-disable react/no-unescaped-entities
+ 
 
 export const metadata = {
   title: 'Unimatrix | Persistent AI Memory via MCP',
