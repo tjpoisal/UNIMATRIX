@@ -41,7 +41,7 @@
     "expo-splash-screen": "~31.0.13",
     "expo-sqlite": "~16.0.0",
     "expo-status-bar": "~3.0.9",
-    "expo-symbols": "~1.0.8",
+    "expo-symbols": "~56.0.6",
     "expo-system-ui": "~56.0.5",
     "expo-web-browser": "~56.0.5",
     "nativewind": "^4.2.5",
