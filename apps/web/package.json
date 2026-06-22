@@ -45,7 +45,7 @@
     "react-dom": "19.2.7",
     "recharts": "^3.8.1",
     "resend": "^4.1.2",
-    "stripe": "^22.2.1",
+    "stripe": "^22.2.3",
     "tailwindcss": "^4",
     "typescript": "^5",
     "ws": "^8.18.0",
