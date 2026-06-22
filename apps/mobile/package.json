@@ -59,7 +59,7 @@
     "zustand": "^5.0.0",
     "expo-background-fetch": "~56.0.19",
     "expo-task-manager": "~56.0.19",
-    "expo-notifications": "~0.32.17"
+    "expo-notifications": "~56.0.18"
   },
   "devDependencies": {
     "@types/react": "~19.2.17",
