@@ -24,7 +24,6 @@
   "include": [
     "packages/**/*.ts",
     "packages/**/*.tsx",
-    "scripts/**/*.ts",
     "prisma/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]

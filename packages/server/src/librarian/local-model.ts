@@ -85,8 +85,8 @@ async function classifyWithOllama(
 
     if (!res.ok) return null;
 
-    const data = await res.json();
-    const raw  = (data.response as string ?? '').trim();
+  const data: any = await res.json();
+  const raw  = (data?.response as string ?? '').trim();
 
     // Extract JSON even if model wraps it in prose
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
@@ -197,8 +197,8 @@ export async function checkLibrarianHealth(): Promise<{
     const res = await fetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    const data  = await res.json();
-    const names: string[] = (data.models ?? []).map((m: any) => m.name as string);
+  const data: any = await res.json();
+  const names: string[] = (data?.models ?? []).map((m: any) => m.name as string);
 
     if (names.some((n) => n.includes('unimatrix-librarian'))) {
       return { available: true, model: LIBRARIAN_MODEL, fallback: 'lora' };
