@@ -21,6 +21,11 @@
       "@unimatrix/llm": ["packages/llm/src"]
     }
   },
-  "include": ["packages/**/*.ts", "packages/**/*.tsx", "apps/**/*.ts", "apps/**/*.tsx"],
+  "include": [
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "scripts/**/*.ts",
+    "prisma/**/*.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

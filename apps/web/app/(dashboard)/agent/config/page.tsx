@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+ 'use client';
 
-interface AgentConfig {
+import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+
+export interface AgentConfig {
   id: string;
   agent_name: string;
   provider: string;
@@ -55,7 +59,7 @@ export default function AgentConfigPage() {
     }
   };
 
-  if (loading) return React.createElement('div', { className: 'p-8' }, 'Loading agent configurations...');
+  if (loading) return <div className="p-8">Loading agent configurations...</div>;
 
   return (
     <div className="p-8 max-w-5xl">

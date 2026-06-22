@@ -31,15 +31,15 @@ interface RecalledMemory {
 }
 
 // Parse command line arguments
-function getArgument(key: string, defaultValue?: string): string | undefined {
+function getArgument(key: string, defaultValue = ''): string {
   const index = process.argv.indexOf(`--${key}`);
   if (index === -1) return defaultValue;
-  return process.argv[index + 1];
+  return String(process.argv[index + 1] ?? defaultValue);
 }
 
-const memoriesFile = getArgument('memories', 'packages/server/memories-demo.jsonl');
-const outputFile = getArgument('output', 'test-results/accuracy-report.json');
-const modelPath = getArgument('model', './models/librarian-v1');
+const memoriesFile: string = getArgument('memories', 'packages/server/memories-demo.jsonl');
+const outputFile: string = getArgument('output', 'test-results/accuracy-report.json');
+const modelPath: string = getArgument('model', './models/librarian-v1');
 
 console.log(`🧪 Testing Librarian AI Accuracy`);
 console.log(`📖 Memories: ${memoriesFile}`);
@@ -47,6 +47,7 @@ console.log(`🤖 Model: ${modelPath}`);
 
 async function loadMemories(): Promise<Memory[]> {
   const memories: Memory[] = [];
+  if (!memoriesFile) throw new Error('memories file required');
   const fileStream = fs.createReadStream(memoriesFile);
 
   const rl = readline.createInterface({
@@ -205,7 +206,7 @@ async function runAccuracyTest() {
   };
 
   // Create output directory if needed
-  const outputDir = outputFile.substring(0, outputFile.lastIndexOf('/'));
+  const outputDir = outputFile.substring(0, outputFile.lastIndexOf('/')) || '.';
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
