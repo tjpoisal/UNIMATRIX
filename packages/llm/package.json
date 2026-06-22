@@ -11,7 +11,7 @@
   "dependencies": {
     "@unimatrix/types": "workspace:*",
     "@unimatrix/db": "workspace:*",
-    "@anthropic-ai/sdk": "^0.104.2",
+    "@anthropic-ai/sdk": "^0.105.0",
     "@google/generative-ai": "^0.24.1",
     "@huggingface/transformers": "^3.8.1",
     "@prisma/client": "^6.19.3",
