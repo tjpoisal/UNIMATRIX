@@ -14,7 +14,6 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { textToBytes, bytesToText } from '@/lib/prisma-utils';
 import bcrypt from "bcryptjs";
 
 // Extend NextRequest for internal org context passing (from API key auth to MCP handlers)
@@ -198,10 +197,9 @@ export async function handleTool(
         select: { id: true, name: true, description: true, isPublic: true, createdAt: true, updatedAt: true },
       });
       if (!palaces.length) return "You have no memory palaces yet. Create one with unimatrix_create_palace.";
-      type PalaceRow = { id: string; name: string; description?: string | null; isPublic: boolean; createdAt: Date };
-      return (palaces as PalaceRow[])
-        .map(p => `## ${p.name}\n- ID: \`${p.id}\`\n${p.description ? `- ${p.description}\n` : ""}- ${p.isPublic ? "Public" : "Private"} · Created ${new Date(p.createdAt).toLocaleDateString()}`)
-        .join("\n\n");
+      return palaces.map((p: { id: string; name: string; description?: string; isPublic: boolean; createdAt: string | Date }) =>
+        `## ${p.name}\n- ID: \`${p.id}\`\n${p.description ? `- ${p.description}\n` : ""}- ${p.isPublic ? "Public" : "Private"} · Created ${new Date(p.createdAt).toLocaleDateString()}`
+      ).join("\n\n");
     }
 
     // ── get_palace ──────────────────────────────────────────────────────────
@@ -226,17 +224,8 @@ export async function handleTool(
       });
       if (!palace) return "Palace not found or access denied.";
 
-      const renderMems = (
-        memories: Array<{ id: string; content: unknown; tags?: string[] | null }>,
-        indent = "",
-      ) =>
-        memories
-          .map(m => {
-            const contentStr = bytesToText(m.content);
-            const tagList = Array.isArray(m.tags) && m.tags.length ? ` [${m.tags.join(', ')}]` : '';
-            return `${indent}- \`${m.id}\`: ${contentStr.slice(0, 200)}${contentStr.length > 200 ? '…' : ''}${tagList}`;
-          })
-          .join("\n");
+      const renderMems = (memories: { id: string; content: string; tags: string[] }[], indent = "") =>
+        memories.map(m => `${indent}- \`${m.id}\`: ${m.content.slice(0, 200)}${m.content.length > 200 ? "…" : ""}${m.tags.length ? ` [${m.tags.join(", ")}]` : ""}`).join("\n");
 
       const lines = [`# ${palace.name}`, palace.description ? `> ${palace.description}` : "", `**ID**: \`${palace.id}\`\n`];
       for (const loc of palace.locations) {
@@ -271,10 +260,9 @@ export async function handleTool(
       });
 
       if (!memories.length) return `No memories found for "${query}".`;
-      const typedMems = memories as Array<{ id: string; content: unknown; tags?: string[] | null; location: { palace: { name: string }; name: string } }>;
-      return typedMems
-        .map(m => `## ${m.location.palace.name} › ${m.location.name}\n**ID**: \`${m.id}\`\n${bytesToText(m.content)}\n${Array.isArray(m.tags) && m.tags.length ? `Tags: ${m.tags.join(", ")}` : ""}`)
-        .join("\n\n---\n\n");
+      return memories.map((m: { id: string; content: string; tags: string[]; location: { name: string; palace: { name: string } } }) =>
+        `## ${m.location.palace.name} › ${m.location.name}\n**ID**: \`${m.id}\`\n${m.content}\n${m.tags.length ? `Tags: ${m.tags.join(", ")}` : ""}`
+      ).join("\n\n---\n\n");
     }
 
     // ── store_memory ─────────────────────────────────────────────────────────
@@ -337,14 +325,9 @@ export async function handleTool(
       if (!location) return "Location not found or access denied.";
 
       const memory = await prisma.memory.create({
-        data: {
-          locationId,
-          content: textToBytes(content),
-          // Prisma expects nested create for tags; map to the shape.
-          tags: { create: tags.map(t => ({ tag: String(t) })) },
-        },
+        data: { locationId, content, tags },
       });
-      return `Memory stored. ID: \`${memory.id}\`\n\nContent: ${bytesToText(memory.content)}${sourceLlm ? ` (auto-filed for ${sourceLlm})` : ""}`;
+      return `Memory stored. ID: \`${memory.id}\`\n\nContent: ${memory.content}${sourceLlm ? ` (auto-filed for ${sourceLlm})` : ""}`;
     }
 
     // ── list_memories ─────────────────────────────────────────────────────────
@@ -369,12 +352,11 @@ export async function handleTool(
         prisma.memory.count({ where: { locationId, deletedAt: null } }),
       ]);
 
-      if (!memories.length) return "No memories at this location.";
-      const typedMemories = memories as Array<{ id: string; content: unknown; tags?: string[] | null; createdAt: string | Date }>; 
-      const lines = [`# ${location.name} — ${total} memories (showing ${typedMemories.length})\n`];
-      for (const m of typedMemories) {
-        lines.push(`**\`${m.id}\`**: ${bytesToText(m.content)}`);
-        if (Array.isArray(m.tags) && m.tags.length) lines.push(`Tags: ${m.tags.join(", ")}`);
+  if (!memories.length) return "No memories at this location.";
+      const lines = [`# ${location.name} — ${total} memories (showing ${memories.length})\n`];
+      for (const m of memories) {
+        lines.push(`**\`${m.id}\`**: ${m.content}`);
+        if (m.tags.length) lines.push(`Tags: ${m.tags.join(", ")}`);
         lines.push(`_${new Date(m.createdAt).toLocaleDateString()}_\n`);
       }
       return lines.join("\n");
@@ -422,15 +404,14 @@ export async function handleTool(
       });
       if (!memory) return "Memory not found or access denied.";
 
-  type UpdatedDataShape = { content?: Uint8Array | null; tags?: { deleteMany?: Record<string, unknown>; create?: { tag: string }[] } };
-  const updatedData: Partial<UpdatedDataShape> = {};
-      if (args.content) updatedData.content = textToBytes(args.content as string) ?? null;
-      if (args.tags) {
-        // replace tags naively — for now delete/create pattern would be better
-        updatedData.tags = { deleteMany: {}, create: (args.tags as string[]).map(t => ({ tag: String(t) })) };
-      }
-      const updated = await prisma.memory.update({ where: { id: memoryId }, data: updatedData });
-      return `Memory updated. ID: \`${updated.id}\`\n${bytesToText(updated.content)}`;
+      const updated = await prisma.memory.update({
+        where: { id: memoryId },
+        data: {
+          ...(args.content ? { content: args.content as string } : {}),
+          ...(args.tags ? { tags: args.tags as string[] } : {}),
+        },
+      });
+      return `Memory updated. ID: \`${updated.id}\`\n${updated.content}`;
     }
 
     // ── get_recent ────────────────────────────────────────────────────────────
@@ -443,10 +424,9 @@ export async function handleTool(
         include: { location: { include: { palace: { select: { id: true, name: true } } } } },
       });
       if (!memories.length) return "No memories found.";
-      const typedRecent = memories as Array<{ id: string; content: unknown; location: { palace: { name: string }; name: string }; lastAccessed: string | Date }>; 
-      return typedRecent
-        .map(m => `**${m.location.palace.name} › ${m.location.name}** (\`${m.id}\`)\n${bytesToText(m.content).slice(0, 300)}${bytesToText(m.content).length > 300 ? "…" : ""}\n_${new Date(m.lastAccessed).toLocaleDateString()}_`)
-        .join("\n\n---\n\n");
+      return memories.map((m: { id: string; content: string; lastAccessed: string | Date; location: { name: string; palace: { name: string } } }) =>
+        `**${m.location.palace.name} › ${m.location.name}** (\`${m.id}\`)\n${m.content.slice(0, 300)}${m.content.length > 300 ? "…" : ""}\n_${new Date(m.lastAccessed).toLocaleDateString()}_`
+      ).join("\n\n---\n\n");
     }
 
     default:
@@ -480,7 +460,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json();
   } catch {
-    return err(null, -32700, "Parse error");
+    return err(null as unknown as number, -32700, "Parse error");
   }
 
   const { id, method, params } = body;

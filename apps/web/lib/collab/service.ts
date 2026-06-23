@@ -8,7 +8,6 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { Prisma } from '@prisma/client';
 import {
   SendMessageInput,
   GetMessagesInput,
@@ -115,7 +114,8 @@ export async function sendMessage(
       senderName: validated.sender_name,
       senderType: validated.sender_type,
       message: validated.message,
-      metadata: (validated.metadata ?? {}) as Prisma.JsonValue,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      metadata: validated.metadata as any,
     },
   });
 
@@ -124,8 +124,8 @@ export async function sendMessage(
     id: message.id,
     room_id: message.roomId,
     sender_id: message.senderId,
-    sender_name: message.senderName ?? '',
-    sender_type: (message.senderType as SenderType) ?? 'human',
+    sender_name: message.senderName,
+    sender_type: message.senderType,
     message: message.message,
     metadata: message.metadata,
     created_at: message.createdAt.toISOString(),
@@ -167,7 +167,8 @@ export async function getMessages(
 
   await assertRoomAccess(validated.room_id, organizationId);
 
-  const where: Record<string, unknown> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any = {
     roomId: validated.room_id,
   };
 
@@ -176,31 +177,19 @@ export async function getMessages(
   }
 
   const messages = await prisma.collabMessage.findMany({
-    where: where as unknown as object,
+    where,
     orderBy: { createdAt: 'asc' },
     take: validated.limit,
   });
 
-  type RawMessage = {
-    id: string;
-    roomId: string;
-    senderId?: string | null;
-    senderName?: string | null;
-    senderType?: string | null;
-    message: string;
-    metadata?: Record<string, unknown> | null;
-    createdAt: Date;
-  };
-
-  return (messages as RawMessage[]).map((m) => ({
+  return messages.map((m: { id: string; roomId: string; senderId?: string | null; senderName?: string | null; senderType?: string | null; message: string; metadata: Record<string, unknown>; createdAt: Date }) => ({
     id: m.id,
     room_id: m.roomId,
-    sender_id: m.senderId ?? null,
-    // Ensure sender_name is always a string to match CollabMessageDTO (fallback to empty string)
-    sender_name: m.senderName ?? '',
-    sender_type: (m.senderType as SenderType) ?? 'human',
+    sender_id: m.senderId,
+    sender_name: m.senderName,
+    sender_type: m.senderType as SenderType,
     message: m.message,
-    metadata: (m.metadata ?? {}) as Record<string, unknown>,
+    metadata: m.metadata as Record<string, unknown>,
     created_at: m.createdAt.toISOString(),
   }));
 }
@@ -315,12 +304,11 @@ export async function listRooms(
       createdAt: true,
     },
   });
-  type RoomRow = { id: string; name: string; description?: string | null; isPrivate: boolean; createdAt: Date };
 
-  return (rooms as RoomRow[]).map(r => ({
+  return rooms.map((r: { id: string; name: string; description?: string | null; isPrivate: boolean; createdAt: Date }) => ({
     id: r.id,
     name: r.name,
-    description: r.description ?? '',
+    description: r.description,
     is_private: r.isPrivate,
     created_at: r.createdAt.toISOString(),
   }));
@@ -332,7 +320,8 @@ export async function listRooms(
 
 async function dispatchMessageWebhooks(
   roomId: string,
-  message: { id: string; senderName?: string; senderType?: string; message: string; metadata?: Record<string, unknown>; createdAt: Date },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  message: any,
   organizationId: string
 ) {
   const subscriptions = await prisma.webhookSubscription.findMany({
@@ -349,10 +338,10 @@ async function dispatchMessageWebhooks(
     room_id: roomId,
     message: {
       id: message.id,
-      sender_name: message.senderName ?? '',
-      sender_type: (message.senderType as SenderType) ?? 'human',
+      sender_name: message.senderName,
+      sender_type: message.senderType,
       message: message.message,
-      metadata: message.metadata ?? {},
+      metadata: message.metadata,
       created_at: message.createdAt.toISOString(),
     },
     organization_id: organizationId,
@@ -362,10 +351,8 @@ async function dispatchMessageWebhooks(
   // await qstashClient.publishJSON({ url: '/api/internal/deliver-webhooks', body: { roomId, messageId: message.id } })
   // This gives you retries, DLQ, visibility, and avoids tying up the MCP/REST handler.
 
-  type SubscriptionRow = { id: string; targetUrl: string; webhookSecret: string };
-
   await Promise.allSettled(
-    (subscriptions as SubscriptionRow[]).map(async (sub) => {
+  subscriptions.map(async (sub: { id: string; targetUrl: string; webhookSecret: string }) => {
       // Per-target delivery protection
       const deliveryRl = await rateLimiters.webhookDelivery(sub.targetUrl);
       if (!deliveryRl.success) {
@@ -394,7 +381,10 @@ async function dispatchMessageWebhooks(
 
         // Update last triggered (fire and forget)
         prisma.webhookSubscription
-          .update({ where: { id: sub.id }, data: { lastTriggeredAt: new Date() } })
+          .update({
+            where: { id: sub.id },
+            data: { lastTriggeredAt: new Date() },
+          })
           .catch(() => {});
       } catch (err) {
         console.error(`[webhook] Failed to deliver to ${sub.targetUrl}:`, err);
