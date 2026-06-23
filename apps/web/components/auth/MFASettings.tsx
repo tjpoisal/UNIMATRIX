@@ -40,14 +40,29 @@ export default function MFASettings() {
   const [feedback, setFeedback] = useState('');
 
   useEffect(() => {
+    let cancelled = false;
+
     if (session?.user) {
-      setMfaEnabled(session.user.mfaEnabled ?? false);
+      // Defer setState to avoid synchronous setState inside effect
+      Promise.resolve().then(() => {
+        if (!cancelled) setMfaEnabled(session.user.mfaEnabled ?? false);
+      });
     }
-    // Fetch trusted-person config
-    fetch('/api/auth/mfa/trusted-person')
-      .then((r) => r.json())
-      .then((d) => setMaskedTrusted(d.maskedEmail))
-      .catch(() => {});
+
+    // Fetch trusted-person config in an async function with cancellation
+    (async () => {
+      try {
+        const r = await fetch('/api/auth/mfa/trusted-person');
+        const d = await r.json();
+        if (!cancelled) setMaskedTrusted(d.maskedEmail);
+      } catch (_) {
+        // ignore
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [session]);
 
   // ── Enable MFA ──────────────────────────────────────────────────────────────
