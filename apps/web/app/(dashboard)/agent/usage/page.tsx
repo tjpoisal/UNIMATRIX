@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 interface UsageData {
@@ -16,29 +16,23 @@ interface AgentSpend {
 }
 
 export default function AgentUsagePage() {
-  const [usageData, setUsageData] = useState<UsageData[]>([]);
-  const [agentSpend, setAgentSpend] = useState<AgentSpend[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // In a real implementation this would call real API endpoints with date range
-    // For now we use mock data that looks realistic
-    const mockUsage: UsageData[] = Array.from({ length: 14 }, (_, i) => ({
+  // Initialize mock usage data synchronously (avoid calling setState inside an effect)
+  const [usageData] = useState<UsageData[]>(() =>
+    Array.from({ length: 14 }, (_, i) => ({
       date: new Date(Date.now() - (13 - i) * 86400000).toISOString().split('T')[0],
       spend: Math.floor(Math.random() * 1800) + 200,
       tokens: Math.floor(Math.random() * 45000) + 8000,
-    }));
+    }))
+  );
 
-    const mockAgents: AgentSpend[] = [
-      { agent_name: 'research-agent', current_spend: 1240, daily_limit: 5000 },
-      { agent_name: 'code-reviewer', current_spend: 890, daily_limit: 3000 },
-      { agent_name: 'writer-agent', current_spend: 2100, daily_limit: 4000 },
-    ];
+  const [agentSpend] = useState<AgentSpend[]>(() => [
+    { agent_name: 'research-agent', current_spend: 1240, daily_limit: 5000 },
+    { agent_name: 'code-reviewer', current_spend: 890, daily_limit: 3000 },
+    { agent_name: 'writer-agent', current_spend: 2100, daily_limit: 4000 },
+  ]);
 
-    setUsageData(mockUsage);
-    setAgentSpend(mockAgents);
-    setLoading(false);
-  }, []);
+  // No loading state required for static mock data — render immediately
+  const [loading] = useState(false);
 
   if (loading) return <div className="p-8">Loading usage analytics...</div>;
 

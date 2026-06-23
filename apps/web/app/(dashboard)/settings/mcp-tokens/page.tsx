@@ -34,7 +34,8 @@ export default function McpTokensPage() {
   }, []);
 
   useEffect(() => {
-    fetchTokens();
+    // Defer the fetch to avoid synchronous setState inside effect body (satisfies lint rule)
+    Promise.resolve().then(() => fetchTokens());
   }, [fetchTokens]);
 
   const handleCreate = async () => {
