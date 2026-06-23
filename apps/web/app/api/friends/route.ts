@@ -41,7 +41,7 @@ export async function GET() {
   ]);
 
   // Normalize: return the "other person" in each friendship
-  const friendList = friends.map((f) => ({
+  const friendList = friends.map((f: any) => ({
     friendshipId: f.id,
     user:
       f.requesterId === session.user!.id ? f.addressee : f.requester,
@@ -50,12 +50,12 @@ export async function GET() {
 
   return NextResponse.json({
     friends: friendList,
-    pendingReceived: pendingReceived.map((f) => ({
+    pendingReceived: pendingReceived.map((f: any) => ({
       friendshipId: f.id,
       user: f.requester,
       sentAt: f.createdAt,
     })),
-    pendingSent: pendingSent.map((f) => ({
+    pendingSent: pendingSent.map((f: any) => ({
       friendshipId: f.id,
       user: f.addressee,
       sentAt: f.createdAt,

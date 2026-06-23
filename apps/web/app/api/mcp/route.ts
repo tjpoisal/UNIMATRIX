@@ -197,7 +197,7 @@ export async function handleTool(
         select: { id: true, name: true, description: true, isPublic: true, createdAt: true, updatedAt: true },
       });
       if (!palaces.length) return "You have no memory palaces yet. Create one with unimatrix_create_palace.";
-      return palaces.map(p =>
+      return palaces.map((p: { id: string; name: string; description?: string; isPublic: boolean; createdAt: string | Date }) =>
         `## ${p.name}\n- ID: \`${p.id}\`\n${p.description ? `- ${p.description}\n` : ""}- ${p.isPublic ? "Public" : "Private"} · Created ${new Date(p.createdAt).toLocaleDateString()}`
       ).join("\n\n");
     }
@@ -260,7 +260,7 @@ export async function handleTool(
       });
 
       if (!memories.length) return `No memories found for "${query}".`;
-      return memories.map(m =>
+      return memories.map((m: { id: string; content: string; tags: string[]; location: { name: string; palace: { name: string } } }) =>
         `## ${m.location.palace.name} › ${m.location.name}\n**ID**: \`${m.id}\`\n${m.content}\n${m.tags.length ? `Tags: ${m.tags.join(", ")}` : ""}`
       ).join("\n\n---\n\n");
     }
@@ -352,7 +352,7 @@ export async function handleTool(
         prisma.memory.count({ where: { locationId, deletedAt: null } }),
       ]);
 
-      if (!memories.length) return "No memories at this location.";
+  if (!memories.length) return "No memories at this location.";
       const lines = [`# ${location.name} — ${total} memories (showing ${memories.length})\n`];
       for (const m of memories) {
         lines.push(`**\`${m.id}\`**: ${m.content}`);
@@ -424,7 +424,7 @@ export async function handleTool(
         include: { location: { include: { palace: { select: { id: true, name: true } } } } },
       });
       if (!memories.length) return "No memories found.";
-      return memories.map(m =>
+      return memories.map((m: { id: string; content: string; lastAccessed: string | Date; location: { name: string; palace: { name: string } } }) =>
         `**${m.location.palace.name} › ${m.location.name}** (\`${m.id}\`)\n${m.content.slice(0, 300)}${m.content.length > 300 ? "…" : ""}\n_${new Date(m.lastAccessed).toLocaleDateString()}_`
       ).join("\n\n---\n\n");
     }

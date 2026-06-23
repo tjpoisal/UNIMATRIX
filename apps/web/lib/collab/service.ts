@@ -182,7 +182,7 @@ export async function getMessages(
     take: validated.limit,
   });
 
-  return messages.map((m) => ({
+  return messages.map((m: { id: string; roomId: string; senderId?: string | null; senderName?: string | null; senderType?: string | null; message: string; metadata: Record<string, unknown>; createdAt: Date }) => ({
     id: m.id,
     room_id: m.roomId,
     sender_id: m.senderId,
@@ -305,7 +305,7 @@ export async function listRooms(
     },
   });
 
-  return rooms.map((r) => ({
+  return rooms.map((r: { id: string; name: string; description?: string | null; isPrivate: boolean; createdAt: Date }) => ({
     id: r.id,
     name: r.name,
     description: r.description,
@@ -352,7 +352,7 @@ async function dispatchMessageWebhooks(
   // This gives you retries, DLQ, visibility, and avoids tying up the MCP/REST handler.
 
   await Promise.allSettled(
-    subscriptions.map(async (sub) => {
+  subscriptions.map(async (sub: { id: string; targetUrl: string; webhookSecret: string }) => {
       // Per-target delivery protection
       const deliveryRl = await rateLimiters.webhookDelivery(sub.targetUrl);
       if (!deliveryRl.success) {

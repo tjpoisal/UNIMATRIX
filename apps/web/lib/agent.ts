@@ -79,9 +79,37 @@ async function getMemoryContext(userId: string, palaceId: string, task: string):
       location: { select: { name: true } },
     },
   });
+  // Prisma schema stores memory content as Bytes and tags as MemoryTag[].
+  // Normalize here so the rest of the code can treat content as string and tags as string[].
+  const decodedMemories = (memories as any[]).map(m => {
+    // decode content from Buffer/Uint8Array if necessary
+    let contentStr: string;
+    const raw = m.content;
+    try {
+      if (typeof raw === 'string') contentStr = raw;
+      else if (raw instanceof Uint8Array) contentStr = new TextDecoder().decode(raw);
+      else if (Buffer.isBuffer(raw)) contentStr = raw.toString('utf8');
+      else contentStr = String(raw ?? '');
+    } catch (e) {
+      contentStr = String(raw ?? '');
+    }
+
+    // normalize tags: could be array of strings or array of { tag: string }
+    let tagsArr: string[] = [];
+    if (Array.isArray(m.tags)) {
+      tagsArr = m.tags.map((t: any) => (typeof t === 'string' ? t : t?.tag ?? String(t))).filter(Boolean);
+    }
+
+    return {
+      id: m.id,
+      content: contentStr,
+      tags: tagsArr,
+      location: m.location ?? { name: 'unknown' },
+    };
+  });
 
   // Score by keyword overlap
-  const scored = memories
+  const scored = decodedMemories
     .map(m => {
       const text = (m.content + ' ' + m.tags.join(' ')).toLowerCase();
       const hits = keywords.filter(k => text.includes(k)).length;
@@ -383,7 +411,7 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
   }
 
   // Decrypt keys
-  const providers = providerRecords.map(p => ({
+  const providers = providerRecords.map((p: { id: string; provider: string; model: string; keyEncrypted: string; keyIv: string }) => ({
     id: p.id,
     provider: p.provider,
     model: p.model,
@@ -426,15 +454,27 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
       });
     }
 
-    const providerNames = providers.map(p => p.provider).join(', ');
-    const memory = await prisma.memory.create({
+  const providerNames = providers.map((p: { provider: string }) => p.provider).join(', ');
+    const contentBytes = new Uint8Array(Buffer.from(`**Task:** ${task}\n\n**Mode:** ${mode} (${providerNames})\n\n**Synthesis:**\n${synthesis}`, 'utf8'));
+    const mem = await prisma.memory.create({
       data: {
         locationId: location.id,
-        content: `**Task:** ${task}\n\n**Mode:** ${mode} (${providerNames})\n\n**Synthesis:**\n${synthesis}`,
-        tags: ['agent', mode, ...providers.map(p => p.provider)],
+        content: contentBytes,
+        contentIv: new Uint8Array(16),
+        source: 'api',
+        status: 'active',
       },
     });
-    memoryId = memory.id;
+    memoryId = mem.id;
+
+    // write tags as MemoryTag rows
+    const agentTags = ['agent', mode, ...providers.map((p: { id: string; provider: string; model: string; apiKey: string }) => p.provider)];
+    if (agentTags.length > 0 && memoryId) {
+      await prisma.memoryTag.createMany({
+        data: agentTags.map((t: string) => ({ memoryId: memoryId as string, tag: t })),
+        skipDuplicates: true,
+      });
+    }
   }
 
   // Auto-magic: also store each individual LLM's response into its dedicated History location
@@ -467,12 +507,20 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
             });
           }
 
-          await prisma.memory.create({
+          const respContent = `**Task:** ${task}\n**Provider:** ${resp.provider} (${resp.model})\n\n${resp.response}`;
+          const respBytes = new Uint8Array(Buffer.from(respContent, 'utf8'));
+          const created = await prisma.memory.create({
             data: {
               locationId: histLoc.id,
-              content: `**Task:** ${task}\n**Provider:** ${resp.provider} (${resp.model})\n\n${resp.response}`,
-              tags: ['llm-history', resp.provider, 'agent', mode],
+              content: respBytes,
+              contentIv: new Uint8Array(16),
+              source: 'api',
+              status: 'active',
             },
+          });
+          await prisma.memoryTag.createMany({
+            data: ['llm-history', resp.provider, 'agent', mode].map(t => ({ memoryId: created.id, tag: t })),
+            skipDuplicates: true,
           });
         }
       } catch (e) {
