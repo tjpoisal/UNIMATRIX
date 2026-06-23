@@ -126,19 +126,35 @@ export async function POST(request: NextRequest) {
 
           case "memory":
             if (change.operation === "create") {
+              const contentBytes = new Uint8Array(Buffer.from(str(d.content), 'utf8'));
               const memory = await prisma.memory.create({
                 data: {
                   locationId: change.locationId!,
-                  content: str(d.content),
-                  tags: Array.isArray(d.tags) ? d.tags.map(String) : [],
+                  content: contentBytes,
+                  contentIv: new Uint8Array(16),
+                  source: 'sync',
+                  status: 'active',
                 },
               });
+
+              if (Array.isArray(d.tags) && d.tags.length > 0) {
+                await prisma.memoryTag.createMany({
+                  data: d.tags.map((t: unknown) => ({ memoryId: memory.id, tag: String(t) })),
+                  skipDuplicates: true,
+                });
+              }
+
               results.push({ id: change.id ?? memory.id, cloudId: memory.id, type: "memory" });
             } else if (change.operation === "update") {
-              await prisma.memory.update({
-                where: { id: change.id! },
-                data: { content: str(d.content), tags: Array.isArray(d.tags) ? d.tags.map(String) : [] },
-              });
+              const updatePayload: Record<string, unknown> = {};
+              if (d.content != null) updatePayload.content = new Uint8Array(Buffer.from(str(d.content), 'utf8'));
+              await prisma.memory.update({ where: { id: change.id! }, data: updatePayload });
+              if (Array.isArray(d.tags) && d.tags.length > 0) {
+                await prisma.memoryTag.createMany({
+                  data: d.tags.map((t: unknown) => ({ memoryId: change.id!, tag: String(t) })),
+                  skipDuplicates: true,
+                });
+              }
               results.push({ id: change.id!, type: "memory" });
             } else if (change.operation === "delete") {
               await prisma.memory.update({

@@ -141,7 +141,7 @@ export async function POST(
     }
 
     // args is optional in the payload; default to empty object
-    let safeArgs: Record<string, unknown> =
+    const safeArgs: Record<string, unknown> =
       args && typeof args === "object" && !Array.isArray(args) ? { ...args } : {};
 
     // Support top-level sourceLlm for non-MCP LLMs (e.g. Gemini, ChatGPT via REST tools)

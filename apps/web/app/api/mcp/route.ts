@@ -324,10 +324,26 @@ export async function handleTool(
       });
       if (!location) return "Location not found or access denied.";
 
+      const contentBytes = new Uint8Array(Buffer.from(content, 'utf8'));
       const memory = await prisma.memory.create({
-        data: { locationId, content, tags },
+        data: {
+          locationId,
+          content: contentBytes,
+          contentIv: new Uint8Array(16),
+          source: 'api',
+          status: 'active',
+        },
       });
-      return `Memory stored. ID: \`${memory.id}\`\n\nContent: ${memory.content}${sourceLlm ? ` (auto-filed for ${sourceLlm})` : ""}`;
+
+      if (tags && Array.isArray(tags) && tags.length > 0) {
+        await prisma.memoryTag.createMany({
+          data: tags.map((t: string) => ({ memoryId: memory.id, tag: t })),
+          skipDuplicates: true,
+        });
+      }
+
+      const decoded = Buffer.from(memory.content as Buffer).toString('utf8');
+      return `Memory stored. ID: \`${memory.id}\`\n\nContent: ${decoded}${sourceLlm ? ` (auto-filed for ${sourceLlm})` : ""}`;
     }
 
     // ── list_memories ─────────────────────────────────────────────────────────

@@ -69,7 +69,7 @@ export default function StatusPage() {
                 <div className="text-xs text-text-muted">45m</div>
               </div>
               <div className="mt-1 text-text-secondary">Brief degradation on vector search for a subset of users during a Neon maintenance window. Full recovery after failover.</div>
-              <a href="https://github.com/tjpoisal/UNIMATRIX/issues" target="_blank" className="text-xs text-accent hover:underline mt-2 inline-block">Postmortem notes →</a>
+              <a href="https://github.com/tjpoisal/UNIMATRIX/issues" target="_blank" className="text-xs text-accent hover:underline mt-2 inline-block" rel="noreferrer">Postmortem notes →</a>
             </div>
 
             <div className="border border-border/30 rounded-2xl p-5">
@@ -87,7 +87,7 @@ export default function StatusPage() {
         </div>
 
         <div className="mt-8 flex flex-wrap gap-4 text-sm">
-          <a href="https://github.com/tjpoisal/UNIMATRIX/issues" target="_blank" className="text-accent hover:underline">Report an issue on GitHub →</a>
+          <a href="https://github.com/tjpoisal/UNIMATRIX/issues" target="_blank" className="text-accent hover:underline" rel="noreferrer">Report an issue on GitHub →</a>
           <Link href="/security" className="text-accent hover:underline">Security &amp; Architecture</Link>
           <Link href="/docs/mcp" className="text-accent hover:underline">MCP Reference</Link>
         </div>

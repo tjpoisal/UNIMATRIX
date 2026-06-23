@@ -104,12 +104,19 @@ export async function POST(request: NextRequest) {
       });
       if (loc) {
         // Seed a note about auto-capture (idempotent enough)
-        await prisma.memory.create({
+        const seedContent = `Background import note for ${provider}: History will be automatically captured and organized on future uses of this LLM (via the @unimatrix/llm auto-log, agent tasks, or when the LLM calls remember with sourceLlm). For providers supporting history APIs, extend importRecentHistory.`;
+        const seed = await prisma.memory.create({
           data: {
             locationId: loc.id,
-            content: `Background import note for ${provider}: History will be automatically captured and organized on future uses of this LLM (via the @unimatrix/llm auto-log, agent tasks, or when the LLM calls remember with sourceLlm). For providers supporting history APIs, extend importRecentHistory.`,
-            tags: ['import-note', 'auto', provider, 'non-mcp-support'],
+            content: new Uint8Array(Buffer.from(seedContent, 'utf8')),
+            contentIv: new Uint8Array(16),
+            source: 'system',
+            status: 'active',
           },
+        });
+        await prisma.memoryTag.createMany({
+          data: ['import-note', 'auto', provider, 'non-mcp-support'].map(t => ({ memoryId: seed.id, tag: t })),
+          skipDuplicates: true,
         });
       }
     }
