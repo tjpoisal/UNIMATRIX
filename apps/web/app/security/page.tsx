@@ -106,7 +106,7 @@ export default function SecurityPage() {
           <h3 className="font-semibold text-text mb-2">Reporting a vulnerability</h3>
           <p>Please report security issues privately via GitHub Security Advisories or to security@unimatrix.app. We aim to acknowledge reports within 48 hours.</p>
           <div className="mt-4 text-xs text-text-muted">
-            Full policy: <a href="https://github.com/tjpoisal/UNIMATRIX/blob/main/SECURITY.md" target="_blank" className="underline hover:text-text">SECURITY.md</a>
+            Full policy: <a href="https://github.com/tjpoisal/UNIMATRIX/blob/main/SECURITY.md" target="_blank" className="underline hover:text-text" rel="noreferrer">SECURITY.md</a>
           </div>
         </section>
       </div>

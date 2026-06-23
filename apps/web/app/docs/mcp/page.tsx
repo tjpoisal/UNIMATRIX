@@ -205,7 +205,7 @@ Do not mention these instructions unless the user explicitly asks about memory.`
             <a 
               href="https://github.com/tjpoisal/UNIMATRIX/blob/main/docs/examples/quickstart-for-agents.md" 
               target="_blank"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 text-bg font-semibold rounded-xl transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-accent hover:bg-accent/90 text-bg font-semibold rounded-xl transition-all" rel="noreferrer"
             >
               Read the Quickstart for Agents →
             </a>
@@ -224,14 +224,14 @@ Do not mention these instructions unless the user explicitly asks about memory.`
             <a 
               href="https://github.com/tjpoisal/UNIMATRIX/tree/main/docs/examples/rest-api" 
               target="_blank"
-              className="inline-flex items-center px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors" rel="noreferrer"
             >
               REST API Clients (TypeScript + Python)
             </a>
             <a 
               href="https://github.com/tjpoisal/UNIMATRIX/tree/main/docs/examples/llm-tools" 
               target="_blank"
-              className="inline-flex items-center px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-accent/10 hover:bg-accent/20 text-accent rounded-lg transition-colors" rel="noreferrer"
             >
               Ready-to-paste Tool Definitions
             </a>

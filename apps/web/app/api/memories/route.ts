@@ -61,15 +61,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const memory = await prisma.memory.create({
+    const contentBytes = new Uint8Array(Buffer.from(content, 'utf8'));
+    const mem = await prisma.memory.create({
       data: {
         locationId: finalLocationId,
-        content,
-        tags: finalTags,
+        content: contentBytes,
+        contentIv: new Uint8Array(16),
+        source: 'api',
+        status: 'active',
       },
     });
 
-    return NextResponse.json(memory, { status: 201 });
+    if (finalTags.length > 0) {
+      await prisma.memoryTag.createMany({
+        data: finalTags.map((t: string) => ({ memoryId: mem.id, tag: t })),
+        skipDuplicates: true,
+      });
+    }
+
+    return NextResponse.json(mem, { status: 201 });
   } catch (error) {
     console.error("Memory POST error:", error);
     return NextResponse.json(
@@ -110,14 +120,20 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const updated = await prisma.memory.update({
-      where: { id },
-      data: {
-        ...(content && { content }),
-        ...(tags && { tags }),
-        lastAccessed: new Date(),
-      },
-    });
+  const updateData: Record<string, unknown> = { lastAccessed: new Date() };
+    if (content) {
+      updateData.content = new Uint8Array(Buffer.from(content, 'utf8'));
+    }
+
+    const updated = await prisma.memory.update({ where: { id }, data: updateData });
+
+    if (tags && Array.isArray(tags)) {
+      // Replace tags by creating any missing tag rows and leaving existing ones (simple approach)
+      await prisma.memoryTag.createMany({
+        data: tags.map((t: string) => ({ memoryId: id, tag: t })),
+        skipDuplicates: true,
+      });
+    }
 
     return NextResponse.json(updated);
   } catch (error) {
