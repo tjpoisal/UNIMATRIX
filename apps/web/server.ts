@@ -16,7 +16,7 @@
  *   PORT is provided automatically by Render / Railway / Fly.io etc.
  */
 
-import { createServer } from 'http';
+import { createServer, IncomingMessage } from 'http';
 import next from 'next';
 import { WebSocketServer, WebSocket } from 'ws';
 import { parse } from 'url';
@@ -59,8 +59,7 @@ app.prepare().then(() => {
     }
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  wss.on('connection', (ws: WebSocket, _request: any, roomId: string) => {
+  wss.on('connection', (ws: WebSocket, _request: IncomingMessage, roomId: string) => {
     console.log(`[WS] Client connected → room: ${roomId}`);
     // SECURITY NOTE (self-hosted / Railway / Fly):
     // The in-process WS has no authentication or org validation in this basic impl.

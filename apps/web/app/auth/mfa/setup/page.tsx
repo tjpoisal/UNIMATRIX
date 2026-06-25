@@ -11,7 +11,7 @@ export default function MFASetupPage() {
   const router = useRouter();
   const [state, setState] = useState<SetupState>('loading');
 
-  const [otpauthUrl, setOtpauthUrl] = useState('');
+  const [_otpauthUrl, _setOtpauthUrl] = useState('');
   const [secret, setSecret]         = useState('');
   const [qrDataUrl, setQrDataUrl]   = useState('');
   const [token, setToken]           = useState('');
@@ -26,7 +26,7 @@ export default function MFASetupPage() {
     fetch('/api/auth/mfa/enable', { method: 'POST' })
       .then((r) => r.json())
       .then(async (data) => {
-        setOtpauthUrl(data.otpauthUrl);
+  _setOtpauthUrl(data.otpauthUrl);
         setSecret(data.secret);
         const url = await QRCode.toDataURL(data.otpauthUrl, { width: 220, margin: 2 });
         setQrDataUrl(url);

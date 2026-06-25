@@ -12,6 +12,7 @@
 
 import { TOOLS as legacyMemoryTools, handleTool as legacyHandleTool } from '@/app/api/mcp/route';
 import { sendMessage, getMessages, subscribeWebhook, createRoom, listRooms } from '@/lib/collab/service';
+import type { GetMessagesInput } from '@/lib/collab/types';
 import type { OpenAITool } from '@/lib/mcp-client';
 
 const MCP_SERVER_URL = process.env.MCP_SERVER_URL ?? 'https://unimatrix-mcp.fly.dev';
@@ -123,12 +124,12 @@ export interface ToolExecutionContext {
 const registry = new Map<string, ToolDefinition>();
 
 // Register legacy memory tools (temporary — will be migrated)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-legacyMemoryTools.forEach((tool: any) => {
-  registry.set(tool.name, {
-    name: tool.name,
-    description: tool.description,
-    inputSchema: tool.inputSchema,
+legacyMemoryTools.forEach((tool: unknown) => {
+  const t = tool as { name: string; description?: string; inputSchema?: Record<string, unknown> };
+  registry.set(t.name, {
+    name: t.name,
+    description: t.description ?? '',
+    inputSchema: t.inputSchema ?? {},
   });
 });
 
@@ -271,30 +272,44 @@ async function executeCollabTool(
     }
 
     if (name === 'collab.list_rooms') {
-      const input = args.limit != null ? { limit: Number(args.limit) } : {};
+      const input = { limit: args.limit != null ? Number(args.limit) : 50 };
       const rooms = await listRooms(input, orgId);
       return { content: [{ type: 'text' as const, text: JSON.stringify(rooms) }] };
     }
 
     if (name === 'collab.send_message') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await sendMessage(args as any, orgId);
+      const msgArgs: Parameters<typeof sendMessage>[0] = {
+        room_id: String(args.room_id),
+        sender_id: (args.sender_id as string) ?? undefined,
+        sender_name: String(args.sender_name),
+        sender_type: (args.sender_type as 'human' | 'agent' | 'system') ?? 'human',
+        message: String(args.message),
+        metadata: (args.metadata as Record<string, unknown>) ?? {},
+      };
+      const result = await sendMessage(msgArgs, orgId);
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(result) }],
       };
     }
 
     if (name === 'collab.get_messages') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const messages = await getMessages(args as any, orgId);
+      const getArgs: GetMessagesInput = {
+        room_id: String(args.room_id),
+        since_id: args.since_id ? String(args.since_id) : undefined,
+        limit: args.limit ? Number(args.limit) : 50,
+      };
+      const messages = await getMessages(getArgs, orgId);
       return {
         content: [{ type: 'text', text: JSON.stringify(messages) }],
       };
     }
 
     if (name === 'collab.subscribe_webhook') {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = await subscribeWebhook(args as any, orgId);
+      const subArgs: Parameters<typeof subscribeWebhook>[0] = {
+        room_id: String(args.room_id),
+        target_url: String(args.target_url),
+      };
+      const result = await subscribeWebhook(subArgs, orgId);
       return {
         content: [{ type: 'text' as const, text: JSON.stringify(result) }],
       };
@@ -317,8 +332,7 @@ export function toOpenAITools(): OpenAITool[] {
     function: {
       name: tool.name,
       description: tool.description,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      parameters: tool.inputSchema as any,
+    parameters: tool.inputSchema as unknown as OpenAITool['function']['parameters'],
     },
   }));
 }

@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Zap, Shield, Cloud, Smartphone, Code2, Lock, Check } from 'lucide-react';
 
 export function MarketingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0e1030] via-[#1a1f3a] to-[#0e1030] text-white">
-      {/* Navigation */}
+      J.{/* Navigation */}
       <nav className="sticky top-0 z-50 bg-[#0e1030]/90 backdrop-blur-md border-b border-[#ff7a00]/20">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold">
@@ -40,9 +40,9 @@ export function MarketingPage() {
             <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
               Your AI Remembers<br /><span className="text-[#ff7a00]">Everything</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
               Start a conversation with ChatGPT on your iPhone. Pick up your iPad. Open Claude. Full context, zero re-explaining.
-              <strong> That's Unimatrix.</strong>
+              <strong> That&apos;s Unimatrix.</strong>
             </p>
 
             {/* CTA Button — Primary Conversion Point */}

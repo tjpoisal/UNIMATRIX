@@ -41,7 +41,8 @@ export default function MFASettings() {
 
   useEffect(() => {
     if (session?.user) {
-      setMfaEnabled(session.user.mfaEnabled ?? false);
+      // Defer setState to avoid synchronous state updates within the effect body
+      setTimeout(() => setMfaEnabled(session.user.mfaEnabled ?? false), 0);
     }
     // Fetch trusted-person config
     fetch('/api/auth/mfa/trusted-person')

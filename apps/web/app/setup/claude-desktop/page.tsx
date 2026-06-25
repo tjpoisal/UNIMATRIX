@@ -55,7 +55,7 @@ export default function ClaudeDesktopSetup() {
               <div>
                 <h2 className="text-2xl font-bold mb-4">Get Your API Key</h2>
                 <p className="text-[#94A3B8] mb-4">
-                  Go to your Unimatrix dashboard and copy your API key. You'll need this for authentication.
+                  Go to your Unimatrix dashboard and copy your API key. You&apos;ll need this for authentication.
                 </p>
                 <a
                   href="/dashboard/settings/integrations"
@@ -117,7 +117,7 @@ export default function ClaudeDesktopSetup() {
               <div>
                 <h2 className="text-2xl font-bold mb-4">Restart Claude Desktop</h2>
                 <p className="text-[#94A3B8] mb-4">
-                  Close Claude completely and reopen it. You should see a new "🏛️" icon (Unimatrix) in the tools menu.
+                  Close Claude completely and reopen it. You should see a new &quot;🏛️&quot; icon (Unimatrix) in the tools menu.
                 </p>
               </div>
             </div>
@@ -131,8 +131,8 @@ export default function ClaudeDesktopSetup() {
                 <h2 className="text-2xl font-bold mb-4">Test It Out</h2>
                 <p className="text-[#94A3B8] mb-4">Try these commands in Claude:</p>
                 <div className="bg-[#1F2937] border border-[#334155]/30 rounded-lg p-4 space-y-2">
-                  <p className="text-[#ff7a00]">@unimatrix recall "python recursion"</p>
-                  <p className="text-[#ff7a00]">@unimatrix remember "React hooks are state management"</p>
+                  <p className="text-[#ff7a00]">@unimatrix recall &quot;python recursion&quot;</p>
+                  <p className="text-[#ff7a00]">@unimatrix remember &quot;React hooks are state management&quot;</p>
                   <p className="text-[#ff7a00]">@unimatrix get_recent 10</p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function ClaudeDesktopSetup() {
           <h2 className="text-2xl font-bold mb-6">❓ Troubleshooting</h2>
           <div className="space-y-6">
             <div>
-              <h3 className="font-bold text-[#ff7a00] mb-2">Icon doesn't appear</h3>
+              <h3 className="font-bold text-[#ff7a00] mb-2">Icon doesn&apos;t appear</h3>
               <p className="text-[#94A3B8]">Try restarting Claude again. If still missing, check that your JSON syntax is correct in the config file.</p>
             </div>
             <div>
@@ -163,9 +163,9 @@ export default function ClaudeDesktopSetup() {
 
         {/* Next Steps */}
         <div className="bg-[#ff7a00]/10 border border-[#ff7a00]/30 rounded-lg p-8">
-          <h2 className="text-2xl font-bold mb-4">🎉 What's Next?</h2>
+          <h2 className="text-2xl font-bold mb-4">🎉 What&apos;s Next?</h2>
           <p className="text-[#94A3B8] mb-6">
-            You're all set! Claude can now recall your memories from across all your conversations. Try asking it to:
+            You&apos;re all set! Claude can now recall your memories from across all your conversations. Try asking it to:
           </p>
           <ul className="space-y-2 text-[#94A3B8] mb-6">
             <li>✓ Recall a specific memory by topic</li>

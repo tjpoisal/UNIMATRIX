@@ -48,6 +48,11 @@ export type AgentRun = $Result.DefaultSelection<Prisma.$AgentRunPayload>
  * 
  */
 export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
+/**
+ * Model StripeSubscription
+ * 
+ */
+export type StripeSubscription = $Result.DefaultSelection<Prisma.$StripeSubscriptionPayload>
 
 /**
  * Enums
@@ -295,6 +300,16 @@ export class PrismaClient<
     * ```
     */
   get auditLog(): Prisma.AuditLogDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.stripeSubscription`: Exposes CRUD operations for the **StripeSubscription** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more StripeSubscriptions
+    * const stripeSubscriptions = await prisma.stripeSubscription.findMany()
+    * ```
+    */
+  get stripeSubscription(): Prisma.StripeSubscriptionDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -742,7 +757,8 @@ export namespace Prisma {
     MemoryTag: 'MemoryTag',
     McpToken: 'McpToken',
     AgentRun: 'AgentRun',
-    AuditLog: 'AuditLog'
+    AuditLog: 'AuditLog',
+    StripeSubscription: 'StripeSubscription'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -761,7 +777,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "space" | "memory" | "memoryTag" | "mcpToken" | "agentRun" | "auditLog"
+      modelProps: "user" | "space" | "memory" | "memoryTag" | "mcpToken" | "agentRun" | "auditLog" | "stripeSubscription"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1283,6 +1299,80 @@ export namespace Prisma {
           }
         }
       }
+      StripeSubscription: {
+        payload: Prisma.$StripeSubscriptionPayload<ExtArgs>
+        fields: Prisma.StripeSubscriptionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StripeSubscriptionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StripeSubscriptionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>
+          }
+          findFirst: {
+            args: Prisma.StripeSubscriptionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StripeSubscriptionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>
+          }
+          findMany: {
+            args: Prisma.StripeSubscriptionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>[]
+          }
+          create: {
+            args: Prisma.StripeSubscriptionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>
+          }
+          createMany: {
+            args: Prisma.StripeSubscriptionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.StripeSubscriptionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>[]
+          }
+          delete: {
+            args: Prisma.StripeSubscriptionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>
+          }
+          update: {
+            args: Prisma.StripeSubscriptionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>
+          }
+          deleteMany: {
+            args: Prisma.StripeSubscriptionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StripeSubscriptionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.StripeSubscriptionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>[]
+          }
+          upsert: {
+            args: Prisma.StripeSubscriptionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$StripeSubscriptionPayload>
+          }
+          aggregate: {
+            args: Prisma.StripeSubscriptionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateStripeSubscription>
+          }
+          groupBy: {
+            args: Prisma.StripeSubscriptionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<StripeSubscriptionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StripeSubscriptionCountArgs<ExtArgs>
+            result: $Utils.Optional<StripeSubscriptionCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1386,6 +1476,7 @@ export namespace Prisma {
     mcpToken?: McpTokenOmit
     agentRun?: AgentRunOmit
     auditLog?: AuditLogOmit
+    stripeSubscription?: StripeSubscriptionOmit
   }
 
   /* Types for Logging */
@@ -1470,6 +1561,7 @@ export namespace Prisma {
     memories: number
     mcpTokens: number
     agentRuns: number
+    stripeSubscriptions: number
     auditLogs: number
   }
 
@@ -1478,6 +1570,7 @@ export namespace Prisma {
     memories?: boolean | UserCountOutputTypeCountMemoriesArgs
     mcpTokens?: boolean | UserCountOutputTypeCountMcpTokensArgs
     agentRuns?: boolean | UserCountOutputTypeCountAgentRunsArgs
+    stripeSubscriptions?: boolean | UserCountOutputTypeCountStripeSubscriptionsArgs
     auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
   }
 
@@ -1518,6 +1611,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountAgentRunsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AgentRunWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountStripeSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StripeSubscriptionWhereInput
   }
 
   /**
@@ -1811,6 +1911,7 @@ export namespace Prisma {
     memories?: boolean | User$memoriesArgs<ExtArgs>
     mcpTokens?: boolean | User$mcpTokensArgs<ExtArgs>
     agentRuns?: boolean | User$agentRunsArgs<ExtArgs>
+    stripeSubscriptions?: boolean | User$stripeSubscriptionsArgs<ExtArgs>
     auditLogs?: boolean | User$auditLogsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -1860,6 +1961,7 @@ export namespace Prisma {
     memories?: boolean | User$memoriesArgs<ExtArgs>
     mcpTokens?: boolean | User$mcpTokensArgs<ExtArgs>
     agentRuns?: boolean | User$agentRunsArgs<ExtArgs>
+    stripeSubscriptions?: boolean | User$stripeSubscriptionsArgs<ExtArgs>
     auditLogs?: boolean | User$auditLogsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -1873,6 +1975,7 @@ export namespace Prisma {
       memories: Prisma.$MemoryPayload<ExtArgs>[]
       mcpTokens: Prisma.$McpTokenPayload<ExtArgs>[]
       agentRuns: Prisma.$AgentRunPayload<ExtArgs>[]
+      stripeSubscriptions: Prisma.$StripeSubscriptionPayload<ExtArgs>[]
       auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -2284,6 +2387,7 @@ export namespace Prisma {
     memories<T extends User$memoriesArgs<ExtArgs> = {}>(args?: Subset<T, User$memoriesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MemoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mcpTokens<T extends User$mcpTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$mcpTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$McpTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     agentRuns<T extends User$agentRunsArgs<ExtArgs> = {}>(args?: Subset<T, User$agentRunsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    stripeSubscriptions<T extends User$stripeSubscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$stripeSubscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     auditLogs<T extends User$auditLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2808,6 +2912,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.stripeSubscriptions
+   */
+  export type User$stripeSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    where?: StripeSubscriptionWhereInput
+    orderBy?: StripeSubscriptionOrderByWithRelationInput | StripeSubscriptionOrderByWithRelationInput[]
+    cursor?: StripeSubscriptionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: StripeSubscriptionScalarFieldEnum | StripeSubscriptionScalarFieldEnum[]
+  }
+
+  /**
    * User.auditLogs
    */
   export type User$auditLogsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2868,6 +2996,7 @@ export namespace Prisma {
     name: string | null
     description: string | null
     isScratchpad: boolean | null
+    embedding: Bytes | null
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
@@ -2881,6 +3010,7 @@ export namespace Prisma {
     name: string | null
     description: string | null
     isScratchpad: boolean | null
+    embedding: Bytes | null
     createdAt: Date | null
     updatedAt: Date | null
     deletedAt: Date | null
@@ -2894,6 +3024,7 @@ export namespace Prisma {
     name: number
     description: number
     isScratchpad: number
+    embedding: number
     createdAt: number
     updatedAt: number
     deletedAt: number
@@ -2909,6 +3040,7 @@ export namespace Prisma {
     name?: true
     description?: true
     isScratchpad?: true
+    embedding?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -2922,6 +3054,7 @@ export namespace Prisma {
     name?: true
     description?: true
     isScratchpad?: true
+    embedding?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -2935,6 +3068,7 @@ export namespace Prisma {
     name?: true
     description?: true
     isScratchpad?: true
+    embedding?: true
     createdAt?: true
     updatedAt?: true
     deletedAt?: true
@@ -3021,6 +3155,7 @@ export namespace Prisma {
     name: string
     description: string | null
     isScratchpad: boolean
+    embedding: Bytes | null
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -3051,6 +3186,7 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isScratchpad?: boolean
+    embedding?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
@@ -3069,6 +3205,7 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isScratchpad?: boolean
+    embedding?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
@@ -3084,6 +3221,7 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isScratchpad?: boolean
+    embedding?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
@@ -3099,12 +3237,13 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isScratchpad?: boolean
+    embedding?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     deletedAt?: boolean
   }
 
-  export type SpaceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "parentId" | "orgId" | "name" | "description" | "isScratchpad" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["space"]>
+  export type SpaceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "parentId" | "orgId" | "name" | "description" | "isScratchpad" | "embedding" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["space"]>
   export type SpaceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     parent?: boolean | Space$parentArgs<ExtArgs>
@@ -3137,6 +3276,7 @@ export namespace Prisma {
       name: string
       description: string | null
       isScratchpad: boolean
+      embedding: Prisma.Bytes | null
       createdAt: Date
       updatedAt: Date
       deletedAt: Date | null
@@ -3574,6 +3714,7 @@ export namespace Prisma {
     readonly name: FieldRef<"Space", 'String'>
     readonly description: FieldRef<"Space", 'String'>
     readonly isScratchpad: FieldRef<"Space", 'Boolean'>
+    readonly embedding: FieldRef<"Space", 'Bytes'>
     readonly createdAt: FieldRef<"Space", 'DateTime'>
     readonly updatedAt: FieldRef<"Space", 'DateTime'>
     readonly deletedAt: FieldRef<"Space", 'DateTime'>
@@ -4086,6 +4227,7 @@ export namespace Prisma {
     content: Bytes | null
     contentIv: Bytes | null
     summary: string | null
+    embedding: Bytes | null
     status: $Enums.MemoryStatus | null
     supersededBy: string | null
     supersededAt: Date | null
@@ -4107,6 +4249,7 @@ export namespace Prisma {
     content: Bytes | null
     contentIv: Bytes | null
     summary: string | null
+    embedding: Bytes | null
     status: $Enums.MemoryStatus | null
     supersededBy: string | null
     supersededAt: Date | null
@@ -4128,6 +4271,7 @@ export namespace Prisma {
     content: number
     contentIv: number
     summary: number
+    embedding: number
     status: number
     supersededBy: number
     supersededAt: number
@@ -4159,6 +4303,7 @@ export namespace Prisma {
     content?: true
     contentIv?: true
     summary?: true
+    embedding?: true
     status?: true
     supersededBy?: true
     supersededAt?: true
@@ -4180,6 +4325,7 @@ export namespace Prisma {
     content?: true
     contentIv?: true
     summary?: true
+    embedding?: true
     status?: true
     supersededBy?: true
     supersededAt?: true
@@ -4201,6 +4347,7 @@ export namespace Prisma {
     content?: true
     contentIv?: true
     summary?: true
+    embedding?: true
     status?: true
     supersededBy?: true
     supersededAt?: true
@@ -4309,6 +4456,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary: string | null
+    embedding: Bytes | null
     status: $Enums.MemoryStatus
     supersededBy: string | null
     supersededAt: Date | null
@@ -4349,6 +4497,7 @@ export namespace Prisma {
     content?: boolean
     contentIv?: boolean
     summary?: boolean
+    embedding?: boolean
     status?: boolean
     supersededBy?: boolean
     supersededAt?: boolean
@@ -4374,6 +4523,7 @@ export namespace Prisma {
     content?: boolean
     contentIv?: boolean
     summary?: boolean
+    embedding?: boolean
     status?: boolean
     supersededBy?: boolean
     supersededAt?: boolean
@@ -4397,6 +4547,7 @@ export namespace Prisma {
     content?: boolean
     contentIv?: boolean
     summary?: boolean
+    embedding?: boolean
     status?: boolean
     supersededBy?: boolean
     supersededAt?: boolean
@@ -4420,6 +4571,7 @@ export namespace Prisma {
     content?: boolean
     contentIv?: boolean
     summary?: boolean
+    embedding?: boolean
     status?: boolean
     supersededBy?: boolean
     supersededAt?: boolean
@@ -4433,7 +4585,7 @@ export namespace Prisma {
     deletedAt?: boolean
   }
 
-  export type MemoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "spaceId" | "orgId" | "content" | "contentIv" | "summary" | "status" | "supersededBy" | "supersededAt" | "confidence" | "source" | "hint" | "indexedAt" | "expiresAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["memory"]>
+  export type MemoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "spaceId" | "orgId" | "content" | "contentIv" | "summary" | "embedding" | "status" | "supersededBy" | "supersededAt" | "confidence" | "source" | "hint" | "indexedAt" | "expiresAt" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["memory"]>
   export type MemoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     space?: boolean | Memory$spaceArgs<ExtArgs>
@@ -4464,6 +4616,7 @@ export namespace Prisma {
       content: Prisma.Bytes
       contentIv: Prisma.Bytes
       summary: string | null
+      embedding: Prisma.Bytes | null
       status: $Enums.MemoryStatus
       supersededBy: string | null
       supersededAt: Date | null
@@ -4908,6 +5061,7 @@ export namespace Prisma {
     readonly content: FieldRef<"Memory", 'Bytes'>
     readonly contentIv: FieldRef<"Memory", 'Bytes'>
     readonly summary: FieldRef<"Memory", 'String'>
+    readonly embedding: FieldRef<"Memory", 'Bytes'>
     readonly status: FieldRef<"Memory", 'MemoryStatus'>
     readonly supersededBy: FieldRef<"Memory", 'String'>
     readonly supersededAt: FieldRef<"Memory", 'DateTime'>
@@ -9838,6 +9992,1209 @@ export namespace Prisma {
 
 
   /**
+   * Model StripeSubscription
+   */
+
+  export type AggregateStripeSubscription = {
+    _count: StripeSubscriptionCountAggregateOutputType | null
+    _min: StripeSubscriptionMinAggregateOutputType | null
+    _max: StripeSubscriptionMaxAggregateOutputType | null
+  }
+
+  export type StripeSubscriptionMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    stripeCustomerId: string | null
+    stripeSubscriptionId: string | null
+    status: string | null
+    priceId: string | null
+    currentPeriodStart: Date | null
+    currentPeriodEnd: Date | null
+    trialStart: Date | null
+    trialEnd: Date | null
+    cancelAt: Date | null
+    cancelledAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type StripeSubscriptionMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    stripeCustomerId: string | null
+    stripeSubscriptionId: string | null
+    status: string | null
+    priceId: string | null
+    currentPeriodStart: Date | null
+    currentPeriodEnd: Date | null
+    trialStart: Date | null
+    trialEnd: Date | null
+    cancelAt: Date | null
+    cancelledAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type StripeSubscriptionCountAggregateOutputType = {
+    id: number
+    userId: number
+    stripeCustomerId: number
+    stripeSubscriptionId: number
+    status: number
+    priceId: number
+    currentPeriodStart: number
+    currentPeriodEnd: number
+    trialStart: number
+    trialEnd: number
+    cancelAt: number
+    cancelledAt: number
+    metadata: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type StripeSubscriptionMinAggregateInputType = {
+    id?: true
+    userId?: true
+    stripeCustomerId?: true
+    stripeSubscriptionId?: true
+    status?: true
+    priceId?: true
+    currentPeriodStart?: true
+    currentPeriodEnd?: true
+    trialStart?: true
+    trialEnd?: true
+    cancelAt?: true
+    cancelledAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type StripeSubscriptionMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    stripeCustomerId?: true
+    stripeSubscriptionId?: true
+    status?: true
+    priceId?: true
+    currentPeriodStart?: true
+    currentPeriodEnd?: true
+    trialStart?: true
+    trialEnd?: true
+    cancelAt?: true
+    cancelledAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type StripeSubscriptionCountAggregateInputType = {
+    id?: true
+    userId?: true
+    stripeCustomerId?: true
+    stripeSubscriptionId?: true
+    status?: true
+    priceId?: true
+    currentPeriodStart?: true
+    currentPeriodEnd?: true
+    trialStart?: true
+    trialEnd?: true
+    cancelAt?: true
+    cancelledAt?: true
+    metadata?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type StripeSubscriptionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StripeSubscription to aggregate.
+     */
+    where?: StripeSubscriptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StripeSubscriptions to fetch.
+     */
+    orderBy?: StripeSubscriptionOrderByWithRelationInput | StripeSubscriptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StripeSubscriptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StripeSubscriptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StripeSubscriptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned StripeSubscriptions
+    **/
+    _count?: true | StripeSubscriptionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StripeSubscriptionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StripeSubscriptionMaxAggregateInputType
+  }
+
+  export type GetStripeSubscriptionAggregateType<T extends StripeSubscriptionAggregateArgs> = {
+        [P in keyof T & keyof AggregateStripeSubscription]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStripeSubscription[P]>
+      : GetScalarType<T[P], AggregateStripeSubscription[P]>
+  }
+
+
+
+
+  export type StripeSubscriptionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StripeSubscriptionWhereInput
+    orderBy?: StripeSubscriptionOrderByWithAggregationInput | StripeSubscriptionOrderByWithAggregationInput[]
+    by: StripeSubscriptionScalarFieldEnum[] | StripeSubscriptionScalarFieldEnum
+    having?: StripeSubscriptionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StripeSubscriptionCountAggregateInputType | true
+    _min?: StripeSubscriptionMinAggregateInputType
+    _max?: StripeSubscriptionMaxAggregateInputType
+  }
+
+  export type StripeSubscriptionGroupByOutputType = {
+    id: string
+    userId: string | null
+    stripeCustomerId: string
+    stripeSubscriptionId: string
+    status: string
+    priceId: string | null
+    currentPeriodStart: Date | null
+    currentPeriodEnd: Date | null
+    trialStart: Date | null
+    trialEnd: Date | null
+    cancelAt: Date | null
+    cancelledAt: Date | null
+    metadata: JsonValue | null
+    createdAt: Date
+    updatedAt: Date
+    _count: StripeSubscriptionCountAggregateOutputType | null
+    _min: StripeSubscriptionMinAggregateOutputType | null
+    _max: StripeSubscriptionMaxAggregateOutputType | null
+  }
+
+  type GetStripeSubscriptionGroupByPayload<T extends StripeSubscriptionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StripeSubscriptionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StripeSubscriptionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StripeSubscriptionGroupByOutputType[P]>
+            : GetScalarType<T[P], StripeSubscriptionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StripeSubscriptionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    stripeCustomerId?: boolean
+    stripeSubscriptionId?: boolean
+    status?: boolean
+    priceId?: boolean
+    currentPeriodStart?: boolean
+    currentPeriodEnd?: boolean
+    trialStart?: boolean
+    trialEnd?: boolean
+    cancelAt?: boolean
+    cancelledAt?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | StripeSubscription$userArgs<ExtArgs>
+  }, ExtArgs["result"]["stripeSubscription"]>
+
+  export type StripeSubscriptionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    stripeCustomerId?: boolean
+    stripeSubscriptionId?: boolean
+    status?: boolean
+    priceId?: boolean
+    currentPeriodStart?: boolean
+    currentPeriodEnd?: boolean
+    trialStart?: boolean
+    trialEnd?: boolean
+    cancelAt?: boolean
+    cancelledAt?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | StripeSubscription$userArgs<ExtArgs>
+  }, ExtArgs["result"]["stripeSubscription"]>
+
+  export type StripeSubscriptionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    stripeCustomerId?: boolean
+    stripeSubscriptionId?: boolean
+    status?: boolean
+    priceId?: boolean
+    currentPeriodStart?: boolean
+    currentPeriodEnd?: boolean
+    trialStart?: boolean
+    trialEnd?: boolean
+    cancelAt?: boolean
+    cancelledAt?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | StripeSubscription$userArgs<ExtArgs>
+  }, ExtArgs["result"]["stripeSubscription"]>
+
+  export type StripeSubscriptionSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    stripeCustomerId?: boolean
+    stripeSubscriptionId?: boolean
+    status?: boolean
+    priceId?: boolean
+    currentPeriodStart?: boolean
+    currentPeriodEnd?: boolean
+    trialStart?: boolean
+    trialEnd?: boolean
+    cancelAt?: boolean
+    cancelledAt?: boolean
+    metadata?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type StripeSubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "stripeCustomerId" | "stripeSubscriptionId" | "status" | "priceId" | "currentPeriodStart" | "currentPeriodEnd" | "trialStart" | "trialEnd" | "cancelAt" | "cancelledAt" | "metadata" | "createdAt" | "updatedAt", ExtArgs["result"]["stripeSubscription"]>
+  export type StripeSubscriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | StripeSubscription$userArgs<ExtArgs>
+  }
+  export type StripeSubscriptionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | StripeSubscription$userArgs<ExtArgs>
+  }
+  export type StripeSubscriptionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | StripeSubscription$userArgs<ExtArgs>
+  }
+
+  export type $StripeSubscriptionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "StripeSubscription"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string | null
+      stripeCustomerId: string
+      stripeSubscriptionId: string
+      status: string
+      priceId: string | null
+      currentPeriodStart: Date | null
+      currentPeriodEnd: Date | null
+      trialStart: Date | null
+      trialEnd: Date | null
+      cancelAt: Date | null
+      cancelledAt: Date | null
+      metadata: Prisma.JsonValue | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["stripeSubscription"]>
+    composites: {}
+  }
+
+  type StripeSubscriptionGetPayload<S extends boolean | null | undefined | StripeSubscriptionDefaultArgs> = $Result.GetResult<Prisma.$StripeSubscriptionPayload, S>
+
+  type StripeSubscriptionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<StripeSubscriptionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: StripeSubscriptionCountAggregateInputType | true
+    }
+
+  export interface StripeSubscriptionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['StripeSubscription'], meta: { name: 'StripeSubscription' } }
+    /**
+     * Find zero or one StripeSubscription that matches the filter.
+     * @param {StripeSubscriptionFindUniqueArgs} args - Arguments to find a StripeSubscription
+     * @example
+     * // Get one StripeSubscription
+     * const stripeSubscription = await prisma.stripeSubscription.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends StripeSubscriptionFindUniqueArgs>(args: SelectSubset<T, StripeSubscriptionFindUniqueArgs<ExtArgs>>): Prisma__StripeSubscriptionClient<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one StripeSubscription that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {StripeSubscriptionFindUniqueOrThrowArgs} args - Arguments to find a StripeSubscription
+     * @example
+     * // Get one StripeSubscription
+     * const stripeSubscription = await prisma.stripeSubscription.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends StripeSubscriptionFindUniqueOrThrowArgs>(args: SelectSubset<T, StripeSubscriptionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__StripeSubscriptionClient<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StripeSubscription that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StripeSubscriptionFindFirstArgs} args - Arguments to find a StripeSubscription
+     * @example
+     * // Get one StripeSubscription
+     * const stripeSubscription = await prisma.stripeSubscription.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends StripeSubscriptionFindFirstArgs>(args?: SelectSubset<T, StripeSubscriptionFindFirstArgs<ExtArgs>>): Prisma__StripeSubscriptionClient<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first StripeSubscription that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StripeSubscriptionFindFirstOrThrowArgs} args - Arguments to find a StripeSubscription
+     * @example
+     * // Get one StripeSubscription
+     * const stripeSubscription = await prisma.stripeSubscription.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends StripeSubscriptionFindFirstOrThrowArgs>(args?: SelectSubset<T, StripeSubscriptionFindFirstOrThrowArgs<ExtArgs>>): Prisma__StripeSubscriptionClient<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more StripeSubscriptions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StripeSubscriptionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all StripeSubscriptions
+     * const stripeSubscriptions = await prisma.stripeSubscription.findMany()
+     * 
+     * // Get first 10 StripeSubscriptions
+     * const stripeSubscriptions = await prisma.stripeSubscription.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const stripeSubscriptionWithIdOnly = await prisma.stripeSubscription.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends StripeSubscriptionFindManyArgs>(args?: SelectSubset<T, StripeSubscriptionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a StripeSubscription.
+     * @param {StripeSubscriptionCreateArgs} args - Arguments to create a StripeSubscription.
+     * @example
+     * // Create one StripeSubscription
+     * const StripeSubscription = await prisma.stripeSubscription.create({
+     *   data: {
+     *     // ... data to create a StripeSubscription
+     *   }
+     * })
+     * 
+     */
+    create<T extends StripeSubscriptionCreateArgs>(args: SelectSubset<T, StripeSubscriptionCreateArgs<ExtArgs>>): Prisma__StripeSubscriptionClient<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many StripeSubscriptions.
+     * @param {StripeSubscriptionCreateManyArgs} args - Arguments to create many StripeSubscriptions.
+     * @example
+     * // Create many StripeSubscriptions
+     * const stripeSubscription = await prisma.stripeSubscription.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends StripeSubscriptionCreateManyArgs>(args?: SelectSubset<T, StripeSubscriptionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many StripeSubscriptions and returns the data saved in the database.
+     * @param {StripeSubscriptionCreateManyAndReturnArgs} args - Arguments to create many StripeSubscriptions.
+     * @example
+     * // Create many StripeSubscriptions
+     * const stripeSubscription = await prisma.stripeSubscription.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many StripeSubscriptions and only return the `id`
+     * const stripeSubscriptionWithIdOnly = await prisma.stripeSubscription.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends StripeSubscriptionCreateManyAndReturnArgs>(args?: SelectSubset<T, StripeSubscriptionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a StripeSubscription.
+     * @param {StripeSubscriptionDeleteArgs} args - Arguments to delete one StripeSubscription.
+     * @example
+     * // Delete one StripeSubscription
+     * const StripeSubscription = await prisma.stripeSubscription.delete({
+     *   where: {
+     *     // ... filter to delete one StripeSubscription
+     *   }
+     * })
+     * 
+     */
+    delete<T extends StripeSubscriptionDeleteArgs>(args: SelectSubset<T, StripeSubscriptionDeleteArgs<ExtArgs>>): Prisma__StripeSubscriptionClient<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one StripeSubscription.
+     * @param {StripeSubscriptionUpdateArgs} args - Arguments to update one StripeSubscription.
+     * @example
+     * // Update one StripeSubscription
+     * const stripeSubscription = await prisma.stripeSubscription.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends StripeSubscriptionUpdateArgs>(args: SelectSubset<T, StripeSubscriptionUpdateArgs<ExtArgs>>): Prisma__StripeSubscriptionClient<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more StripeSubscriptions.
+     * @param {StripeSubscriptionDeleteManyArgs} args - Arguments to filter StripeSubscriptions to delete.
+     * @example
+     * // Delete a few StripeSubscriptions
+     * const { count } = await prisma.stripeSubscription.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends StripeSubscriptionDeleteManyArgs>(args?: SelectSubset<T, StripeSubscriptionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StripeSubscriptions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StripeSubscriptionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many StripeSubscriptions
+     * const stripeSubscription = await prisma.stripeSubscription.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends StripeSubscriptionUpdateManyArgs>(args: SelectSubset<T, StripeSubscriptionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more StripeSubscriptions and returns the data updated in the database.
+     * @param {StripeSubscriptionUpdateManyAndReturnArgs} args - Arguments to update many StripeSubscriptions.
+     * @example
+     * // Update many StripeSubscriptions
+     * const stripeSubscription = await prisma.stripeSubscription.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more StripeSubscriptions and only return the `id`
+     * const stripeSubscriptionWithIdOnly = await prisma.stripeSubscription.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends StripeSubscriptionUpdateManyAndReturnArgs>(args: SelectSubset<T, StripeSubscriptionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one StripeSubscription.
+     * @param {StripeSubscriptionUpsertArgs} args - Arguments to update or create a StripeSubscription.
+     * @example
+     * // Update or create a StripeSubscription
+     * const stripeSubscription = await prisma.stripeSubscription.upsert({
+     *   create: {
+     *     // ... data to create a StripeSubscription
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the StripeSubscription we want to update
+     *   }
+     * })
+     */
+    upsert<T extends StripeSubscriptionUpsertArgs>(args: SelectSubset<T, StripeSubscriptionUpsertArgs<ExtArgs>>): Prisma__StripeSubscriptionClient<$Result.GetResult<Prisma.$StripeSubscriptionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of StripeSubscriptions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StripeSubscriptionCountArgs} args - Arguments to filter StripeSubscriptions to count.
+     * @example
+     * // Count the number of StripeSubscriptions
+     * const count = await prisma.stripeSubscription.count({
+     *   where: {
+     *     // ... the filter for the StripeSubscriptions we want to count
+     *   }
+     * })
+    **/
+    count<T extends StripeSubscriptionCountArgs>(
+      args?: Subset<T, StripeSubscriptionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StripeSubscriptionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a StripeSubscription.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StripeSubscriptionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StripeSubscriptionAggregateArgs>(args: Subset<T, StripeSubscriptionAggregateArgs>): Prisma.PrismaPromise<GetStripeSubscriptionAggregateType<T>>
+
+    /**
+     * Group by StripeSubscription.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StripeSubscriptionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StripeSubscriptionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StripeSubscriptionGroupByArgs['orderBy'] }
+        : { orderBy?: StripeSubscriptionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StripeSubscriptionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStripeSubscriptionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the StripeSubscription model
+   */
+  readonly fields: StripeSubscriptionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for StripeSubscription.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StripeSubscriptionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends StripeSubscription$userArgs<ExtArgs> = {}>(args?: Subset<T, StripeSubscription$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the StripeSubscription model
+   */
+  interface StripeSubscriptionFieldRefs {
+    readonly id: FieldRef<"StripeSubscription", 'String'>
+    readonly userId: FieldRef<"StripeSubscription", 'String'>
+    readonly stripeCustomerId: FieldRef<"StripeSubscription", 'String'>
+    readonly stripeSubscriptionId: FieldRef<"StripeSubscription", 'String'>
+    readonly status: FieldRef<"StripeSubscription", 'String'>
+    readonly priceId: FieldRef<"StripeSubscription", 'String'>
+    readonly currentPeriodStart: FieldRef<"StripeSubscription", 'DateTime'>
+    readonly currentPeriodEnd: FieldRef<"StripeSubscription", 'DateTime'>
+    readonly trialStart: FieldRef<"StripeSubscription", 'DateTime'>
+    readonly trialEnd: FieldRef<"StripeSubscription", 'DateTime'>
+    readonly cancelAt: FieldRef<"StripeSubscription", 'DateTime'>
+    readonly cancelledAt: FieldRef<"StripeSubscription", 'DateTime'>
+    readonly metadata: FieldRef<"StripeSubscription", 'Json'>
+    readonly createdAt: FieldRef<"StripeSubscription", 'DateTime'>
+    readonly updatedAt: FieldRef<"StripeSubscription", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * StripeSubscription findUnique
+   */
+  export type StripeSubscriptionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which StripeSubscription to fetch.
+     */
+    where: StripeSubscriptionWhereUniqueInput
+  }
+
+  /**
+   * StripeSubscription findUniqueOrThrow
+   */
+  export type StripeSubscriptionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which StripeSubscription to fetch.
+     */
+    where: StripeSubscriptionWhereUniqueInput
+  }
+
+  /**
+   * StripeSubscription findFirst
+   */
+  export type StripeSubscriptionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which StripeSubscription to fetch.
+     */
+    where?: StripeSubscriptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StripeSubscriptions to fetch.
+     */
+    orderBy?: StripeSubscriptionOrderByWithRelationInput | StripeSubscriptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StripeSubscriptions.
+     */
+    cursor?: StripeSubscriptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StripeSubscriptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StripeSubscriptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StripeSubscriptions.
+     */
+    distinct?: StripeSubscriptionScalarFieldEnum | StripeSubscriptionScalarFieldEnum[]
+  }
+
+  /**
+   * StripeSubscription findFirstOrThrow
+   */
+  export type StripeSubscriptionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which StripeSubscription to fetch.
+     */
+    where?: StripeSubscriptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StripeSubscriptions to fetch.
+     */
+    orderBy?: StripeSubscriptionOrderByWithRelationInput | StripeSubscriptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for StripeSubscriptions.
+     */
+    cursor?: StripeSubscriptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StripeSubscriptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StripeSubscriptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of StripeSubscriptions.
+     */
+    distinct?: StripeSubscriptionScalarFieldEnum | StripeSubscriptionScalarFieldEnum[]
+  }
+
+  /**
+   * StripeSubscription findMany
+   */
+  export type StripeSubscriptionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * Filter, which StripeSubscriptions to fetch.
+     */
+    where?: StripeSubscriptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of StripeSubscriptions to fetch.
+     */
+    orderBy?: StripeSubscriptionOrderByWithRelationInput | StripeSubscriptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing StripeSubscriptions.
+     */
+    cursor?: StripeSubscriptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` StripeSubscriptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` StripeSubscriptions.
+     */
+    skip?: number
+    distinct?: StripeSubscriptionScalarFieldEnum | StripeSubscriptionScalarFieldEnum[]
+  }
+
+  /**
+   * StripeSubscription create
+   */
+  export type StripeSubscriptionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a StripeSubscription.
+     */
+    data: XOR<StripeSubscriptionCreateInput, StripeSubscriptionUncheckedCreateInput>
+  }
+
+  /**
+   * StripeSubscription createMany
+   */
+  export type StripeSubscriptionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many StripeSubscriptions.
+     */
+    data: StripeSubscriptionCreateManyInput | StripeSubscriptionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * StripeSubscription createManyAndReturn
+   */
+  export type StripeSubscriptionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * The data used to create many StripeSubscriptions.
+     */
+    data: StripeSubscriptionCreateManyInput | StripeSubscriptionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StripeSubscription update
+   */
+  export type StripeSubscriptionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a StripeSubscription.
+     */
+    data: XOR<StripeSubscriptionUpdateInput, StripeSubscriptionUncheckedUpdateInput>
+    /**
+     * Choose, which StripeSubscription to update.
+     */
+    where: StripeSubscriptionWhereUniqueInput
+  }
+
+  /**
+   * StripeSubscription updateMany
+   */
+  export type StripeSubscriptionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update StripeSubscriptions.
+     */
+    data: XOR<StripeSubscriptionUpdateManyMutationInput, StripeSubscriptionUncheckedUpdateManyInput>
+    /**
+     * Filter which StripeSubscriptions to update
+     */
+    where?: StripeSubscriptionWhereInput
+    /**
+     * Limit how many StripeSubscriptions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * StripeSubscription updateManyAndReturn
+   */
+  export type StripeSubscriptionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * The data used to update StripeSubscriptions.
+     */
+    data: XOR<StripeSubscriptionUpdateManyMutationInput, StripeSubscriptionUncheckedUpdateManyInput>
+    /**
+     * Filter which StripeSubscriptions to update
+     */
+    where?: StripeSubscriptionWhereInput
+    /**
+     * Limit how many StripeSubscriptions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * StripeSubscription upsert
+   */
+  export type StripeSubscriptionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the StripeSubscription to update in case it exists.
+     */
+    where: StripeSubscriptionWhereUniqueInput
+    /**
+     * In case the StripeSubscription found by the `where` argument doesn't exist, create a new StripeSubscription with this data.
+     */
+    create: XOR<StripeSubscriptionCreateInput, StripeSubscriptionUncheckedCreateInput>
+    /**
+     * In case the StripeSubscription was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StripeSubscriptionUpdateInput, StripeSubscriptionUncheckedUpdateInput>
+  }
+
+  /**
+   * StripeSubscription delete
+   */
+  export type StripeSubscriptionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+    /**
+     * Filter which StripeSubscription to delete.
+     */
+    where: StripeSubscriptionWhereUniqueInput
+  }
+
+  /**
+   * StripeSubscription deleteMany
+   */
+  export type StripeSubscriptionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which StripeSubscriptions to delete
+     */
+    where?: StripeSubscriptionWhereInput
+    /**
+     * Limit how many StripeSubscriptions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * StripeSubscription.user
+   */
+  export type StripeSubscription$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * StripeSubscription without action
+   */
+  export type StripeSubscriptionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StripeSubscription
+     */
+    select?: StripeSubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the StripeSubscription
+     */
+    omit?: StripeSubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: StripeSubscriptionInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -9875,6 +11232,7 @@ export namespace Prisma {
     name: 'name',
     description: 'description',
     isScratchpad: 'isScratchpad',
+    embedding: 'embedding',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     deletedAt: 'deletedAt'
@@ -9891,6 +11249,7 @@ export namespace Prisma {
     content: 'content',
     contentIv: 'contentIv',
     summary: 'summary',
+    embedding: 'embedding',
     status: 'status',
     supersededBy: 'supersededBy',
     supersededAt: 'supersededAt',
@@ -9964,6 +11323,27 @@ export namespace Prisma {
   };
 
   export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+  export const StripeSubscriptionScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    stripeCustomerId: 'stripeCustomerId',
+    stripeSubscriptionId: 'stripeSubscriptionId',
+    status: 'status',
+    priceId: 'priceId',
+    currentPeriodStart: 'currentPeriodStart',
+    currentPeriodEnd: 'currentPeriodEnd',
+    trialStart: 'trialStart',
+    trialEnd: 'trialEnd',
+    cancelAt: 'cancelAt',
+    cancelledAt: 'cancelledAt',
+    metadata: 'metadata',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type StripeSubscriptionScalarFieldEnum = (typeof StripeSubscriptionScalarFieldEnum)[keyof typeof StripeSubscriptionScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -10194,6 +11574,7 @@ export namespace Prisma {
     memories?: MemoryListRelationFilter
     mcpTokens?: McpTokenListRelationFilter
     agentRuns?: AgentRunListRelationFilter
+    stripeSubscriptions?: StripeSubscriptionListRelationFilter
     auditLogs?: AuditLogListRelationFilter
   }
 
@@ -10212,6 +11593,7 @@ export namespace Prisma {
     memories?: MemoryOrderByRelationAggregateInput
     mcpTokens?: McpTokenOrderByRelationAggregateInput
     agentRuns?: AgentRunOrderByRelationAggregateInput
+    stripeSubscriptions?: StripeSubscriptionOrderByRelationAggregateInput
     auditLogs?: AuditLogOrderByRelationAggregateInput
   }
 
@@ -10233,6 +11615,7 @@ export namespace Prisma {
     memories?: MemoryListRelationFilter
     mcpTokens?: McpTokenListRelationFilter
     agentRuns?: AgentRunListRelationFilter
+    stripeSubscriptions?: StripeSubscriptionListRelationFilter
     auditLogs?: AuditLogListRelationFilter
   }, "id" | "clerk_id" | "email" | "stripeCustomerId">
 
@@ -10279,6 +11662,7 @@ export namespace Prisma {
     name?: StringFilter<"Space"> | string
     description?: StringNullableFilter<"Space"> | string | null
     isScratchpad?: BoolFilter<"Space"> | boolean
+    embedding?: BytesNullableFilter<"Space"> | Bytes | null
     createdAt?: DateTimeFilter<"Space"> | Date | string
     updatedAt?: DateTimeFilter<"Space"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Space"> | Date | string | null
@@ -10296,6 +11680,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     isScratchpad?: SortOrder
+    embedding?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
@@ -10316,6 +11701,7 @@ export namespace Prisma {
     name?: StringFilter<"Space"> | string
     description?: StringNullableFilter<"Space"> | string | null
     isScratchpad?: BoolFilter<"Space"> | boolean
+    embedding?: BytesNullableFilter<"Space"> | Bytes | null
     createdAt?: DateTimeFilter<"Space"> | Date | string
     updatedAt?: DateTimeFilter<"Space"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Space"> | Date | string | null
@@ -10333,6 +11719,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     isScratchpad?: SortOrder
+    embedding?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrderInput | SortOrder
@@ -10352,6 +11739,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Space"> | string
     description?: StringNullableWithAggregatesFilter<"Space"> | string | null
     isScratchpad?: BoolWithAggregatesFilter<"Space"> | boolean
+    embedding?: BytesNullableWithAggregatesFilter<"Space"> | Bytes | null
     createdAt?: DateTimeWithAggregatesFilter<"Space"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Space"> | Date | string
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Space"> | Date | string | null
@@ -10368,6 +11756,7 @@ export namespace Prisma {
     content?: BytesFilter<"Memory"> | Bytes
     contentIv?: BytesFilter<"Memory"> | Bytes
     summary?: StringNullableFilter<"Memory"> | string | null
+    embedding?: BytesNullableFilter<"Memory"> | Bytes | null
     status?: EnumMemoryStatusFilter<"Memory"> | $Enums.MemoryStatus
     supersededBy?: UuidNullableFilter<"Memory"> | string | null
     supersededAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
@@ -10392,6 +11781,7 @@ export namespace Prisma {
     content?: SortOrder
     contentIv?: SortOrder
     summary?: SortOrderInput | SortOrder
+    embedding?: SortOrderInput | SortOrder
     status?: SortOrder
     supersededBy?: SortOrderInput | SortOrder
     supersededAt?: SortOrderInput | SortOrder
@@ -10419,6 +11809,7 @@ export namespace Prisma {
     content?: BytesFilter<"Memory"> | Bytes
     contentIv?: BytesFilter<"Memory"> | Bytes
     summary?: StringNullableFilter<"Memory"> | string | null
+    embedding?: BytesNullableFilter<"Memory"> | Bytes | null
     status?: EnumMemoryStatusFilter<"Memory"> | $Enums.MemoryStatus
     supersededBy?: UuidNullableFilter<"Memory"> | string | null
     supersededAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
@@ -10443,6 +11834,7 @@ export namespace Prisma {
     content?: SortOrder
     contentIv?: SortOrder
     summary?: SortOrderInput | SortOrder
+    embedding?: SortOrderInput | SortOrder
     status?: SortOrder
     supersededBy?: SortOrderInput | SortOrder
     supersededAt?: SortOrderInput | SortOrder
@@ -10472,6 +11864,7 @@ export namespace Prisma {
     content?: BytesWithAggregatesFilter<"Memory"> | Bytes
     contentIv?: BytesWithAggregatesFilter<"Memory"> | Bytes
     summary?: StringNullableWithAggregatesFilter<"Memory"> | string | null
+    embedding?: BytesNullableWithAggregatesFilter<"Memory"> | Bytes | null
     status?: EnumMemoryStatusWithAggregatesFilter<"Memory"> | $Enums.MemoryStatus
     supersededBy?: UuidNullableWithAggregatesFilter<"Memory"> | string | null
     supersededAt?: DateTimeNullableWithAggregatesFilter<"Memory"> | Date | string | null
@@ -10783,6 +12176,111 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"AuditLog"> | Date | string
   }
 
+  export type StripeSubscriptionWhereInput = {
+    AND?: StripeSubscriptionWhereInput | StripeSubscriptionWhereInput[]
+    OR?: StripeSubscriptionWhereInput[]
+    NOT?: StripeSubscriptionWhereInput | StripeSubscriptionWhereInput[]
+    id?: StringFilter<"StripeSubscription"> | string
+    userId?: UuidNullableFilter<"StripeSubscription"> | string | null
+    stripeCustomerId?: StringFilter<"StripeSubscription"> | string
+    stripeSubscriptionId?: StringFilter<"StripeSubscription"> | string
+    status?: StringFilter<"StripeSubscription"> | string
+    priceId?: StringNullableFilter<"StripeSubscription"> | string | null
+    currentPeriodStart?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    currentPeriodEnd?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    trialStart?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    trialEnd?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    cancelAt?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    cancelledAt?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    metadata?: JsonNullableFilter<"StripeSubscription">
+    createdAt?: DateTimeFilter<"StripeSubscription"> | Date | string
+    updatedAt?: DateTimeFilter<"StripeSubscription"> | Date | string
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type StripeSubscriptionOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    stripeCustomerId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    status?: SortOrder
+    priceId?: SortOrderInput | SortOrder
+    currentPeriodStart?: SortOrderInput | SortOrder
+    currentPeriodEnd?: SortOrderInput | SortOrder
+    trialStart?: SortOrderInput | SortOrder
+    trialEnd?: SortOrderInput | SortOrder
+    cancelAt?: SortOrderInput | SortOrder
+    cancelledAt?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type StripeSubscriptionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    stripeCustomerId?: string
+    stripeSubscriptionId?: string
+    AND?: StripeSubscriptionWhereInput | StripeSubscriptionWhereInput[]
+    OR?: StripeSubscriptionWhereInput[]
+    NOT?: StripeSubscriptionWhereInput | StripeSubscriptionWhereInput[]
+    userId?: UuidNullableFilter<"StripeSubscription"> | string | null
+    status?: StringFilter<"StripeSubscription"> | string
+    priceId?: StringNullableFilter<"StripeSubscription"> | string | null
+    currentPeriodStart?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    currentPeriodEnd?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    trialStart?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    trialEnd?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    cancelAt?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    cancelledAt?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    metadata?: JsonNullableFilter<"StripeSubscription">
+    createdAt?: DateTimeFilter<"StripeSubscription"> | Date | string
+    updatedAt?: DateTimeFilter<"StripeSubscription"> | Date | string
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id" | "stripeCustomerId" | "stripeSubscriptionId">
+
+  export type StripeSubscriptionOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    stripeCustomerId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    status?: SortOrder
+    priceId?: SortOrderInput | SortOrder
+    currentPeriodStart?: SortOrderInput | SortOrder
+    currentPeriodEnd?: SortOrderInput | SortOrder
+    trialStart?: SortOrderInput | SortOrder
+    trialEnd?: SortOrderInput | SortOrder
+    cancelAt?: SortOrderInput | SortOrder
+    cancelledAt?: SortOrderInput | SortOrder
+    metadata?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: StripeSubscriptionCountOrderByAggregateInput
+    _max?: StripeSubscriptionMaxOrderByAggregateInput
+    _min?: StripeSubscriptionMinOrderByAggregateInput
+  }
+
+  export type StripeSubscriptionScalarWhereWithAggregatesInput = {
+    AND?: StripeSubscriptionScalarWhereWithAggregatesInput | StripeSubscriptionScalarWhereWithAggregatesInput[]
+    OR?: StripeSubscriptionScalarWhereWithAggregatesInput[]
+    NOT?: StripeSubscriptionScalarWhereWithAggregatesInput | StripeSubscriptionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"StripeSubscription"> | string
+    userId?: UuidNullableWithAggregatesFilter<"StripeSubscription"> | string | null
+    stripeCustomerId?: StringWithAggregatesFilter<"StripeSubscription"> | string
+    stripeSubscriptionId?: StringWithAggregatesFilter<"StripeSubscription"> | string
+    status?: StringWithAggregatesFilter<"StripeSubscription"> | string
+    priceId?: StringNullableWithAggregatesFilter<"StripeSubscription"> | string | null
+    currentPeriodStart?: DateTimeNullableWithAggregatesFilter<"StripeSubscription"> | Date | string | null
+    currentPeriodEnd?: DateTimeNullableWithAggregatesFilter<"StripeSubscription"> | Date | string | null
+    trialStart?: DateTimeNullableWithAggregatesFilter<"StripeSubscription"> | Date | string | null
+    trialEnd?: DateTimeNullableWithAggregatesFilter<"StripeSubscription"> | Date | string | null
+    cancelAt?: DateTimeNullableWithAggregatesFilter<"StripeSubscription"> | Date | string | null
+    cancelledAt?: DateTimeNullableWithAggregatesFilter<"StripeSubscription"> | Date | string | null
+    metadata?: JsonNullableWithAggregatesFilter<"StripeSubscription">
+    createdAt?: DateTimeWithAggregatesFilter<"StripeSubscription"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"StripeSubscription"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     clerk_id: string
@@ -10798,6 +12296,7 @@ export namespace Prisma {
     memories?: MemoryCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogCreateNestedManyWithoutUserInput
   }
 
@@ -10816,6 +12315,7 @@ export namespace Prisma {
     memories?: MemoryUncheckedCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenUncheckedCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -10834,6 +12334,7 @@ export namespace Prisma {
     memories?: MemoryUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
   }
 
@@ -10852,6 +12353,7 @@ export namespace Prisma {
     memories?: MemoryUncheckedUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUncheckedUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUncheckedUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -10900,6 +12402,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -10917,6 +12420,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -10930,6 +12434,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10947,6 +12452,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10962,6 +12468,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -10973,6 +12480,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10986,6 +12494,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10997,6 +12506,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -11021,6 +12531,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -11041,6 +12552,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11065,6 +12577,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11087,6 +12600,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -11106,6 +12620,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11127,6 +12642,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11465,6 +12981,131 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type StripeSubscriptionCreateInput = {
+    id?: string
+    stripeCustomerId: string
+    stripeSubscriptionId: string
+    status: string
+    priceId?: string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialStart?: Date | string | null
+    trialEnd?: Date | string | null
+    cancelAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user?: UserCreateNestedOneWithoutStripeSubscriptionsInput
+  }
+
+  export type StripeSubscriptionUncheckedCreateInput = {
+    id?: string
+    userId?: string | null
+    stripeCustomerId: string
+    stripeSubscriptionId: string
+    status: string
+    priceId?: string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialStart?: Date | string | null
+    trialEnd?: Date | string | null
+    cancelAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StripeSubscriptionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: StringFieldUpdateOperationsInput | string
+    stripeSubscriptionId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priceId?: NullableStringFieldUpdateOperationsInput | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutStripeSubscriptionsNestedInput
+  }
+
+  export type StripeSubscriptionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: StringFieldUpdateOperationsInput | string
+    stripeSubscriptionId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priceId?: NullableStringFieldUpdateOperationsInput | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StripeSubscriptionCreateManyInput = {
+    id?: string
+    userId?: string | null
+    stripeCustomerId: string
+    stripeSubscriptionId: string
+    status: string
+    priceId?: string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialStart?: Date | string | null
+    trialEnd?: Date | string | null
+    cancelAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StripeSubscriptionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: StringFieldUpdateOperationsInput | string
+    stripeSubscriptionId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priceId?: NullableStringFieldUpdateOperationsInput | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StripeSubscriptionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    stripeCustomerId?: StringFieldUpdateOperationsInput | string
+    stripeSubscriptionId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priceId?: NullableStringFieldUpdateOperationsInput | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -11541,6 +13182,12 @@ export namespace Prisma {
     none?: AgentRunWhereInput
   }
 
+  export type StripeSubscriptionListRelationFilter = {
+    every?: StripeSubscriptionWhereInput
+    some?: StripeSubscriptionWhereInput
+    none?: StripeSubscriptionWhereInput
+  }
+
   export type AuditLogListRelationFilter = {
     every?: AuditLogWhereInput
     some?: AuditLogWhereInput
@@ -11565,6 +13212,10 @@ export namespace Prisma {
   }
 
   export type AgentRunOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type StripeSubscriptionOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -11680,6 +13331,13 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type BytesNullableFilter<$PrismaModel = never> = {
+    equals?: Bytes | BytesFieldRefInput<$PrismaModel> | null
+    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
+    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
+    not?: NestedBytesNullableFilter<$PrismaModel> | Bytes | null
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -11698,6 +13356,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     isScratchpad?: SortOrder
+    embedding?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -11711,6 +13370,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     isScratchpad?: SortOrder
+    embedding?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -11724,6 +13384,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     isScratchpad?: SortOrder
+    embedding?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     deletedAt?: SortOrder
@@ -11735,6 +13396,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type BytesNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Bytes | BytesFieldRefInput<$PrismaModel> | null
+    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
+    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
+    not?: NestedBytesNullableWithAggregatesFilter<$PrismaModel> | Bytes | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBytesNullableFilter<$PrismaModel>
+    _max?: NestedBytesNullableFilter<$PrismaModel>
   }
 
   export type UuidFilter<$PrismaModel = never> = {
@@ -11811,6 +13482,7 @@ export namespace Prisma {
     content?: SortOrder
     contentIv?: SortOrder
     summary?: SortOrder
+    embedding?: SortOrder
     status?: SortOrder
     supersededBy?: SortOrder
     supersededAt?: SortOrder
@@ -11836,6 +13508,7 @@ export namespace Prisma {
     content?: SortOrder
     contentIv?: SortOrder
     summary?: SortOrder
+    embedding?: SortOrder
     status?: SortOrder
     supersededBy?: SortOrder
     supersededAt?: SortOrder
@@ -11857,6 +13530,7 @@ export namespace Prisma {
     content?: SortOrder
     contentIv?: SortOrder
     summary?: SortOrder
+    embedding?: SortOrder
     status?: SortOrder
     supersededBy?: SortOrder
     supersededAt?: SortOrder
@@ -12254,6 +13928,63 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type StripeSubscriptionCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    stripeCustomerId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    status?: SortOrder
+    priceId?: SortOrder
+    currentPeriodStart?: SortOrder
+    currentPeriodEnd?: SortOrder
+    trialStart?: SortOrder
+    trialEnd?: SortOrder
+    cancelAt?: SortOrder
+    cancelledAt?: SortOrder
+    metadata?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StripeSubscriptionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    stripeCustomerId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    status?: SortOrder
+    priceId?: SortOrder
+    currentPeriodStart?: SortOrder
+    currentPeriodEnd?: SortOrder
+    trialStart?: SortOrder
+    trialEnd?: SortOrder
+    cancelAt?: SortOrder
+    cancelledAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type StripeSubscriptionMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    stripeCustomerId?: SortOrder
+    stripeSubscriptionId?: SortOrder
+    status?: SortOrder
+    priceId?: SortOrder
+    currentPeriodStart?: SortOrder
+    currentPeriodEnd?: SortOrder
+    trialStart?: SortOrder
+    trialEnd?: SortOrder
+    cancelAt?: SortOrder
+    cancelledAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type SpaceCreateNestedManyWithoutUserInput = {
     create?: XOR<SpaceCreateWithoutUserInput, SpaceUncheckedCreateWithoutUserInput> | SpaceCreateWithoutUserInput[] | SpaceUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SpaceCreateOrConnectWithoutUserInput | SpaceCreateOrConnectWithoutUserInput[]
@@ -12280,6 +14011,13 @@ export namespace Prisma {
     connectOrCreate?: AgentRunCreateOrConnectWithoutUserInput | AgentRunCreateOrConnectWithoutUserInput[]
     createMany?: AgentRunCreateManyUserInputEnvelope
     connect?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+  }
+
+  export type StripeSubscriptionCreateNestedManyWithoutUserInput = {
+    create?: XOR<StripeSubscriptionCreateWithoutUserInput, StripeSubscriptionUncheckedCreateWithoutUserInput> | StripeSubscriptionCreateWithoutUserInput[] | StripeSubscriptionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StripeSubscriptionCreateOrConnectWithoutUserInput | StripeSubscriptionCreateOrConnectWithoutUserInput[]
+    createMany?: StripeSubscriptionCreateManyUserInputEnvelope
+    connect?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
   }
 
   export type AuditLogCreateNestedManyWithoutUserInput = {
@@ -12315,6 +14053,13 @@ export namespace Prisma {
     connectOrCreate?: AgentRunCreateOrConnectWithoutUserInput | AgentRunCreateOrConnectWithoutUserInput[]
     createMany?: AgentRunCreateManyUserInputEnvelope
     connect?: AgentRunWhereUniqueInput | AgentRunWhereUniqueInput[]
+  }
+
+  export type StripeSubscriptionUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<StripeSubscriptionCreateWithoutUserInput, StripeSubscriptionUncheckedCreateWithoutUserInput> | StripeSubscriptionCreateWithoutUserInput[] | StripeSubscriptionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StripeSubscriptionCreateOrConnectWithoutUserInput | StripeSubscriptionCreateOrConnectWithoutUserInput[]
+    createMany?: StripeSubscriptionCreateManyUserInputEnvelope
+    connect?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
   }
 
   export type AuditLogUncheckedCreateNestedManyWithoutUserInput = {
@@ -12396,6 +14141,20 @@ export namespace Prisma {
     deleteMany?: AgentRunScalarWhereInput | AgentRunScalarWhereInput[]
   }
 
+  export type StripeSubscriptionUpdateManyWithoutUserNestedInput = {
+    create?: XOR<StripeSubscriptionCreateWithoutUserInput, StripeSubscriptionUncheckedCreateWithoutUserInput> | StripeSubscriptionCreateWithoutUserInput[] | StripeSubscriptionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StripeSubscriptionCreateOrConnectWithoutUserInput | StripeSubscriptionCreateOrConnectWithoutUserInput[]
+    upsert?: StripeSubscriptionUpsertWithWhereUniqueWithoutUserInput | StripeSubscriptionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: StripeSubscriptionCreateManyUserInputEnvelope
+    set?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
+    disconnect?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
+    delete?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
+    connect?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
+    update?: StripeSubscriptionUpdateWithWhereUniqueWithoutUserInput | StripeSubscriptionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: StripeSubscriptionUpdateManyWithWhereWithoutUserInput | StripeSubscriptionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: StripeSubscriptionScalarWhereInput | StripeSubscriptionScalarWhereInput[]
+  }
+
   export type AuditLogUpdateManyWithoutUserNestedInput = {
     create?: XOR<AuditLogCreateWithoutUserInput, AuditLogUncheckedCreateWithoutUserInput> | AuditLogCreateWithoutUserInput[] | AuditLogUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AuditLogCreateOrConnectWithoutUserInput | AuditLogCreateOrConnectWithoutUserInput[]
@@ -12466,6 +14225,20 @@ export namespace Prisma {
     deleteMany?: AgentRunScalarWhereInput | AgentRunScalarWhereInput[]
   }
 
+  export type StripeSubscriptionUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<StripeSubscriptionCreateWithoutUserInput, StripeSubscriptionUncheckedCreateWithoutUserInput> | StripeSubscriptionCreateWithoutUserInput[] | StripeSubscriptionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: StripeSubscriptionCreateOrConnectWithoutUserInput | StripeSubscriptionCreateOrConnectWithoutUserInput[]
+    upsert?: StripeSubscriptionUpsertWithWhereUniqueWithoutUserInput | StripeSubscriptionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: StripeSubscriptionCreateManyUserInputEnvelope
+    set?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
+    disconnect?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
+    delete?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
+    connect?: StripeSubscriptionWhereUniqueInput | StripeSubscriptionWhereUniqueInput[]
+    update?: StripeSubscriptionUpdateWithWhereUniqueWithoutUserInput | StripeSubscriptionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: StripeSubscriptionUpdateManyWithWhereWithoutUserInput | StripeSubscriptionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: StripeSubscriptionScalarWhereInput | StripeSubscriptionScalarWhereInput[]
+  }
+
   export type AuditLogUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AuditLogCreateWithoutUserInput, AuditLogUncheckedCreateWithoutUserInput> | AuditLogCreateWithoutUserInput[] | AuditLogUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AuditLogCreateOrConnectWithoutUserInput | AuditLogCreateOrConnectWithoutUserInput[]
@@ -12522,6 +14295,10 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
+  }
+
+  export type NullableBytesFieldUpdateOperationsInput = {
+    set?: Bytes | null
   }
 
   export type UserUpdateOneRequiredWithoutSpacesNestedInput = {
@@ -12779,6 +14556,22 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAuditLogsInput, UserUpdateWithoutAuditLogsInput>, UserUncheckedUpdateWithoutAuditLogsInput>
   }
 
+  export type UserCreateNestedOneWithoutStripeSubscriptionsInput = {
+    create?: XOR<UserCreateWithoutStripeSubscriptionsInput, UserUncheckedCreateWithoutStripeSubscriptionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStripeSubscriptionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneWithoutStripeSubscriptionsNestedInput = {
+    create?: XOR<UserCreateWithoutStripeSubscriptionsInput, UserUncheckedCreateWithoutStripeSubscriptionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStripeSubscriptionsInput
+    upsert?: UserUpsertWithoutStripeSubscriptionsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStripeSubscriptionsInput, UserUpdateWithoutStripeSubscriptionsInput>, UserUncheckedUpdateWithoutStripeSubscriptionsInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -12918,12 +14711,29 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type NestedBytesNullableFilter<$PrismaModel = never> = {
+    equals?: Bytes | BytesFieldRefInput<$PrismaModel> | null
+    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
+    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
+    not?: NestedBytesNullableFilter<$PrismaModel> | Bytes | null
+  }
+
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedBytesNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Bytes | BytesFieldRefInput<$PrismaModel> | null
+    in?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
+    notIn?: Bytes[] | ListBytesFieldRefInput<$PrismaModel> | null
+    not?: NestedBytesNullableWithAggregatesFilter<$PrismaModel> | Bytes | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedBytesNullableFilter<$PrismaModel>
+    _max?: NestedBytesNullableFilter<$PrismaModel>
   }
 
   export type NestedUuidFilter<$PrismaModel = never> = {
@@ -13160,6 +14970,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13175,6 +14986,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13198,6 +15010,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -13220,6 +15033,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -13320,6 +15134,50 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type StripeSubscriptionCreateWithoutUserInput = {
+    id?: string
+    stripeCustomerId: string
+    stripeSubscriptionId: string
+    status: string
+    priceId?: string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialStart?: Date | string | null
+    trialEnd?: Date | string | null
+    cancelAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StripeSubscriptionUncheckedCreateWithoutUserInput = {
+    id?: string
+    stripeCustomerId: string
+    stripeSubscriptionId: string
+    status: string
+    priceId?: string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialStart?: Date | string | null
+    trialEnd?: Date | string | null
+    cancelAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type StripeSubscriptionCreateOrConnectWithoutUserInput = {
+    where: StripeSubscriptionWhereUniqueInput
+    create: XOR<StripeSubscriptionCreateWithoutUserInput, StripeSubscriptionUncheckedCreateWithoutUserInput>
+  }
+
+  export type StripeSubscriptionCreateManyUserInputEnvelope = {
+    data: StripeSubscriptionCreateManyUserInput | StripeSubscriptionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AuditLogCreateWithoutUserInput = {
     id?: string
     action: string
@@ -13375,6 +15233,7 @@ export namespace Prisma {
     name?: StringFilter<"Space"> | string
     description?: StringNullableFilter<"Space"> | string | null
     isScratchpad?: BoolFilter<"Space"> | boolean
+    embedding?: BytesNullableFilter<"Space"> | Bytes | null
     createdAt?: DateTimeFilter<"Space"> | Date | string
     updatedAt?: DateTimeFilter<"Space"> | Date | string
     deletedAt?: DateTimeNullableFilter<"Space"> | Date | string | null
@@ -13407,6 +15266,7 @@ export namespace Prisma {
     content?: BytesFilter<"Memory"> | Bytes
     contentIv?: BytesFilter<"Memory"> | Bytes
     summary?: StringNullableFilter<"Memory"> | string | null
+    embedding?: BytesNullableFilter<"Memory"> | Bytes | null
     status?: EnumMemoryStatusFilter<"Memory"> | $Enums.MemoryStatus
     supersededBy?: UuidNullableFilter<"Memory"> | string | null
     supersededAt?: DateTimeNullableFilter<"Memory"> | Date | string | null
@@ -13488,6 +15348,43 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"AgentRun"> | Date | string
   }
 
+  export type StripeSubscriptionUpsertWithWhereUniqueWithoutUserInput = {
+    where: StripeSubscriptionWhereUniqueInput
+    update: XOR<StripeSubscriptionUpdateWithoutUserInput, StripeSubscriptionUncheckedUpdateWithoutUserInput>
+    create: XOR<StripeSubscriptionCreateWithoutUserInput, StripeSubscriptionUncheckedCreateWithoutUserInput>
+  }
+
+  export type StripeSubscriptionUpdateWithWhereUniqueWithoutUserInput = {
+    where: StripeSubscriptionWhereUniqueInput
+    data: XOR<StripeSubscriptionUpdateWithoutUserInput, StripeSubscriptionUncheckedUpdateWithoutUserInput>
+  }
+
+  export type StripeSubscriptionUpdateManyWithWhereWithoutUserInput = {
+    where: StripeSubscriptionScalarWhereInput
+    data: XOR<StripeSubscriptionUpdateManyMutationInput, StripeSubscriptionUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type StripeSubscriptionScalarWhereInput = {
+    AND?: StripeSubscriptionScalarWhereInput | StripeSubscriptionScalarWhereInput[]
+    OR?: StripeSubscriptionScalarWhereInput[]
+    NOT?: StripeSubscriptionScalarWhereInput | StripeSubscriptionScalarWhereInput[]
+    id?: StringFilter<"StripeSubscription"> | string
+    userId?: UuidNullableFilter<"StripeSubscription"> | string | null
+    stripeCustomerId?: StringFilter<"StripeSubscription"> | string
+    stripeSubscriptionId?: StringFilter<"StripeSubscription"> | string
+    status?: StringFilter<"StripeSubscription"> | string
+    priceId?: StringNullableFilter<"StripeSubscription"> | string | null
+    currentPeriodStart?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    currentPeriodEnd?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    trialStart?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    trialEnd?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    cancelAt?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    cancelledAt?: DateTimeNullableFilter<"StripeSubscription"> | Date | string | null
+    metadata?: JsonNullableFilter<"StripeSubscription">
+    createdAt?: DateTimeFilter<"StripeSubscription"> | Date | string
+    updatedAt?: DateTimeFilter<"StripeSubscription"> | Date | string
+  }
+
   export type AuditLogUpsertWithWhereUniqueWithoutUserInput = {
     where: AuditLogWhereUniqueInput
     update: XOR<AuditLogUpdateWithoutUserInput, AuditLogUncheckedUpdateWithoutUserInput>
@@ -13531,6 +15428,7 @@ export namespace Prisma {
     memories?: MemoryCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogCreateNestedManyWithoutUserInput
   }
 
@@ -13548,6 +15446,7 @@ export namespace Prisma {
     memories?: MemoryUncheckedCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenUncheckedCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -13562,6 +15461,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13578,6 +15478,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13595,6 +15496,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13610,6 +15512,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13633,6 +15536,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -13655,6 +15559,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -13704,6 +15609,7 @@ export namespace Prisma {
     memories?: MemoryUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
   }
 
@@ -13721,6 +15627,7 @@ export namespace Prisma {
     memories?: MemoryUncheckedUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUncheckedUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUncheckedUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -13741,6 +15648,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13757,6 +15665,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13809,6 +15718,7 @@ export namespace Prisma {
     spaces?: SpaceCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogCreateNestedManyWithoutUserInput
   }
 
@@ -13826,6 +15736,7 @@ export namespace Prisma {
     spaces?: SpaceUncheckedCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenUncheckedCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -13840,6 +15751,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13856,6 +15768,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -13914,6 +15827,7 @@ export namespace Prisma {
     spaces?: SpaceUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
   }
 
@@ -13931,6 +15845,7 @@ export namespace Prisma {
     spaces?: SpaceUncheckedUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUncheckedUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUncheckedUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -13951,6 +15866,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -13967,6 +15883,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14005,6 +15922,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -14028,6 +15946,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -14063,6 +15982,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14086,6 +16006,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14113,6 +16034,7 @@ export namespace Prisma {
     spaces?: SpaceCreateNestedManyWithoutUserInput
     memories?: MemoryCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogCreateNestedManyWithoutUserInput
   }
 
@@ -14130,6 +16052,7 @@ export namespace Prisma {
     spaces?: SpaceUncheckedCreateNestedManyWithoutUserInput
     memories?: MemoryUncheckedCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -14163,6 +16086,7 @@ export namespace Prisma {
     spaces?: SpaceUpdateManyWithoutUserNestedInput
     memories?: MemoryUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
   }
 
@@ -14180,6 +16104,7 @@ export namespace Prisma {
     spaces?: SpaceUncheckedUpdateManyWithoutUserNestedInput
     memories?: MemoryUncheckedUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUncheckedUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -14197,6 +16122,7 @@ export namespace Prisma {
     spaces?: SpaceCreateNestedManyWithoutUserInput
     memories?: MemoryCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogCreateNestedManyWithoutUserInput
   }
 
@@ -14214,6 +16140,7 @@ export namespace Prisma {
     spaces?: SpaceUncheckedCreateNestedManyWithoutUserInput
     memories?: MemoryUncheckedCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenUncheckedCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -14247,6 +16174,7 @@ export namespace Prisma {
     spaces?: SpaceUpdateManyWithoutUserNestedInput
     memories?: MemoryUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
   }
 
@@ -14264,6 +16192,7 @@ export namespace Prisma {
     spaces?: SpaceUncheckedUpdateManyWithoutUserNestedInput
     memories?: MemoryUncheckedUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUncheckedUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -14282,6 +16211,7 @@ export namespace Prisma {
     memories?: MemoryCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -14299,6 +16229,7 @@ export namespace Prisma {
     memories?: MemoryUncheckedCreateNestedManyWithoutUserInput
     mcpTokens?: McpTokenUncheckedCreateNestedManyWithoutUserInput
     agentRuns?: AgentRunUncheckedCreateNestedManyWithoutUserInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -14332,6 +16263,7 @@ export namespace Prisma {
     memories?: MemoryUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -14349,6 +16281,95 @@ export namespace Prisma {
     memories?: MemoryUncheckedUpdateManyWithoutUserNestedInput
     mcpTokens?: McpTokenUncheckedUpdateManyWithoutUserNestedInput
     agentRuns?: AgentRunUncheckedUpdateManyWithoutUserNestedInput
+    stripeSubscriptions?: StripeSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutStripeSubscriptionsInput = {
+    id?: string
+    clerk_id: string
+    email: string
+    name?: string | null
+    image?: string | null
+    tier?: string
+    stripeCustomerId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    spaces?: SpaceCreateNestedManyWithoutUserInput
+    memories?: MemoryCreateNestedManyWithoutUserInput
+    mcpTokens?: McpTokenCreateNestedManyWithoutUserInput
+    agentRuns?: AgentRunCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutStripeSubscriptionsInput = {
+    id?: string
+    clerk_id: string
+    email: string
+    name?: string | null
+    image?: string | null
+    tier?: string
+    stripeCustomerId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    deletedAt?: Date | string | null
+    spaces?: SpaceUncheckedCreateNestedManyWithoutUserInput
+    memories?: MemoryUncheckedCreateNestedManyWithoutUserInput
+    mcpTokens?: McpTokenUncheckedCreateNestedManyWithoutUserInput
+    agentRuns?: AgentRunUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutStripeSubscriptionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutStripeSubscriptionsInput, UserUncheckedCreateWithoutStripeSubscriptionsInput>
+  }
+
+  export type UserUpsertWithoutStripeSubscriptionsInput = {
+    update: XOR<UserUpdateWithoutStripeSubscriptionsInput, UserUncheckedUpdateWithoutStripeSubscriptionsInput>
+    create: XOR<UserCreateWithoutStripeSubscriptionsInput, UserUncheckedCreateWithoutStripeSubscriptionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutStripeSubscriptionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutStripeSubscriptionsInput, UserUncheckedUpdateWithoutStripeSubscriptionsInput>
+  }
+
+  export type UserUpdateWithoutStripeSubscriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerk_id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    tier?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    spaces?: SpaceUpdateManyWithoutUserNestedInput
+    memories?: MemoryUpdateManyWithoutUserNestedInput
+    mcpTokens?: McpTokenUpdateManyWithoutUserNestedInput
+    agentRuns?: AgentRunUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutStripeSubscriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    clerk_id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    tier?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    spaces?: SpaceUncheckedUpdateManyWithoutUserNestedInput
+    memories?: MemoryUncheckedUpdateManyWithoutUserNestedInput
+    mcpTokens?: McpTokenUncheckedUpdateManyWithoutUserNestedInput
+    agentRuns?: AgentRunUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SpaceCreateManyUserInput = {
@@ -14358,6 +16379,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -14370,6 +16392,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -14411,6 +16434,23 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type StripeSubscriptionCreateManyUserInput = {
+    id?: string
+    stripeCustomerId: string
+    stripeSubscriptionId: string
+    status: string
+    priceId?: string | null
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialStart?: Date | string | null
+    trialEnd?: Date | string | null
+    cancelAt?: Date | string | null
+    cancelledAt?: Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AuditLogCreateManyUserInput = {
     id?: string
     action: string
@@ -14426,6 +16466,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14441,6 +16482,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14455,6 +16497,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14466,6 +16509,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14488,6 +16532,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14509,6 +16554,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14606,6 +16652,57 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type StripeSubscriptionUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: StringFieldUpdateOperationsInput | string
+    stripeSubscriptionId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priceId?: NullableStringFieldUpdateOperationsInput | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StripeSubscriptionUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: StringFieldUpdateOperationsInput | string
+    stripeSubscriptionId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priceId?: NullableStringFieldUpdateOperationsInput | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type StripeSubscriptionUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    stripeCustomerId?: StringFieldUpdateOperationsInput | string
+    stripeSubscriptionId?: StringFieldUpdateOperationsInput | string
+    status?: StringFieldUpdateOperationsInput | string
+    priceId?: NullableStringFieldUpdateOperationsInput | string | null
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AuditLogUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     action?: StringFieldUpdateOperationsInput | string
@@ -14640,6 +16737,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isScratchpad?: boolean
+    embedding?: Bytes | null
     createdAt?: Date | string
     updatedAt?: Date | string
     deletedAt?: Date | string | null
@@ -14652,6 +16750,7 @@ export namespace Prisma {
     content: Bytes
     contentIv: Bytes
     summary?: string | null
+    embedding?: Bytes | null
     status?: $Enums.MemoryStatus
     supersededBy?: string | null
     supersededAt?: Date | string | null
@@ -14671,6 +16770,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14686,6 +16786,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14700,6 +16801,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isScratchpad?: BoolFieldUpdateOperationsInput | boolean
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14711,6 +16813,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14733,6 +16836,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -14754,6 +16858,7 @@ export namespace Prisma {
     content?: BytesFieldUpdateOperationsInput | Bytes
     contentIv?: BytesFieldUpdateOperationsInput | Bytes
     summary?: NullableStringFieldUpdateOperationsInput | string | null
+    embedding?: NullableBytesFieldUpdateOperationsInput | Bytes | null
     status?: EnumMemoryStatusFieldUpdateOperationsInput | $Enums.MemoryStatus
     supersededBy?: NullableStringFieldUpdateOperationsInput | string | null
     supersededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

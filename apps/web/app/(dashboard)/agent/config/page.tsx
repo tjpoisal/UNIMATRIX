@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-interface AgentConfig {
+export interface AgentConfig {
   id: string;
   agent_name: string;
   provider: string;
@@ -32,7 +32,13 @@ export default function AgentConfigPage() {
   };
 
   useEffect(() => {
-    fetchConfigs();
+    (async () => {
+      try {
+        await fetchConfigs();
+      } catch (e) {
+        console.error(e);
+      }
+    })();
   }, []);
 
   const updateConfig = async (id: string, updates: Partial<AgentConfig>) => {

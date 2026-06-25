@@ -42,16 +42,16 @@ async function exportMemories() {
       `Found ${memories.length} memories. Formatting for training...`,
     );
 
-    const trainingExamples: MemoryTrainingExample[] = memories.map((mem) => ({
-      content: mem.content,
-      context: mem.location?.name || mem.location?.palace?.name || undefined,
-      tags: mem.tags || [],
-      importance:
-        mem.embedding && (mem.embedding as any).importance === 'high'
-          ? 'high'
-          : 'medium',
-      timestamp: mem.createdAt.toISOString(),
-    }));
+    const trainingExamples: MemoryTrainingExample[] = memories.map((mem) => {
+      const embedding = (mem as any).embedding;
+      return {
+        content: mem.content,
+        context: mem.location?.name || mem.location?.palace?.name || undefined,
+        tags: mem.tags || [],
+        importance: embedding && (embedding as any).importance === 'high' ? 'high' : 'medium',
+        timestamp: mem.createdAt.toISOString(),
+      } as MemoryTrainingExample;
+    });
 
     // Output as JSONL (one JSON object per line)
     for (const example of trainingExamples) {
