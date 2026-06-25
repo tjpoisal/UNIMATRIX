@@ -11,7 +11,7 @@ export function OnboardingFlow() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [memoryContent, setMemoryContent] = useState('');
   const [contextName, setContextName] = useState('');
-  const [apiKey, setApiKey] = useState('');
+  const [apiKey, _setApiKey] = useState('');
   const [copied, setCopied] = useState(false);
 
   const passwordStrength = getPasswordStrength(encryptionPassword);
@@ -96,7 +96,7 @@ export function OnboardingFlow() {
           <div className="animate-in fade-in">
             <h2 className="text-3xl font-bold mb-2">🔐 Create Your Encryption Password</h2>
             <p className="text-[#94A3B8] mb-8">
-              This password encrypts ALL your memories. We can't recover it, so save it somewhere safe.
+              This password encrypts ALL your memories. We can&apos;t recover it, so save it somewhere safe.
             </p>
 
             <div className="bg-[#ff7a00]/10 border border-[#ff7a00]/30 rounded-lg p-4 mb-8">
@@ -184,9 +184,9 @@ export function OnboardingFlow() {
             <div className="bg-[#111827]/50 border border-[#334155]/30 rounded-lg p-4 mb-8">
               <p className="text-sm text-[#94A3B8]">
                 <strong>Examples:</strong><br/>
-                • "Python: list comprehension is faster than loops"<br/>
-                • "React hooks: useCallback prevents re-renders"<br/>
-                • "Conversation: Why AI agents fail without memory"
+                • &quot;Python: list comprehension is faster than loops&quot;<br/>
+                • &quot;React hooks: useCallback prevents re-renders&quot;<br/>
+                • &quot;Conversation: Why AI agents fail without memory&quot;
               </p>
             </div>
 
@@ -292,7 +292,7 @@ export function OnboardingFlow() {
         {/* Step 5: Next Steps */}
         {step === 'next-steps' && (
           <div className="animate-in fade-in">
-            <h2 className="text-3xl font-bold mb-2">🚀 What's Next?</h2>
+            <h2 className="text-3xl font-bold mb-2">🚀 What&apos;s Next?</h2>
             <p className="text-[#94A3B8] mb-8">
               Your palace is set up. Now unlock its full power with these integrations.
             </p>
@@ -360,7 +360,7 @@ export function OnboardingFlow() {
             <div className="text-7xl mb-6">🎉</div>
             <h2 className="text-3xl font-bold mb-4">Your Palace is Ready!</h2>
             <p className="text-[#94A3B8] mb-8 max-w-xl mx-auto">
-              You've set up encryption, saved your first memory, and organized your palace. Everything is encrypted and ready to sync across your devices.
+              You&apos;ve set up encryption, saved your first memory, and organized your palace. Everything is encrypted and ready to sync across your devices.
             </p>
 
             <div className="bg-[#111827]/50 border border-[#334155]/30 rounded-lg p-6 mb-8 text-left">
@@ -379,7 +379,7 @@ export function OnboardingFlow() {
                   {copied ? '✓' : '📋'}
                 </button>
               </div>
-              <p className="text-xs text-[#64748B] mt-2">You'll need this to set up MCP and integrations</p>
+              <p className="text-xs text-[#64748B] mt-2">You&apos;ll need this to set up MCP and integrations</p>
             </div>
 
             <Link

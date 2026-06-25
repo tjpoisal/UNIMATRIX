@@ -108,3 +108,5 @@ package-lock.json
 eas.json
 app.json
 .env*
+
+/generated/prisma

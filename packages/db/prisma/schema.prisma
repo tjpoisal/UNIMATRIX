@@ -56,6 +56,7 @@ model User {
   memories   Memory[]
   mcpTokens  McpToken[]
   agentRuns  AgentRun[]
+  stripeSubscriptions StripeSubscription[]
   auditLogs  AuditLog[]
 
   createdAt DateTime  @default(now())
@@ -83,7 +84,7 @@ model Space {
   name          String
   description   String?
   isScratchpad  Boolean   @default(false)
-  embedding     Unsupported("vector(512)")?
+  embedding     Bytes?
 
   // Relations
   memories      Memory[]
@@ -115,7 +116,7 @@ model Memory {
   contentIv     Bytes        @map("content_iv")
 
   summary       String?
-  embedding     Unsupported("vector(512)")?
+  embedding     Bytes?
 
   status        MemoryStatus @default(active)
   supersededBy  String?      @map("superseded_by") @db.Uuid
@@ -237,4 +238,32 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Stripe Subscriptions (canonical)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model StripeSubscription {
+  id                   String   @id @default(cuid())
+  userId               String?  @db.Uuid
+  user                 User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  stripeCustomerId     String   @unique
+  stripeSubscriptionId String   @unique
+  status               String
+  priceId              String?
+  currentPeriodStart   DateTime?
+  currentPeriodEnd     DateTime?
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  cancelAt             DateTime?
+  cancelledAt          DateTime?
+  metadata             Json?
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([userId])
+  @@map("stripe_subscriptions")
 }

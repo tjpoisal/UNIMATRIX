@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 
-/* eslint-disable react/no-unescaped-entities -- illustrative terminal/code examples and marketing copy contain quotes/apostrophes for realism and readability */
+// Note: copy contains quotes/apostrophes. Keep as-is for marketing readability.
 
 interface ProofSectionProps {
   title: string;

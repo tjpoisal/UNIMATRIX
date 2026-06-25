@@ -25,16 +25,16 @@ interface TrainingExample {
 }
 
 // Parse command line arguments
-function getArgument(key: string, defaultValue?: string): string | undefined {
+function getArgument(key: string, defaultValue = ''): string {
   const index = process.argv.indexOf(`--${key}`);
   if (index === -1) return defaultValue;
-  return process.argv[index + 1];
+  return String(process.argv[index + 1] ?? defaultValue);
 }
 
-const inputFile = getArgument('input', 'memories-demo.jsonl');
-const outputFile = getArgument('output', 'mistral-formatted.jsonl');
-const trainTestSplit = parseFloat(getArgument('split-ratio', '0.9'));
-const modelType = getArgument('model', 'mistral');
+const inputFile: string = getArgument('input', 'memories-demo.jsonl');
+const outputFile: string = getArgument('output', 'mistral-formatted.jsonl');
+const trainTestSplit: number = parseFloat(getArgument('split-ratio', '0.9'));
+const modelType: string = getArgument('model', 'mistral');
 
 console.log(`📊 Preparing training data for ${modelType}`);
 console.log(`📖 Input: ${inputFile}`);
@@ -142,8 +142,8 @@ async function processMemories() {
 
   let lineCount = 0;
   let exampleCount = 0;
-  const trainExamples = [];
-  const testExamples = [];
+  const trainExamples: string[] = [];
+  const testExamples: string[] = [];
 
   for await (const line of rl) {
     if (!line.trim()) continue;

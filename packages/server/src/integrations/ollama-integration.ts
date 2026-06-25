@@ -155,9 +155,9 @@ export async function checkOllamaHealth(ollamaUrl: string): Promise<boolean> {
 
 export async function listOllamaModels(ollamaUrl: string): Promise<string[]> {
   try {
-    const res  = await fetch(`${ollamaUrl}/api/tags`, { signal: AbortSignal.timeout(5000) });
-    const data = await res.json();
-    return (data.models ?? []).map((m: any) => m.name as string);
+  const res  = await fetch(`${ollamaUrl}/api/tags`, { signal: (AbortSignal as any).timeout?.(5000) });
+  const data: any = await res.json();
+  return (data?.models ?? []).map((m: any) => m.name as string);
   } catch {
     return [];
   }
