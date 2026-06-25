@@ -1,7 +1,11 @@
 const { FlatCompat } = require('@eslint/eslintrc');
+const js = require('@eslint/js');
+const tsParser = require('@typescript-eslint/parser');
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
 });
 
 module.exports = [
@@ -14,7 +18,6 @@ module.exports = [
       ecmaVersion: 2024,
       sourceType: 'module',
       tsconfigRootDir: __dirname,
-      project: ['./tsconfig.json', './packages/*/tsconfig.json', './apps/*/tsconfig.json'],
     },
     plugins: ['@typescript-eslint', 'react', 'react-hooks'],
     extends: [
@@ -36,4 +39,16 @@ module.exports = [
       '@typescript-eslint/no-explicit-any': 'off',
     },
   }),
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        ecmaVersion: 2024,
+        sourceType: 'module',
+        tsconfigRootDir: __dirname,
+        project: ['./tsconfig.json', './packages/*/tsconfig.json', './apps/*/tsconfig.json'],
+      },
+    },
+  },
 ];
