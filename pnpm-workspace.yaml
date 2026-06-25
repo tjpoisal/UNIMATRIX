@@ -3,3 +3,12 @@ packages:
   - 'apps/web'
   - 'apps/mobile'
   - 'apps/desktop'
+overrides:
+  postcss: '>=8.5.10'
+  uuid: '>=11.1.1'
+  esbuild: '>=0.28.1'
+  tar: '>=7.5.16'
+packageExtensions:
+  xcode@3.0.1:
+    dependencies:
+      uuid: '^11.1.1'
