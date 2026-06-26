@@ -114,7 +114,7 @@ export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianR
   try {
     embedding = await generateEmbedding(content);
   } catch (err) {
-    console.error(`[Librarian] Embedding failed for ${memoryId}:`, err);
+    console.error('[Librarian] Embedding failed for %s:', memoryId, err);
     throw err;
   }
 
