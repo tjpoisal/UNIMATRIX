@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { encryptApiKey } from '@/lib/crypto';
-import { randomBytes } from "crypto";
-import bcrypt from "bcryptjs";
+// removed unused imports: randomBytes, bcryptjs
 
 const SUPPORTED_PROVIDERS = ['claude', 'openai', 'gemini', 'groq', 'ollama'];
 

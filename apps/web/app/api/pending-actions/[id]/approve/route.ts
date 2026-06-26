@@ -48,7 +48,8 @@ export async function POST(
     });
 
     return NextResponse.json({ success: true, action: updated });
-  } catch (_error) {
+  } catch (err) {
+    console.error('Failed to approve pending action', err);
     return NextResponse.json({ error: 'Failed to approve action' }, { status: 500 });
   }
 }

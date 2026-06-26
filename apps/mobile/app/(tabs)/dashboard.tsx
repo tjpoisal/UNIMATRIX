@@ -15,9 +15,11 @@ interface StatCard {
   color: string;
 }
 
-function StatTile({ label, value, sub, color }: StatCard) {
+const StatTile: React.FC<StatCard> = ({ label, value, sub, color }) => {
+  // ensure we always produce a valid color string (append alpha) and fallback if undefined
+  const borderColor = `${color ?? '#00F5FF'}30`;
   return (
-    <View style={[styles.tile, { borderColor: color + '30' }]}>
+    <View style={[styles.tile, { borderColor }]}>
       <Text style={[styles.tileValue, { color }]}>{value}</Text>
       <Text style={styles.tileLabel}>{label}</Text>
       {sub && <Text style={styles.tileSub}>{sub}</Text>}
@@ -123,12 +125,12 @@ const styles = StyleSheet.create({
   statusDot:    { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
   statusText:   { fontSize: 14, fontWeight: '600' },
   serverVersion:{ color: '#475569', fontSize: 12, marginTop: 6 },
-  tilesRow:     { flexDirection: 'row', gap: 12, marginBottom: 12 },
-  tile:         { flex: 1, backgroundColor: '#111827', borderWidth: 1, borderRadius: 12, padding: 14 },
+  tilesRow:     { flexDirection: 'row', marginBottom: 12 },
+  tile:         { flex: 1, backgroundColor: '#111827', borderWidth: 1, borderRadius: 12, padding: 14, marginRight: 12 },
   tileValue:    { fontSize: 22, fontWeight: '800', marginBottom: 4 },
   tileLabel:    { color: '#94A3B8', fontSize: 12, fontWeight: '600' },
   tileSub:      { color: '#475569', fontSize: 11, marginTop: 2 },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#94A3B8', marginTop: 24, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.8, fontSize: 12 },
+  sectionTitle: { fontWeight: '700', color: '#94A3B8', marginTop: 24, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.8, fontSize: 12 },
   platformRow:  { flexDirection: 'row', alignItems: 'center', backgroundColor: '#111827', borderRadius: 10, padding: 12, marginBottom: 8 },
   platformIcon: { fontSize: 20, marginRight: 12, width: 28, textAlign: 'center' },
   platformInfo: { flex: 1 },

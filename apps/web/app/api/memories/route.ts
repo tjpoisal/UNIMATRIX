@@ -44,7 +44,10 @@ export async function POST(request: NextRequest) {
             if (ml) finalLocationId = ml.id;
           }
         }
-      } catch {}
+      } catch (e) {
+        // ignore auto-resolve failures — leave finalLocationId unset
+        console.debug('auto-resolve location failed', e);
+      }
     }
 
     if (!finalLocationId) {

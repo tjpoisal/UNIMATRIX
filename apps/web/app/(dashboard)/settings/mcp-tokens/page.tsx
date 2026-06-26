@@ -55,7 +55,7 @@ export default function McpTokensPage() {
         const err = await res.json();
         setError(err.error || 'Failed to create token');
       }
-    } catch (_e) {
+    } catch {
       setError('Network error');
     } finally {
       setCreating(false);

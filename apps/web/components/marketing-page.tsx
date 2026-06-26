@@ -40,9 +40,9 @@ export function MarketingPage() {
             <h1 className="text-6xl md:text-7xl font-black mb-6 leading-tight">
               Your AI Remembers<br /><span className="text-[#ff7a00]">Everything</span>
             </h1>
-            <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-400 mb-8 max-w-3xl mx-auto">
               Start a conversation with ChatGPT on your iPhone. Pick up your iPad. Open Claude. Full context, zero re-explaining.
-              <strong> That's Unimatrix.</strong>
+              <strong> That&apos;s Unimatrix.</strong>
             </p>
 
             {/* CTA Button — Primary Conversion Point */}

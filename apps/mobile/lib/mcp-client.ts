@@ -23,59 +23,42 @@ function toMemory(raw: any): Memory {
   };
 }
 
-export class McpClient {
-  private async base(): Promise<string> {
-    return (await AsyncStorage.getItem("unimatrix_server_url")) ?? DEFAULT_URL;
-  }
+// Minimal MCP client for the mobile app (used by dashboard)
+export type HealthResponse = { status: string; version?: string };
+export type Memory = { id: string; content: string; createdAt?: string; [key: string]: any };
 
-  private async headers(): Promise<HeadersInit> {
-    const token = await AsyncStorage.getItem("unimatrix_mcp_token");
-    const h: HeadersInit = { "Content-Type": "application/json" };
-    if (token) h["x-unimatrix-key"] = token;
-    return h;
-  }
+const API_BASE = (process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api').replace(/\/$/, '');
+const MCP_BASE = `${API_BASE}/mcp`;
 
-  async getRecent(limit = 20): Promise<Memory[]> {
-    const base = await this.base();
-    const headers = await this.headers();
-    const res = await fetch(`${base}/api/memories?limit=${limit}`, { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    return (json.memories ?? json ?? []).map(toMemory);
-  }
-
-  async recall(query: string, spaceId?: string): Promise<RecallResult> {
-    const base = await this.base();
-    const headers = await this.headers();
-    const params = new URLSearchParams({ q: query, ...(spaceId ? { spaceId } : {}) });
-    const res = await fetch(`${base}/api/search?${params}`, { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    return { memories: (json.memories ?? []).map(toMemory), query, spaceId: spaceId ?? null };
-  }
-
-  async storeMemory(input: { content: string; hint?: string; tags?: string[]; password: string }): Promise<{ memoryId: string }> {
-    const base = await this.base();
-    const headers = await this.headers();
-    // lightweight placeholder encryption (no-op ciphertext)
-    const nonce = await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, input.password + Date.now());
-    const ciphertext = input.content;
-    const res = await fetch(`${base}/api/memories/create`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ encryptedContent: ciphertext, nonce: nonce.slice(0, 32), hint: input.hint ?? null, tags: input.tags ?? [], source: "mobile" }),
-    });
-    if (!res.ok) throw new Error(`Store failed: HTTP ${res.status}`);
-    return res.json();
-  }
-
-  async getHealth(): Promise<{ status: string; version: string }> {
-    const base = await this.base();
-    const signal = (AbortSignal as any).timeout?.(5000);
-    const res = await fetch(`${base}/health`, { signal });
-    if (!res.ok) throw new Error("Unhealthy");
-    return res.json();
+async function safeJson<T>(res: Response, fallback: T): Promise<T> {
+  try {
+    if (!res.ok) return fallback;
+    const data = await res.json();
+    return data as T;
+  } catch {
+    return fallback;
   }
 }
 
-export const mcpClient = new McpClient();
+async function getHealth(): Promise<HealthResponse> {
+  try {
+    const res = await fetch(`${MCP_BASE}/health`);
+    return await safeJson<HealthResponse>(res, { status: 'offline', version: '' });
+  } catch {
+    return { status: 'offline', version: '' };
+  }
+}
+
+async function getRecent(limit = 10): Promise<Memory[]> {
+  try {
+    const res = await fetch(`${MCP_BASE}/recent?limit=${encodeURIComponent(String(limit))}`);
+    return await safeJson<Memory[]>(res, []);
+  } catch {
+    return [];
+  }
+}
+
+export const mcpClient = {
+  getHealth,
+  getRecent,
+};

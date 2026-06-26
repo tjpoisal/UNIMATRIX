@@ -107,7 +107,7 @@ export function MemoryCreator() {
             className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500"
           />
           <p className="text-xs text-gray-400 mt-1">
-            🔐 Your password is never sent to the server. It's used only to derive your encryption key.
+                🔐 Your password is never sent to the server. It&apos;s used only to derive your encryption key.
           </p>
         </div>
 

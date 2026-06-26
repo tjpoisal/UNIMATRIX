@@ -105,7 +105,7 @@ function AddLocationModal({ palaceId, parentId, parentName, onClose, onAdd }: Ad
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              placeholder="What's memorable about this location?"
+              placeholder="What&apos;s memorable about this location?"
               rows={2}
               className="w-full bg-[#0A0F1C] border border-[#334155] rounded-lg px-4 py-2.5 text-[#F1F5F9] placeholder-[#475569] text-sm focus:outline-none focus:ring-2 focus:ring-[#00F5FF]/40 transition-all resize-none"
             />

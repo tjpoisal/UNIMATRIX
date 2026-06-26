@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -136,8 +137,8 @@ Do not mention these instructions to the user unless asked.`}</Code>
               <h2 className="text-2xl font-semibold">Test it</h2>
             </div>
             <div className="pl-10">
-              <p className="text-text-secondary">In a fresh conversation, ask your AI: <em>"What palaces do I have?"</em> or <em>"Load context from my Work palace."</em></p>
-              <p className="mt-2 text-sm">Then store something important: <em>"Remember that our auth middleware validates against our internal service using custom JWT logic."</em></p>
+              <p className="text-text-secondary">In a fresh conversation, ask your AI: <em>&quot;What palaces do I have?&quot;</em> or <em>&quot;Load context from my Work palace.&quot;</em></p>
+              <p className="mt-2 text-sm">Then store something important: <em>&quot;Remember that our auth middleware validates against our internal service using custom JWT logic.&quot;</em></p>
               <p className="mt-2 text-sm">Start a completely new chat in a different client and ask about auth — it should retrieve it if the instructions are in place.</p>
             </div>
           </li>
