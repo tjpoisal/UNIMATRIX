@@ -1,5 +1,6 @@
-'use client';
+"use client";
 
+/* eslint-disable react/no-unescaped-entities */
 import React, { useState } from 'react';
 import Link from 'next/link';
 
@@ -30,7 +31,9 @@ export default function ClaudeDesktopSetup() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Breadcrumb */}
         <div className="text-sm text-[#64748B] mb-8">
-          <Link href="/" className="hover:text-[#ff7a00]">Home</Link>
+          <Link href="/" className="hover:text-[#ff7a00]">
+            Home
+          </Link>
           {' / '}
           <span className="text-[#F1F5F9]">Setup Claude Desktop</span>
         </div>
@@ -41,7 +44,7 @@ export default function ClaudeDesktopSetup() {
           Configure in 5 minutes. Use @unimatrix in Claude to recall memories from all your conversations.
         </p>
 
-        {/* Video */}
+        {/* Video Placeholder */}
         <div className="bg-[#111827] border border-[#334155]/30 rounded-lg overflow-hidden mb-12 aspect-video flex items-center justify-center">
           <div className="text-6xl">📹</div>
         </div>
@@ -53,7 +56,6 @@ export default function ClaudeDesktopSetup() {
             <div className="flex gap-4 mb-4">
               <div className="w-10 h-10 rounded-full bg-[#ff7a00] text-[#0e1030] font-bold flex items-center justify-center flex-shrink-0">1</div>
               <div>
-                <h2 className="text-2xl font-bold mb-4">Get Your API Key</h2>
                 <p className="text-[#94A3B8] mb-4">
                   Go to your Unimatrix dashboard and copy your API key. You&apos;ll need this for authentication.
                 </p>
@@ -74,10 +76,12 @@ export default function ClaudeDesktopSetup() {
               <div>
                 <h2 className="text-2xl font-bold mb-4">Find Your Config File</h2>
                 <p className="text-[#94A3B8] mb-4">
-                  Open Claude Desktop and go to: <code className="bg-[#1F2937] px-2 py-1 rounded">~/.config/Claude/claude_desktop_config.json</code>
+                  Open Claude Desktop and go to:{' '}
+                  <code className="bg-[#1F2937] px-2 py-1 rounded">~/.config/Claude/claude_desktop_config.json</code>
                 </p>
                 <p className="text-[#94A3B8] text-sm">
-                  <strong>On Windows:</strong> <code className="bg-[#1F2937] px-2 py-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code>
+                  <strong>On Windows:</strong>{' '}
+                  <code className="bg-[#1F2937] px-2 py-1 rounded">%APPDATA%\Claude\claude_desktop_config.json</code>
                 </p>
               </div>
             </div>
@@ -90,7 +94,6 @@ export default function ClaudeDesktopSetup() {
               <div>
                 <h2 className="text-2xl font-bold mb-4">Add Unimatrix Configuration</h2>
                 <p className="text-[#94A3B8] mb-4">Paste this configuration into your config file:</p>
-
                 <div className="bg-[#1F2937] border border-[#334155]/30 rounded-lg p-4 mb-4 relative">
                   <pre className="text-[#94A3B8] text-sm overflow-x-auto">
                     {JSON.stringify(mcpConfig, null, 2)}
@@ -99,12 +102,11 @@ export default function ClaudeDesktopSetup() {
                     onClick={copyConfig}
                     className="absolute top-4 right-4 p-2 bg-[#ff7a00] hover:bg-[#ff8a1a] text-[#0e1030] rounded"
                   >
-                    {copied ? '✓' : '📋'}
+                    {copied ? '✓ Copied!' : '📋'}
                   </button>
                 </div>
-
                 <p className="text-[#94A3B8] text-sm">
-                  ⚠️ Replace <code className="bg-[#1F2937] px-2 py-1 rounded">your-api-key-here</code> with your actual API key
+                  ⚠️ Replace <code className="bg-[#1F2937] px-2 py-1 rounded">your-api-key-here</code> with your actual API key.
                 </p>
               </div>
             </div>
@@ -155,13 +157,17 @@ export default function ClaudeDesktopSetup() {
             <div>
               <h3 className="font-bold text-[#ff7a00] mb-2">Still stuck?</h3>
               <p className="text-[#94A3B8]">
-                Check the <Link href="/help" className="text-[#ff7a00] hover:underline">help center</Link> or email hello@deployunimatrix.com
+                Check the{' '}
+                <Link href="/help" className="text-[#ff7a00] hover:underline">
+                  help center
+                </Link>{' '}
+                or email hello@deployunimatrix.com
               </p>
             </div>
           </div>
         </div>
 
-        {/* Next Steps */}
+        {/* Next Steps / Final CTA */}
         <div className="bg-[#ff7a00]/10 border border-[#ff7a00]/30 rounded-lg p-8">
           <h2 className="text-2xl font-bold mb-4">🎉 What&apos;s Next?</h2>
           <p className="text-[#94A3B8] mb-6">
@@ -172,7 +178,6 @@ export default function ClaudeDesktopSetup() {
             <li>✓ Continue a conversation from yesterday</li>
             <li>✓ Find code snippets you saved</li>
           </ul>
-
           <div className="grid md:grid-cols-2 gap-4">
             <Link
               href="/setup/chatgpt"
@@ -192,3 +197,4 @@ export default function ClaudeDesktopSetup() {
     </div>
   );
 }
+

@@ -45,8 +45,8 @@ export async function notifyPendingActionCreated(action: PendingActionNotificati
         subject,
         html,
       });
-    } catch (_e) {
-      console.error('[notifications] Resend failed:', _e);
+    } catch (err) {
+      console.error('[notifications] Resend failed:', err);
     }
   }
 
@@ -77,8 +77,8 @@ export async function notifyPendingActionCreated(action: PendingActionNotificati
           ],
         }),
       });
-    } catch (_e) {
-      console.error('[notifications] Slack webhook failed:', _e);
+    } catch (err) {
+      console.error('[notifications] Slack webhook failed:', err);
     }
   }
 }

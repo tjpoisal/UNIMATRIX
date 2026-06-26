@@ -90,14 +90,25 @@ async function getMemoryContext(userId: string, palaceId: string, task: string):
       else if (raw instanceof Uint8Array) contentStr = new TextDecoder().decode(raw);
       else if (Buffer.isBuffer(raw)) contentStr = raw.toString('utf8');
       else contentStr = String(raw ?? '');
-    } catch (e) {
+    } catch (err) {
+      // Log decoding failures for debugging; avoid unused catch binding (ESLint)
+      console.debug('Failed to decode memory content', err);
       contentStr = String(raw ?? '');
     }
 
     // normalize tags: could be array of strings or array of { tag: string }
     let tagsArr: string[] = [];
     if (Array.isArray(m.tags)) {
-      tagsArr = m.tags.map((t: any) => (typeof t === 'string' ? t : t?.tag ?? String(t))).filter(Boolean);
+      tagsArr = m.tags
+        .map((t: unknown) => {
+          if (typeof t === 'string') return t;
+          if (typeof t === 'object' && t !== null && 'tag' in (t as Record<string, unknown>)) {
+            const maybe = (t as Record<string, unknown>).tag;
+            return typeof maybe === 'string' ? maybe : String(maybe);
+          }
+          return String(t);
+        })
+        .filter(Boolean) as string[];
     }
 
     return {

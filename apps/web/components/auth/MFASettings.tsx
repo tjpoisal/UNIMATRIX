@@ -55,8 +55,9 @@ export default function MFASettings() {
         const r = await fetch('/api/auth/mfa/trusted-person');
         const d = await r.json();
         if (!cancelled) setMaskedTrusted(d.maskedEmail);
-      } catch (_) {
-        // ignore
+      } catch (err) {
+        // Non-fatal; record for debugging
+        console.debug('Failed to fetch trusted-person config', err);
       }
     })();
 

@@ -1,3 +1,4 @@
+ 
 'use client';
 
 import React, { useState } from 'react';
@@ -165,7 +166,7 @@ export default function HelpPage() {
               </div>
             ))}
           </div>
-        ) : searchQuery ? (
+          ) : searchQuery ? (
           <div className="text-center py-12">
             <p className="text-[#94A3B8] mb-4">No articles found matching &quot;{searchQuery}&quot;</p>
             <button

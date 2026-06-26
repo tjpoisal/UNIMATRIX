@@ -109,6 +109,7 @@ export async function proxy(request: Request) {
     return new Response(res.body, { status: res.status, headers });
   } catch (err) {
     // Fail safe for builds / runtime errors
+    console.error('proxy error:', err);
     return new Response("proxy error", { status: 502 });
   }
 }

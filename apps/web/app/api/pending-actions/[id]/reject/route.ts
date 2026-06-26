@@ -44,7 +44,8 @@ export async function POST(
     });
 
     return NextResponse.json({ success: true, action: updated });
-  } catch (_error) {
+  } catch (err) {
+    console.error('Failed to reject pending action', err);
     return NextResponse.json({ error: 'Failed to reject action' }, { status: 500 });
   }
 }

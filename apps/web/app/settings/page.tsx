@@ -132,8 +132,8 @@ function SettingsContent() {
         <h2 className="text-lg font-semibold text-text mb-1">Plan &amp; Billing</h2>
         <p className="text-sm text-text-secondary mb-5">
           {isPro
-            ? "You're on the Pro plan. Manage or cancel your subscription any time."
-            : "You're on the Free plan. Upgrade to unlock unlimited palaces, memories, and sharing."}
+            ? "You&apos;re on the Pro plan. Manage or cancel your subscription any time."
+            : "You&apos;re on the Free plan. Upgrade to unlock unlimited palaces, memories, and sharing."}
         </p>
 
         <div className="flex items-center gap-3 mb-5">

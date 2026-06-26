@@ -151,7 +151,9 @@ export async function requiresHumanApproval(
       if (typeof rules[toolName] === 'boolean') {
         return rules[toolName];
       }
-    } catch {}
+    } catch (err) {
+      console.debug('Failed to parse hitl_tool_rules for agent', agentName, err);
+    }
   }
 
   // Fall back to global agent flag
@@ -268,6 +270,7 @@ export async function logToolExecutionTelemetry(
       data: { current_spend: { increment: costInCents } },
     });
   } catch (e) {
-    console.warn('[telemetry] Failed to log tool usage:', e);
+    // Non-fatal telemetry logging failure — surface for debugging
+    console.debug('[telemetry] Failed to log tool usage:', e);
   }
 }
