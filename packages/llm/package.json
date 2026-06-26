@@ -1,26 +1,19 @@
 {
   "name": "@unimatrix/llm",
   "version": "0.1.0",
-  "description": "LLM providers and utilities",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@unimatrix/types": "workspace:*",
-    "@unimatrix/db": "workspace:*",
     "@anthropic-ai/sdk": "^0.104.2",
-    "@google/generative-ai": "^0.24.1",
-    "@huggingface/transformers": "^3.8.1",
-    "@prisma/client": "^6.19.3",
-    "groq-sdk": "^0.7.0",
-    "onnxruntime-node": "^1.27.0",
     "openai": "^4.104.0"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
+    "@types/node": "^25.9.3",
     "typescript": "^5.9.3"
   }
 }
