@@ -144,7 +144,7 @@ jobs:
 
     steps:
       - name: Post failure to Slack
-        uses: slackapi/slack-github-action@v1.27.0
+        uses: slackapi/slack-github-action@v3.0.3
         with:
           payload: |
             {
