@@ -22,11 +22,11 @@ jobs:
           # pnpm run build:desktop
       - name: Create GitHub Release
         id: release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
       - name: Upload release artifacts
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             dist/*.dmg
