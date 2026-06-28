@@ -1,0 +1,14 @@
+{
+  "platform": "perplexity",
+  "title": "Perplexity",
+  "quickStart": [
+    "Open Perplexity settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Install extension, visit perplexity.ai, save answer blocks.",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

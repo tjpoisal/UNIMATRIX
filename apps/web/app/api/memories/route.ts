@@ -10,11 +10,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { locationId, content, tags, sourceLlm } = await request.json();
+    const { locationId, content, encryptedContent, nonce, tags, sourceLlm } = await request.json();
 
-    if (!content) {
+    if (!content && !encryptedContent) {
       return NextResponse.json(
-        { error: "content is required" },
+        { error: "encryptedContent is required" },
         { status: 400 }
       );
     }
@@ -64,7 +64,9 @@ export async function POST(request: NextRequest) {
     const memory = await prisma.memory.create({
       data: {
         locationId: finalLocationId,
-        content,
+        content: encryptedContent
+          ? JSON.stringify({ encryptedContent, nonce: nonce ?? null, encoding: 'aes-256-gcm-base64' })
+          : content,
         tags: finalTags,
       },
     });

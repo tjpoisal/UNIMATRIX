@@ -1,0 +1,14 @@
+{
+  "platform": "deepseek",
+  "title": "DeepSeek",
+  "quickStart": [
+    "Open DeepSeek settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Add DEEPSEEK_API_KEY and register deepseek provider.",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "platform": "claude-desktop",
+  "title": "Claude Desktop",
+  "quickStart": [
+    "Open Claude Desktop settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "{\\n  \\\"mcpServers\\\": {\\n    \\\"unimatrix\\\": {\\n      \\\"url\\\": \\\"https://unimatrix-mcp.fly.dev/mcp\\\",\\n      \\\"apiKey\\\": \\\"YOUR_API_KEY\\\"\\n    }\\n  }\\n}",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

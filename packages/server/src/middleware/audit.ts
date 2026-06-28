@@ -42,6 +42,23 @@ export interface AuditEntry {
   errorCode?:      string;
 }
 
+export async function auditLog(
+  userId: string,
+  action: 'CREATE' | 'READ' | 'DELETE' | 'SUPERSEDE' | 'EXPORT' | 'SHARE',
+  memoryId?: string,
+  metadata?: Record<string, unknown>
+): Promise<void> {
+  try {
+    await pool.query(
+      `INSERT INTO audit_logs (user_id, action, memory_id, metadata)
+       VALUES ($1, $2, $3, $4::jsonb)`,
+      [userId, action, memoryId ?? null, metadata ? JSON.stringify(metadata) : null],
+    );
+  } catch (err) {
+    console.error('[auditLog] Failed to write audit log:', err);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Core write function
 // ---------------------------------------------------------------------------

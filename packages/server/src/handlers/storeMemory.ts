@@ -19,7 +19,7 @@
  */
 
 import { withUserContext, withUserContextRaw } from '../db/client.js';
-import { withAudit }                           from '../middleware/audit.js';
+import { withAudit, auditLog }                from '../middleware/audit.js';
 import { checkForInjection, sanitizeForIndexing } from '../security/sanitize.js';
 import { encryptContent, prepareForEmbedding }    from '../security/encryption.js';
 import { processLibrarianJob }                 from '../librarian/processJob.js';
@@ -148,6 +148,8 @@ export const storeMemoryHandler = withAudit(
         console.error(`[Librarian] Inline processing failed for ${memoryId}:`, err);
       });
     }
+
+    void auditLog(userId, 'CREATE', memoryId, { tool: 'store_memory' });
 
     return {
       memoryId,

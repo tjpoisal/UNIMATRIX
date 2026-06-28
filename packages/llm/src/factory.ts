@@ -4,6 +4,7 @@ import { OpenAIProvider } from './providers/openai.js';
 import { GeminiProvider } from './providers/gemini.js';
 import { GroqProvider } from './providers/groq.js';
 import { OllamaProvider } from './providers/ollama.js';
+import { OpenAICompatProvider, OPENAI_COMPAT_PROVIDERS } from './providers/openai-compat.js';
 import type { UnimatrixMemoryConfig } from './memory.js';
 
 /**
@@ -65,7 +66,20 @@ export class LLMProviderFactory {
         break;
 
       default:
-        throw new Error(`Unknown LLM provider: ${providerName}`);
+        {
+          const compat = OPENAI_COMPAT_PROVIDERS[providerName.toLowerCase()];
+          if (!compat) throw new Error(`Unknown LLM provider: ${providerName}`);
+          const apiKey =
+            config.apiKey ||
+            (compat.envKey ? process.env[compat.envKey] || '' : 'local');
+          provider = new OpenAICompatProvider(
+            providerName,
+            config.endpoint || compat.baseURL,
+            apiKey,
+            compat.models,
+            config.model || compat.models[0]
+          );
+        }
     }
 
     if (config.unimatrixMemory) {
@@ -152,6 +166,21 @@ export class LLMProviderFactory {
     );
     if (memCfg) (p as any).setUnimatrixMemoryConfig?.(memCfg);
     providers.push(p);
+
+    for (const [name, compat] of Object.entries(OPENAI_COMPAT_PROVIDERS)) {
+      if (!compat.envKey) continue;
+      const apiKey = process.env[compat.envKey];
+      if (!apiKey) continue;
+      const provider = new OpenAICompatProvider(
+        name,
+        compat.baseURL,
+        apiKey,
+        compat.models,
+        process.env[`${name.toUpperCase()}_MODEL`] || compat.models[0]
+      );
+      if (memCfg) (provider as any).setUnimatrixMemoryConfig?.(memCfg);
+      providers.push(provider);
+    }
 
     return providers;
   }

@@ -217,6 +217,7 @@ model LLMProvider {
 
   provider     String // claude | openai | gemini | groq | ollama
   model        String // e.g. "claude-opus-4-6", "gpt-4o", "gemini-pro"
+  baseUrl      String?
   label        String? // user-friendly name e.g. "My Claude Key"
   keyEncrypted String // AES-256-GCM encrypted API key
   keyIv        String // initialization vector for decryption

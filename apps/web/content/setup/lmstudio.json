@@ -1,0 +1,14 @@
+{
+  "platform": "lmstudio",
+  "title": "LM Studio",
+  "quickStart": [
+    "Open LM Studio settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Use baseUrl http://localhost:1234/v1 in provider setup.",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

@@ -16,7 +16,7 @@
  */
 
 import { withUserContextRaw, withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
-import { withAudit }              from '../middleware/audit.js';
+import { withAudit, auditLog }    from '../middleware/audit.js';
 import { generateQueryEmbedding } from '../embeddings.js';
 import { quantize2bit, cosineSim } from '../lib/quantize.js';
 import { estimateTokenCount }     from '../utils/tokens.js';
@@ -62,6 +62,8 @@ interface FtsRow {
   id:         string;
   summary:    string;
   bm25_rank:  string;
+  created_at: Date;
+  tags:       string[];
 }
 
 interface TripleRow {
@@ -69,6 +71,30 @@ interface TripleRow {
   predicate: string;
   object:    string;
   confidence: string;
+}
+
+type MemoryTier = 'HOT' | 'WARM' | 'COLD' | 'ARCHIVE';
+
+const HALF_LIFE_BY_TIER: Record<MemoryTier, number> = {
+  HOT: 180,
+  WARM: 90,
+  COLD: 30,
+  ARCHIVE: 7,
+};
+
+function resolveMemoryTier(tags: string[]): MemoryTier {
+  const lowered = tags.map((tag) => tag.toLowerCase());
+  if (lowered.includes('tier:hot') || lowered.includes('storage-tier:hot')) return 'HOT';
+  if (lowered.includes('tier:cold') || lowered.includes('storage-tier:cold')) return 'COLD';
+  if (lowered.includes('tier:archive') || lowered.includes('storage-tier:archive')) return 'ARCHIVE';
+  return 'WARM';
+}
+
+function applyTemporalDecay(score: number, createdAt: Date, halfLifeDays = 90): number {
+  const ageMs = Date.now() - createdAt.getTime();
+  const ageDays = ageMs / (1000 * 60 * 60 * 24);
+  const decay = Math.pow(0.5, ageDays / halfLifeDays);
+  return score * (0.3 + 0.7 * decay);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -129,6 +155,11 @@ export const recallHandler = withAudit(
       const res = await client.query<FtsRow>(
         `SELECT m.id, m.summary,
                 ts_rank(m.fts_vector, plainto_tsquery('english', $1)) AS bm25_rank
+                ,m.created_at
+                ,(
+                  SELECT COALESCE(ARRAY_AGG(t.tag ORDER BY t.tag), ARRAY[]::text[])
+                  FROM memory_tags t WHERE t.memory_id = m.id
+                 ) AS tags
            FROM memories m
           WHERE m.user_id    = current_user_id()::uuid
             AND m.fts_vector @@ plainto_tsquery('english', $1)
@@ -150,6 +181,8 @@ export const recallHandler = withAudit(
       vec_sim?:  number;
       embedding: string | null;
       source:    string;
+      createdAt: Date;
+      tags:      string[];
     }>();
 
     vectorRows.forEach((row, rank) => {
@@ -159,6 +192,8 @@ export const recallHandler = withAudit(
         vec_sim:   parseFloat(row.cosine_sim),
         embedding: row.embedding,
         source:    'vector',
+        createdAt: row.created_at,
+        tags: row.tags ?? [],
       });
     });
 
@@ -177,16 +212,24 @@ export const recallHandler = withAudit(
           rrf_score: addition,
           embedding: null,
           source:    'bm25_only',
+          createdAt: row.created_at,
+          tags: row.tags ?? [],
         });
       }
     });
 
     // Rescore using full float32 embedding for the top-K×3 candidates
-    const rescore = Array.from(rrf.entries())
+    let rescore = Array.from(rrf.entries())
       .sort((a, b) => b[1].rrf_score - a[1].rrf_score)
       .slice(0, topK * 3)
       .map(([id, data]) => {
-        let finalScore = data.rrf_score;
+        const tier = resolveMemoryTier(data.tags);
+        const decayedRrf = applyTemporalDecay(
+          data.rrf_score,
+          data.createdAt,
+          HALF_LIFE_BY_TIER[tier],
+        );
+        let finalScore = decayedRrf;
 
         if (data.embedding) {
           try {
@@ -195,7 +238,7 @@ export const recallHandler = withAudit(
             );
             const cosine = cosineSim(qFloat, storedVec);
             // Weighted blend: 70% float32 cosine + 30% RRF (RRF adds diversity)
-            finalScore = cosine * 0.7 + data.rrf_score * 0.3;
+            finalScore = cosine * 0.7 + decayedRrf * 0.3;
           } catch {
             // embedding parse failed (shouldn't happen) — fall back to RRF score
           }
@@ -205,6 +248,31 @@ export const recallHandler = withAudit(
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, topK);
+
+    const candidateIds = rescore.map((item) => item.id);
+    if (candidateIds.length > 0) {
+      const linkRows = await withUserContextReadOnly(userId, async (client) => {
+        const res = await client.query<{ memory_id: string; link_count: string }>(
+          `SELECT memory_id, COUNT(*)::text AS link_count
+             FROM (
+               SELECT memory_a_id AS memory_id FROM memory_links WHERE memory_a_id = ANY($1::uuid[])
+               UNION ALL
+               SELECT memory_b_id AS memory_id FROM memory_links WHERE memory_b_id = ANY($1::uuid[])
+             ) links
+            GROUP BY memory_id`,
+          [candidateIds],
+        );
+        return res.rows;
+      });
+      const linkMap = new Map(linkRows.map((row) => [row.memory_id, parseInt(row.link_count, 10)]));
+      rescore = rescore
+        .map((item) => ({
+          ...item,
+          score: item.score + Math.min((linkMap.get(item.id) ?? 0) * 0.01, 0.1),
+        }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, topK);
+    }
 
     // Fetch full metadata for the re-ranked IDs
     const finalIds = rescore.map(r => r.id);
@@ -307,6 +375,12 @@ export const recallHandler = withAudit(
         );
       }).catch(err => console.error('[recall] Access stat update failed (non-fatal):', err));
     }
+
+    void auditLog(userId, 'READ', undefined, {
+      tool: 'recall_context',
+      query: input.query,
+      count: memories.length,
+    });
 
     return {
       memories,

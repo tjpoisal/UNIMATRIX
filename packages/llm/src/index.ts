@@ -8,6 +8,7 @@ export * from '@unimatrix/types';
 
 // Providers
 export * from './providers/index.js';
+export { OPENAI_COMPAT_PROVIDERS } from './providers/openai-compat.js';
 
 // Registry
 export { LLMProviderRegistry } from './registry.js';
