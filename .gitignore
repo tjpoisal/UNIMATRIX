@@ -110,3 +110,5 @@ app.json
 .env*
 
 /generated/prisma
+
+packages/db/generated/prisma-client/
