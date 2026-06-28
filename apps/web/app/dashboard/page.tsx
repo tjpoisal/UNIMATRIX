@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import AppShell from '@/components/layout/AppShell';
 import PalaceGrid from '@/components/dashboard/PalaceGrid';
+import ContinueSessionButton from '@/components/dashboard/ContinueSessionButton';
 
 export const metadata = {
   title: 'Dashboard - Unimatrix',
@@ -18,6 +19,7 @@ export default async function DashboardPage() {
   return (
     <AppShell>
       <div className="p-8">
+        <ContinueSessionButton />
         <PalaceGrid />
       </div>
     </AppShell>

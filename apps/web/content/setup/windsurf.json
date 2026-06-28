@@ -1,0 +1,14 @@
+{
+  "platform": "windsurf",
+  "title": "Windsurf",
+  "quickStart": [
+    "Open Windsurf settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Windsurf MCP settings: add Unimatrix endpoint and API key",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "platform": "mistral",
+  "title": "Mistral",
+  "quickStart": [
+    "Open Mistral settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Add MISTRAL_API_KEY and register mistral provider.",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

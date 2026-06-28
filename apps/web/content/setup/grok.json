@@ -1,0 +1,14 @@
+{
+  "platform": "grok",
+  "title": "Grok",
+  "quickStart": [
+    "Open Grok settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Install extension, visit x.com/grok, click Save to Unimatrix.",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

@@ -126,6 +126,8 @@ export const MEMORY_TOOL_MANIFESTS = [
 const RRF_K          = 60;
 const TOP_K_BUFFER   = 40;
 const MAX_RERANK     = 24;
+type MemoryTier = 'HOT' | 'WARM' | 'COLD' | 'ARCHIVE';
+const HALF_LIFE_BY_TIER: Record<MemoryTier, number> = { HOT: 180, WARM: 90, COLD: 30, ARCHIVE: 7 };
 
 interface MemoryRow {
   id:         string;
@@ -143,6 +145,8 @@ interface FtsRow {
   id:        string;
   summary:   string;
   bm25_rank: string;
+  created_at: Date;
+  tags:      string[];
 }
 
 interface TripleRow {
@@ -150,6 +154,21 @@ interface TripleRow {
   predicate:  string;
   object:     string;
   confidence: string;
+}
+
+function resolveMemoryTier(tags: string[]): MemoryTier {
+  const lowered = tags.map((tag) => tag.toLowerCase());
+  if (lowered.includes('tier:hot') || lowered.includes('storage-tier:hot')) return 'HOT';
+  if (lowered.includes('tier:cold') || lowered.includes('storage-tier:cold')) return 'COLD';
+  if (lowered.includes('tier:archive') || lowered.includes('storage-tier:archive')) return 'ARCHIVE';
+  return 'WARM';
+}
+
+function applyTemporalDecay(score: number, createdAt: Date, halfLifeDays = 90): number {
+  const ageMs = Date.now() - createdAt.getTime();
+  const ageDays = ageMs / (1000 * 60 * 60 * 24);
+  const decay = Math.pow(0.5, ageDays / halfLifeDays);
+  return score * (0.3 + 0.7 * decay);
 }
 
 async function hybridSearch(
@@ -193,7 +212,9 @@ async function hybridSearch(
   // L2 BM25
   const fRows = await withROCtx(userId, async (client) => {
     const res = await client.query<FtsRow>(
-      `SELECT m.id, m.summary, ts_rank(m.fts_vector, plainto_tsquery('english', $1)) AS bm25_rank
+      `SELECT m.id, m.summary, ts_rank(m.fts_vector, plainto_tsquery('english', $1)) AS bm25_rank,
+              m.created_at,
+              (SELECT COALESCE(ARRAY_AGG(t.tag ORDER BY t.tag), ARRAY[]::text[]) FROM memory_tags t WHERE t.memory_id = m.id) AS tags
          FROM memories m
         WHERE m.user_id = current_user_id()::uuid
           AND m.fts_vector @@ plainto_tsquery('english', $1)
@@ -219,11 +240,13 @@ async function hybridSearch(
     .sort((a, b) => b[1].rrf_score - a[1].rrf_score)
     .slice(0, MAX_RERANK)
     .map(([id, data]) => {
-      let score = data.rrf_score;
+      const tier = resolveMemoryTier(data.tags);
+      const decayedRrf = applyTemporalDecay(data.rrf_score, data.created_at, HALF_LIFE_BY_TIER[tier]);
+      let score = decayedRrf;
       if (data.embedding) {
         try {
           const sv = new Float32Array(data.embedding.replace(/[\[\]]/g, '').split(',').map(Number));
-          score = cosineSim(qFloat, sv) * 0.7 + data.rrf_score * 0.3;
+          score = cosineSim(qFloat, sv) * 0.7 + decayedRrf * 0.3;
         } catch { /* fall back to rrf_score */ }
       }
       return { id, summary: data.summary, score, source: data.source, tags: data.tags, createdAt: data.created_at };

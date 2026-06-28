@@ -1,0 +1,14 @@
+{
+  "platform": "ollama",
+  "title": "Ollama",
+  "quickStart": [
+    "Open Ollama settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Set webhook/base URL and use OpenAI-compatible endpoint.",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

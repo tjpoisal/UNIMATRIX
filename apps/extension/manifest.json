@@ -17,6 +17,7 @@
     "https://copilot.microsoft.com/*",
     "https://huggingface.co/*",
     "https://x.com/*",
+    "https://grok.com/*",
     "https://grok.x.ai/*",
     "https://www.perplexity.ai/*",
     "https://perplexity.ai/*",
@@ -43,7 +44,8 @@
         "https://gemini.google.com/*",
         "https://copilot.microsoft.com/*",
         "https://huggingface.co/*",
-        "https://x.com/grok*",
+        "https://x.com/*",
+        "https://grok.com/*",
         "https://grok.x.ai/*",
         "https://www.perplexity.ai/*",
         "https://perplexity.ai/*"

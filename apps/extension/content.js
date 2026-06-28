@@ -27,6 +27,7 @@
     if (h.includes('gemini.google'))     return 'gemini';
     if (h.includes('copilot.microsoft')) return 'copilot';
     if (h.includes('x.com') && location.pathname.startsWith('/grok')) return 'grok';
+    if (h.includes('grok.com'))          return 'grok';
     if (h.includes('grok.x.ai'))         return 'grok';
     if (h.includes('perplexity.ai'))     return 'perplexity';
     if (h.includes('huggingface.co'))    return 'huggingface';
@@ -109,6 +110,11 @@
         const text = el.innerText?.trim();
         if (text) messages.push({ role: 'assistant', content: text });
       });
+    } else if (SITE === 'grok') {
+      const grokCaptured = captureGrok();
+      if (grokCaptured) {
+        messages.push({ role: 'assistant', content: grokCaptured });
+      }
     } else if (SITE === 'perplexity') {
       // Perplexity: questions in inputs, answers in prose blocks
       const answers = document.querySelectorAll('.prose, [class*="answer"], [data-testid="answer"]');
@@ -132,6 +138,16 @@
     }
 
     return messages;
+  }
+
+  function captureGrok() {
+    const messages = [];
+    const messageElements = document.querySelectorAll('[data-testid="conversation-turn"], [role="article"]');
+    messageElements.forEach((el) => {
+      const text = el.textContent?.trim();
+      if (text && text.length > 10) messages.push(text);
+    });
+    return messages.slice(-10).join('\n---\n');
   }
 
   function formatConversationForStorage(messages) {

@@ -54,6 +54,7 @@ model User {
   // Relations
   spaces     Space[]
   memories   Memory[]
+  memoryShares MemoryShare[] @relation("MemoryShareRecipient")
   mcpTokens  McpToken[]
   agentRuns  AgentRun[]
   stripeSubscriptions StripeSubscription[]
@@ -122,7 +123,8 @@ model Memory {
   supersededBy  String?      @map("superseded_by") @db.Uuid
   supersededAt  DateTime?    @map("superseded_at")
 
-  confidence    Float?
+  confidence    Float        @default(0.5)
+  mentionCount  Int          @default(1) @map("mention_count")
   source        MemorySource @default(mcp)
   hint          String?
 
@@ -131,6 +133,9 @@ model Memory {
 
   // Relations
   tags          MemoryTag[]
+  shares        MemoryShare[]
+  linksA        MemoryLink[] @relation("MemoryLinkA")
+  linksB        MemoryLink[] @relation("MemoryLinkB")
 
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt     @map("updated_at")
@@ -227,7 +232,9 @@ model AuditLog {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  action    String   // e.g. "memory.store", "memory.recall", "token.revoke"
+  action    String   // CREATE, READ, DELETE, SUPERSEDE, EXPORT, SHARE
+  memoryId  String?  @map("memory_id") @db.Uuid
+  memory    Memory?  @relation(fields: [memoryId], references: [id], onDelete: SetNull)
   resource  String?  // affected resource type
   resourceId String? // affected resource id
   metadata  Json?    // extra context
@@ -235,9 +242,45 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([userId])
+  @@index([userId, createdAt])
   @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+model MemoryShare {
+  id           String   @id @default(cuid())
+  memoryId     String   @map("memory_id") @db.Uuid
+  sharedWithId String   @map("shared_with_id")
+  canRead      Boolean  @default(true) @map("can_read")
+  canDelete    Boolean  @default(false) @map("can_delete")
+  expiresAt    DateTime? @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  memory       Memory   @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+  sharedWith   User     @relation("MemoryShareRecipient", fields: [sharedWithId], references: [id], onDelete: Cascade)
+
+  @@index([memoryId])
+  @@index([sharedWithId])
+  @@map("memory_shares")
+}
+
+model MemoryLink {
+  id        String   @id @default(cuid())
+  memoryAId String   @map("memory_a_id") @db.Uuid
+  memoryBId String   @map("memory_b_id") @db.Uuid
+  linkType  String   @default("entity_shared") @map("link_type")
+  weight    Float    @default(1.0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  memoryA   Memory   @relation("MemoryLinkA", fields: [memoryAId], references: [id], onDelete: Cascade)
+  memoryB   Memory   @relation("MemoryLinkB", fields: [memoryBId], references: [id], onDelete: Cascade)
+
+  @@unique([memoryAId, memoryBId])
+  @@index([memoryAId])
+  @@index([memoryBId])
+  @@map("memory_links")
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import LocationTree from '@/components/palace/LocationTree';
+import { deriveKey, encryptMemory } from '@/lib/encryption';
 
 interface Memory {
   id: string;
@@ -339,10 +340,21 @@ export default function PalaceEditorPage() {
     setSaveMsg('');
     try {
       const tags = editTags.split(',').map(t => t.trim()).filter(Boolean);
+      const userPassword = window.prompt('Enter your encryption password to save this memory securely');
+      if (!userPassword) {
+        throw new Error('Encryption password is required');
+      }
+      const key = await deriveKey(userPassword);
+      const encrypted = await encryptMemory(editContent, key);
       const res = await fetch('/api/memories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ locationId: newMemoryLocationId, content: editContent, tags }),
+        body: JSON.stringify({
+          locationId: newMemoryLocationId,
+          encryptedContent: encrypted.ciphertext,
+          nonce: encrypted.nonce,
+          tags,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Create failed');

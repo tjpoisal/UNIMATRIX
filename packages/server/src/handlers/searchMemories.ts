@@ -22,7 +22,7 @@
  */
 
 import { withUserContextRaw, withUserContextReadOnlyRaw as withUserContextReadOnly } from '../db/client.js';
-import { withAudit }               from '../middleware/audit.js';
+import { withAudit, auditLog }     from '../middleware/audit.js';
 import { generateQueryEmbedding }  from '../embeddings.js';
 import { estimateTokenCount }      from '../utils/tokens.js';
 import type { MemoryStatus, MemorySource, RecalledMemory } from '../types/domain.js';
@@ -171,6 +171,12 @@ export const searchMemoriesHandler = withAudit(
       final.push(m);
       tokenCount += est;
     }
+
+    void auditLog(userId, 'READ', undefined, {
+      tool: 'search_memories',
+      query: input.query,
+      count: final.length,
+    });
 
     return {
       memories:   final,

@@ -1,0 +1,14 @@
+{
+  "platform": "cursor",
+  "title": "Cursor",
+  "quickStart": [
+    "Open Cursor settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Cursor > Settings > MCP > Add server https://unimatrix-mcp.fly.dev/mcp",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

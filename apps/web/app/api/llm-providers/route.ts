@@ -5,7 +5,33 @@ import { encryptApiKey } from '@/lib/crypto';
 import { randomBytes as _randomBytes } from "crypto";
 import _bcrypt from "bcryptjs";
 
-const SUPPORTED_PROVIDERS = ['claude', 'openai', 'gemini', 'groq', 'ollama'];
+const OPENAI_COMPAT_PROVIDERS: Record<string, { envKey: string }> = {
+  mistral: { envKey: 'MISTRAL_API_KEY' },
+  deepseek: { envKey: 'DEEPSEEK_API_KEY' },
+  together: { envKey: 'TOGETHER_API_KEY' },
+  fireworks: { envKey: 'FIREWORKS_API_KEY' },
+  cerebras: { envKey: 'CEREBRAS_API_KEY' },
+  sambanova: { envKey: 'SAMBANOVA_API_KEY' },
+  xai: { envKey: 'XAI_API_KEY' },
+  openrouter: { envKey: 'OPENROUTER_API_KEY' },
+  nvidia: { envKey: 'NVIDIA_API_KEY' },
+  ai21: { envKey: 'AI21_API_KEY' },
+  sonar: { envKey: 'PERPLEXITY_API_KEY' },
+  vllm: { envKey: '' },
+  lmstudio: { envKey: '' },
+  jan: { envKey: '' },
+  llamacpp: { envKey: '' },
+  textgenui: { envKey: '' },
+};
+
+const SUPPORTED_PROVIDERS = [
+  'claude',
+  'openai',
+  'gemini',
+  'groq',
+  'ollama',
+  ...Object.keys(OPENAI_COMPAT_PROVIDERS),
+];
 
 // GET /api/llm-providers — list user's connected LLM providers (no keys)
 export async function GET() {
@@ -20,6 +46,7 @@ export async function GET() {
       id: true,
       provider: true,
       model: true,
+      baseUrl: true,
       label: true,
       keyPrefix: true,
       createdAt: true,
@@ -37,7 +64,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { provider, model, apiKey, label } = await request.json();
+  const { provider, model, apiKey, label, baseUrl } = await request.json();
 
   if (!provider || !SUPPORTED_PROVIDERS.includes(provider)) {
     return NextResponse.json(
@@ -48,11 +75,16 @@ export async function POST(request: NextRequest) {
   if (!model?.trim()) {
     return NextResponse.json({ error: 'Model is required' }, { status: 400 });
   }
-  if (provider !== 'ollama' && !apiKey?.trim()) {
+  const compatCfg = OPENAI_COMPAT_PROVIDERS[provider];
+  const isLocalCompat = !!compatCfg && compatCfg.envKey === '';
+  if (provider !== 'ollama' && !isLocalCompat && !apiKey?.trim()) {
     return NextResponse.json({ error: 'API key is required' }, { status: 400 });
   }
+  if (isLocalCompat && baseUrl && typeof baseUrl !== 'string') {
+    return NextResponse.json({ error: 'baseUrl must be a string when provided' }, { status: 400 });
+  }
 
-  const rawKey = provider === 'ollama' ? 'local' : apiKey.trim();
+  const rawKey = provider === 'ollama' || isLocalCompat ? 'local' : apiKey.trim();
   const { encrypted, iv } = encryptApiKey(rawKey);
   const keyPrefix = rawKey.slice(0, 8) + '...';
 
@@ -70,6 +102,7 @@ export async function POST(request: NextRequest) {
       keyIv: iv,
       keyPrefix,
       label: label?.trim() || null,
+      baseUrl: baseUrl?.trim() || null,
       isActive: true,
     },
     create: {
@@ -77,6 +110,7 @@ export async function POST(request: NextRequest) {
       provider,
       model: model.trim(),
       label: label?.trim() || null,
+      baseUrl: baseUrl?.trim() || null,
       keyEncrypted: encrypted,
       keyIv: iv,
       keyPrefix,
@@ -122,6 +156,7 @@ export async function POST(request: NextRequest) {
       id: record.id,
       provider: record.provider,
       model: record.model,
+      baseUrl: record.baseUrl,
       label: record.label,
       keyPrefix: record.keyPrefix,
       createdAt: record.createdAt,

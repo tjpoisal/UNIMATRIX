@@ -1,17 +1,24 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 /**
  * Health check endpoint for Render (and other platforms).
  * Used by load balancers and monitoring.
  */
 export async function GET() {
+  let dbOk = false;
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    dbOk = true;
+  } catch {
+    dbOk = false;
+  }
   return NextResponse.json(
     {
       status: 'ok',
-      service: 'unimatrix-web',
-      timestamp: new Date().toISOString(),
-      version: process.env.npm_package_version ?? '0.1.0',
+      db: dbOk ? 'connected' : 'error',
+      ts: Date.now(),
     },
-    { status: 200 }
+    { status: dbOk ? 200 : 503 }
   );
 }

@@ -1,0 +1,14 @@
+{
+  "platform": "vllm",
+  "title": "vLLM",
+  "quickStart": [
+    "Open vLLM settings",
+    "Paste the config snippet",
+    "Test the connection"
+  ],
+  "config": "Use baseUrl http://localhost:8000/v1 in provider setup.",
+  "faq": [
+    {"q": "Connection failed", "a": "Check API key, URL, and network access."},
+    {"q": "No memories returned", "a": "Save a memory first, then retry recall."}
+  ]
+}

@@ -40,6 +40,14 @@ interface Triple {
   object:    string;
 }
 
+interface ContradictionResult {
+  newTriple: Triple;
+  existingTripleId: string;
+  existingMemoryId: string | null;
+  confidence: number;
+  suggestedAction: 'supersede';
+}
+
 /**
  * Lightweight regex-based triple extractor.
  * Covers the most common first-person fact patterns without any LLM call.
@@ -69,6 +77,41 @@ function extractTriplesHeuristic(content: string, userId: string): Triple[] {
       const obj = m[1]?.trim().slice(0, 140);
       if (obj && obj.length > 2) {
         triples.push({ subject: userId, predicate: pred, object: obj });
+      }
+
+      async function detectContradictions(
+        client: import('pg').PoolClient,
+        newTriples: Triple[],
+        userId: string,
+      ): Promise<ContradictionResult[]> {
+        const contradictions: ContradictionResult[] = [];
+        for (const triple of newTriples) {
+          const existing = await client.query<{
+            id: string;
+            object: string;
+            source_memory_id: string | null;
+          }>(
+            `SELECT id, object, source_memory_id
+               FROM memory_triples
+              WHERE user_id      = current_user_id()::uuid
+                AND subject      = $1
+                AND predicate    = $2
+                AND superseded_at IS NULL`,
+            [triple.subject, triple.predicate],
+          );
+          for (const ex of existing.rows) {
+            if (ex.object !== triple.object) {
+              contradictions.push({
+                newTriple: triple,
+                existingTripleId: ex.id,
+                existingMemoryId: ex.source_memory_id,
+                confidence: 0.8,
+                suggestedAction: 'supersede',
+              });
+            }
+          }
+        }
+        return contradictions;
       }
     }
   }
@@ -142,6 +185,43 @@ export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianR
 
   // ── 8. Write back within RLS context ─────────────────────────────────────
   await withUserContextRaw(userId, async (client) => {
+    const nearDuplicate = await client.query<{ id: string; confidence: string | null; mention_count: string | null }>(
+      `SELECT id, confidence, mention_count
+         FROM memories
+        WHERE user_id = current_user_id()::uuid
+          AND id != $1
+          AND indexed_at IS NOT NULL
+          AND status = 'active'
+          AND (1.0 - (embedding <=> $2::vector)) > 0.92
+        ORDER BY (embedding <=> $2::vector) ASC
+        LIMIT 1`,
+      [memoryId, `[${embedding.join(',')}]`],
+    );
+    if (nearDuplicate.rows.length > 0) {
+      const winner = nearDuplicate.rows[0];
+      await client.query(
+        `UPDATE memories
+            SET mention_count = COALESCE(mention_count, 1) + 1,
+                confidence    = LEAST(1.0, COALESCE(confidence, 0.5) + 0.1),
+                updated_at    = NOW()
+          WHERE id = $1`,
+        [winner.id],
+      );
+      await client.query(
+        `UPDATE memories
+            SET status = 'superseded',
+                superseded_by = $1,
+                superseded_at = NOW()
+          WHERE id = $2`,
+        [winner.id, memoryId],
+      );
+      await client.query(
+        `INSERT INTO audit_logs (user_id, action, resource, resource_id, metadata)
+         VALUES ($1, 'SUPERSEDE', 'memory', $2, $3::jsonb)`,
+        [userId, memoryId, JSON.stringify({ reason: 'semantic_duplicate', similarTo: winner.id })],
+      );
+      return;
+    }
 
     // UPDATE memories — all semantic + quantized fields in one round-trip
     await client.query(
@@ -188,28 +268,40 @@ export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianR
       );
     }
 
-    // UPSERT semantic triples — supersede contradictions, insert new
-    for (const triple of triples) {
-      // Check for an active triple with the same subject+predicate but different object
-      const existing = await client.query<{ id: string; object: string }>(
-        `SELECT id, object FROM memory_triples
-          WHERE user_id   = current_user_id()::uuid
-            AND subject   = $1
-            AND predicate = $2
-            AND superseded_at IS NULL
-          LIMIT 1`,
-        [triple.subject, triple.predicate],
+    const contradictions = await detectContradictions(client, triples, userId);
+    for (const contradiction of contradictions) {
+      await client.query(
+        `UPDATE memory_triples SET superseded_at = NOW() WHERE id = $1`,
+        [contradiction.existingTripleId],
       );
-
-      if (existing.rows.length > 0 && existing.rows[0].object !== triple.object) {
-        // Supersede the contradicting triple
+      if (contradiction.existingMemoryId) {
         await client.query(
-          `UPDATE memory_triples SET superseded_at = NOW() WHERE id = $1`,
-          [existing.rows[0].id],
+          `UPDATE memories
+              SET status = 'superseded',
+                  superseded_by = $1,
+                  superseded_at = NOW()
+            WHERE id = $2
+              AND status = 'active'`,
+          [memoryId, contradiction.existingMemoryId],
+        );
+        await client.query(
+          `INSERT INTO audit_logs (user_id, action, resource, resource_id, metadata)
+           VALUES ($1, 'SUPERSEDE', 'memory', $2, $3::jsonb)`,
+          [
+            userId,
+            contradiction.existingMemoryId,
+            JSON.stringify({
+              reason: 'triple_contradiction',
+              confidence: contradiction.confidence,
+              triple: contradiction.newTriple,
+            }),
+          ],
         );
       }
+    }
 
-      // Insert the new triple (ON CONFLICT DO NOTHING guards exact duplicates)
+    // UPSERT semantic triples — supersede contradictions, insert new
+    for (const triple of triples) {
       await client.query(
         `INSERT INTO memory_triples
            (user_id, space_id, subject, predicate, object, source_memory_id, source_llm)
@@ -225,6 +317,32 @@ export async function processLibrarianJob(job: LibrarianJob): Promise<LibrarianR
           sourceLlm ?? null,
         ],
       );
+
+      const related = await client.query<{ source_memory_id: string }>(
+        `SELECT DISTINCT source_memory_id
+           FROM memory_triples
+          WHERE user_id = current_user_id()::uuid
+            AND source_memory_id IS NOT NULL
+            AND source_memory_id != $1
+            AND (
+              subject = $2 OR object = $2 OR
+              subject = $3 OR object = $3
+            )
+          LIMIT 10`,
+        [memoryId, triple.subject, triple.object],
+      );
+      for (const rel of related.rows) {
+        const [memoryAId, memoryBId] = memoryId < rel.source_memory_id
+          ? [memoryId, rel.source_memory_id]
+          : [rel.source_memory_id, memoryId];
+        await client.query(
+          `INSERT INTO memory_links (memory_a_id, memory_b_id, link_type, weight)
+           VALUES ($1, $2, 'entity_shared', 1.0)
+           ON CONFLICT (memory_a_id, memory_b_id)
+           DO UPDATE SET weight = memory_links.weight + 0.1, updated_at = NOW()`,
+          [memoryAId, memoryBId],
+        );
+      }
     }
 
     // Poly-tag when alt-space confidence is high enough
