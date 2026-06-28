@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Unimatrix Memory",
+  "version": "0.1.0",
+  "description": "Captures conversations from AI apps and syncs them to your Unimatrix memory store.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://perplexity.ai/*",
+    "https://www.perplexity.ai/*",
+    "https://gemini.google.com/*",
+    "https://copilot.microsoft.com/*",
+    "https://meta.ai/*",
+    "https://grok.x.ai/*",
+    "https://poe.com/*",
+    "https://you.com/*",
+    "https://www.phind.com/*",
+    "https://chat.mistral.ai/*",
+    "https://heypi.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    { "matches": ["https://www.perplexity.ai/*"], "js": ["content/perplexity.js"], "run_at": "document_idle" },
+    { "matches": ["https://gemini.google.com/*"],  "js": ["content/gemini.js"],     "run_at": "document_idle" },
+    { "matches": ["https://copilot.microsoft.com/*"], "js": ["content/copilot.js"], "run_at": "document_idle" },
+    { "matches": ["https://meta.ai/*"],             "js": ["content/meta-ai.js"],   "run_at": "document_idle" },
+    { "matches": ["https://grok.x.ai/*"],           "js": ["content/grok.js"],      "run_at": "document_idle" },
+    { "matches": ["https://poe.com/*"],             "js": ["content/poe.js"],       "run_at": "document_idle" },
+    { "matches": ["https://you.com/*"],             "js": ["content/youcom.js"],    "run_at": "document_idle" },
+    { "matches": ["https://www.phind.com/*"],       "js": ["content/phind.js"],     "run_at": "document_idle" },
+    { "matches": ["https://chat.mistral.ai/*"],     "js": ["content/lechat.js"],    "run_at": "document_idle" },
+    { "matches": ["https://heypi.com/*"],           "js": ["content/pi.js"],        "run_at": "document_idle" }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Unimatrix Memory",
+    "default_icon": { "32": "icons/icon32.png", "128": "icons/icon128.png" }
+  }
+}
