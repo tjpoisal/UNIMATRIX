@@ -1,165 +1,129 @@
 /**
- * Background Worker for Unimatrix (Render Worker service)
+ * src/worker.ts
  *
- * This is a real long-running worker that offloads heavy semantic processing
- * (Voyage embeddings, summarization, space classification, tagging) from the
- * main MCP request path.
+ * UniMatrix background worker.
+ * Runs as unimatrix-worker on Fly.io (always-on persistent machine).
  *
- * Current implementation:
- * - Polls AgentRun rows with task='librarian' + status='pending' (enqueued by store_memory / supersede_memory)
- * - Executes the real Librarian (embeddings + summarize + tag + classifySpace)
- * - Updates the AgentRun to completed/failed and marks memory indexedAt
- * - Designed to be run as dedicated Render Worker (see render.yaml) or sidecar.
- *
- * To run locally:
- *   pnpm --filter @unimatrix/server build
- *   DATABASE_URL=... node dist/worker.js
- *
- * On Render: Use the worker service definition in render.yaml (Docker recommended).
+ * Scheduled jobs:
+ *   every 5 min  → Librarian queue drain (existing)
+ *   every 1 hour → Importance decay batch (all active users)
+ *   every 6 hours → Re-tier batch (adaptive compression)
+ *   every 24 hours → Deduplication pass
  */
 
-import { processLibrarianJob } from './librarian/processJob.js';
-import type { LibrarianJob } from './types/domain.js';
-import { prisma, pool } from './db/client.js';
-const __repoDir = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
+import Fastify from 'fastify';
+import { Pool } from 'pg';
+import { runGlobalDecayPass } from './lib/decay.js';
+import { runReTierBatch }     from './lib/tierManager.js';
 
-const POLL_INTERVAL_MS = 15_000; // 15 seconds
-const BATCH_SIZE = 10;
+const server = Fastify({ logger: true });
+const db = new Pool({ connectionString: process.env.DATABASE_URL });
 
-async function getPendingLibrarianAgentRuns(): Promise<Array<{ id: string; userId: string; job: LibrarianJob }>> {
-  const runs = await prisma.agentRun.findMany({
-    where: {
-      task: 'librarian',
-      status: 'pending',
-    },
-    orderBy: { createdAt: 'asc' },
-    take: BATCH_SIZE,
-    select: { id: true, userId: true, result: true },
-  });
+// ── Health check ─────────────────────────────────────────────────────────────
+server.get('/health', async () => ({ status: 'ok', worker: 'unimatrix-worker', ts: new Date().toISOString() }));
 
-  const out: Array<{ id: string; userId: string; job: LibrarianJob }> = [];
-  for (const r of runs) {
-    try {
-      const payload = r.result as any;
-      if (payload?.job) {
-        out.push({
-          id: r.id,
-          userId: r.userId,
-          job: payload.job as LibrarianJob,
-        });
-      }
-    } catch (e) {
-      console.warn('[Worker] Bad AgentRun result payload for', r.id);
-    }
-  }
-  return out;
-}
-
-async function markAgentRunCompleted(runId: string, result: any, memoryId: string) {
-  await prisma.agentRun.update({
-    where: { id: runId },
-    data: {
-      status: 'completed',
-      result: result as any,
-      memoryIds: [memoryId],
-    },
-  });
-}
-
-async function markAgentRunFailed(runId: string, errMsg: string) {
-  await prisma.agentRun.update({
-    where: { id: runId },
-    data: {
-      status: 'failed',
-      errorMsg: errMsg,
-    },
-  });
-}
-
-async function markMemoryIndexed(memoryId: string) {
-  await prisma.memory.update({
-    where: { id: memoryId },
-    data: { indexedAt: new Date() },
-  });
-}
-
-async function processBatch() {
-  const pendingRuns = await getPendingLibrarianAgentRuns();
-
-  for (const run of pendingRuns) {
-    const { id: runId, job } = run;
-
-    if (!job.content) {
-      await markAgentRunFailed(runId, 'No content in job payload');
-      continue;
-    }
-
-    try {
-      console.log(`[Worker] Processing AgentRun ${runId} for memory ${job.memoryId}`);
-      const libResult = await processLibrarianJob(job);
-      await markAgentRunCompleted(runId, libResult, job.memoryId);
-      await markMemoryIndexed(job.memoryId);
-      console.log(`[Worker] AgentRun ${runId} completed → space ${libResult.spaceId}`);
-    } catch (err: any) {
-      console.error(`[Worker] AgentRun ${runId} failed:`, err);
-      await markAgentRunFailed(runId, err?.message || String(err));
-    }
-  }
-}
-
-// ── TTL Expiry Cleanup ─────────────────────────────────────────────────────
-
-const TTL_CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // hourly
-
-async function expireOldMemories(): Promise<void> {
+// ── Job: Global decay ─────────────────────────────────────────────────────────
+async function runDecayJob(): Promise<void> {
+  console.log('[Worker] Starting global decay pass...');
   try {
-    const result = await prisma.memory.updateMany({
-      where: {
-        expiresAt:  { lte: new Date() },
-        deletedAt:  null,
-        status:     { not: 'archived' },
-      },
-      data: {
-        deletedAt: new Date(),
-        status:    'archived',
-      },
-    });
-    if (result.count > 0) {
-      console.log(`[Worker] TTL expiry: soft-deleted ${result.count} expired memories`);
-    }
-  } catch (err: any) {
-    console.error('[Worker] TTL expiry error:', err?.message);
+    const result = await runGlobalDecayPass(
+      { query: (sql: string, params?: unknown[]) => db.query(sql, params as unknown[]) },
+      { limit: 500, staleAfterDays: 3 },
+    );
+    console.log(`[Worker] Decay complete — users: ${result.usersProcessed}, updated: ${result.totalUpdated}`);
+  } catch (err) {
+    console.error('[Worker] Decay job error:', err);
   }
 }
 
-async function main() {
-  console.log('[Worker] Unimatrix background worker starting...');
-  console.log(`[Worker] Poll interval: ${POLL_INTERVAL_MS}ms, batch: ${BATCH_SIZE}`);
-
-  // Run TTL cleanup immediately on start, then hourly
-  await expireOldMemories();
-  setInterval(expireOldMemories, TTL_CLEANUP_INTERVAL_MS);
-
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    try {
-      await processBatch();
-    } catch (err) {
-      console.error('[Worker] Batch error (will retry):', err);
+// ── Job: Re-tier all users ────────────────────────────────────────────────────
+async function runReTierJob(): Promise<void> {
+  console.log('[Worker] Starting re-tier pass...');
+  try {
+    const { rows } = await db.query<{ user_id: string }>(
+      `SELECT DISTINCT user_id::text FROM memories WHERE deleted_at IS NULL AND status != 'superseded'`
+    );
+    let totalPromoted = 0, totalDemoted = 0;
+    for (const row of rows) {
+      try {
+        const result = await runReTierBatch(row.user_id, { limit: 500 });
+        totalPromoted += result.promoted;
+        totalDemoted  += result.demoted;
+      } catch (err) {
+        console.error(`[Worker] Re-tier error for user ${row.user_id}:`, err);
+      }
     }
-    await new Promise((res) => setTimeout(res, POLL_INTERVAL_MS));
+    console.log(`[Worker] Re-tier complete — promoted: ${totalPromoted}, demoted: ${totalDemoted}`);
+  } catch (err) {
+    console.error('[Worker] Re-tier job error:', err);
   }
 }
 
-// Allow direct execution
-// if (__repoDir /* import.meta.url */ === `file://${process.argv[1]}`) {
-const isEntryPoint = typeof require !== 'undefined' && require.main === module;
-
-if (isEntryPoint) {
-  main().catch((err) => {
-    console.error('[Worker] Fatal error:', err);
-    process.exit(1);
-  });
+// ── Job: Deduplication pass ───────────────────────────────────────────────────
+async function runDeduplicationJob(): Promise<void> {
+  console.log('[Worker] Starting deduplication pass...');
+  try {
+    // Find near-duplicate active memories (cosine distance < 0.05) per user
+    // and soft-supersede the older one.
+    const { rows } = await db.query<{ user_id: string }>(
+      `SELECT DISTINCT user_id::text FROM memories
+        WHERE status = 'active' AND deleted_at IS NULL AND embedding IS NOT NULL`
+    );
+    let totalSuperseded = 0;
+    for (const row of rows) {
+      try {
+        const { rows: dupes } = await db.query<{ id_a: string; id_b: string }>(
+          `SELECT a.id AS id_a, b.id AS id_b
+             FROM memories a
+             JOIN memories b ON b.user_id = a.user_id
+               AND b.id > a.id
+               AND b.status = 'active'
+               AND b.deleted_at IS NULL
+               AND (a.embedding <=> b.embedding) < 0.05
+            WHERE a.user_id = $1
+              AND a.status = 'active'
+              AND a.deleted_at IS NULL
+              AND a.embedding IS NOT NULL
+            LIMIT 100`,
+          [row.user_id],
+        );
+        for (const dupe of dupes) {
+          await db.query(
+            `UPDATE memories SET status = 'superseded', superseded_by = $1, superseded_at = NOW()
+              WHERE id = $2 AND status = 'active'`,
+            [dupe.id_a, dupe.id_b],
+          );
+          totalSuperseded++;
+        }
+      } catch (err) {
+        console.error(`[Worker] Dedup error for user ${row.user_id}:`, err);
+      }
+    }
+    console.log(`[Worker] Dedup complete — superseded: ${totalSuperseded}`);
+  } catch (err) {
+    console.error('[Worker] Dedup job error:', err);
+  }
 }
 
-export { main as runWorker, processBatch };
+// ── Scheduler ─────────────────────────────────────────────────────────────────
+function scheduleJob(fn: () => Promise<void>, intervalMs: number, label: string): void {
+  const run = async () => {
+    await fn();
+    setTimeout(run, intervalMs);
+  };
+  setTimeout(run, intervalMs); // first run after first interval
+  console.log(`[Worker] Scheduled ${label} every ${intervalMs / 60_000} min`);
+}
+
+const MINUTE = 60_000;
+
+scheduleJob(runDecayJob,        60 * MINUTE,   'decay');
+scheduleJob(runReTierJob,       360 * MINUTE,  're-tier');
+scheduleJob(runDeduplicationJob, 1440 * MINUTE, 'dedup');
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+const PORT = parseInt(process.env.PORT ?? '8080', 10);
+server.listen({ port: PORT, host: '0.0.0.0' }, (err) => {
+  if (err) { server.log.error(err); process.exit(1); }
+  console.log(`[Worker] Listening on :${PORT}`);
+});
