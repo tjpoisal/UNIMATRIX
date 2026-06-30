@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Linking, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, Linking } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '@/lib/api';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { handleGoogleOAuth, handleGitHubOAuth } from '@/lib/oauth';
+import { OAuthButton } from '@/components/OAuthButton';
 
 export default function LoginScreen() {
   const params = useLocalSearchParams<{ key?: string; token?: string; connectToken?: string }>();
@@ -153,13 +155,20 @@ The system will automatically include relevant history from that LLM's dedicated
 
           await AsyncStorage.setItem('authToken', data.key);
           await AsyncStorage.setItem('userId', 'from-connect-token');
-          setApiKey(data.key);
-          setMode('apikey');
+          setTimeout(() => {
+            setApiKey(data.key);
+            setMode('apikey');
+          }, 0);
 
           // Enhanced auto-magic setup (palace + locations + welcome content)
           setTimeout(async () => {
             await runAutoMagicSetup();
-            router.replace('/(tabs)/dashboard');
+            const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+            if (onboardingCompleted === 'true') {
+              router.replace('/(tabs)/dashboard');
+            } else {
+              router.replace('/(auth)/onboarding');
+            }
           }, 200);
         } catch (e: any) {
           Alert.alert('Connect Failed', e.message || 'Could not exchange the mobile connect token. Please use the API key manually.');
@@ -168,8 +177,10 @@ The system will automatically include relevant history from that LLM's dedicated
         }
       })();
     } else if (params.key) {
-      setApiKey(params.key);
-      setMode('apikey');
+      setTimeout(() => {
+        setApiKey(params.key);
+        setMode('apikey');
+      }, 0);
 
       // Auto login with the key from deep link / QR for super easy flow
       (async () => {
@@ -179,7 +190,12 @@ The system will automatically include relevant history from that LLM's dedicated
           // Enhanced auto-magic setup (palace + locations + welcome content)
           setTimeout(async () => {
             await runAutoMagicSetup();
-            router.replace('/(tabs)/dashboard');
+            const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+            if (onboardingCompleted === 'true') {
+              router.replace('/(tabs)/dashboard');
+            } else {
+              router.replace('/(auth)/onboarding');
+            }
           }, 300);
         } catch (e) {
           // fall to manual
@@ -189,7 +205,12 @@ The system will automatically include relevant history from that LLM's dedicated
     if (params.token) {
       (async () => {
         await AsyncStorage.setItem('authToken', params.token as string);
-        router.replace('/(tabs)/dashboard');
+        const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+        if (onboardingCompleted === 'true') {
+          router.replace('/(tabs)/dashboard');
+        } else {
+          router.replace('/(auth)/onboarding');
+        }
       })();
     }
   }, [params.key, params.token, params.connectToken]);
@@ -205,7 +226,14 @@ The system will automatically include relevant history from that LLM's dedicated
       const response = await apiClient.login(email, password);
       await AsyncStorage.setItem('authToken', response.token);
       await AsyncStorage.setItem('userId', response.user.id);
-      router.replace('/(tabs)/dashboard');
+      
+      // Check if onboarding is completed
+      const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+      if (onboardingCompleted === 'true') {
+        router.replace('/(tabs)/dashboard');
+      } else {
+        router.replace('/(auth)/onboarding');
+      }
     } catch (error: any) {
       Alert.alert('Login Failed', error.response?.data?.message || 'Invalid credentials');
     } finally {
@@ -223,9 +251,58 @@ The system will automatically include relevant history from that LLM's dedicated
     try {
       await AsyncStorage.setItem('authToken', apiKey.trim());
       await AsyncStorage.setItem('userId', 'from-key');
-      router.replace('/(tabs)/dashboard');
+      
+      // Check if onboarding is completed
+      const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+      if (onboardingCompleted === 'true') {
+        router.replace('/(tabs)/dashboard');
+      } else {
+        router.replace('/(auth)/onboarding');
+      }
     } catch (error: any) {
       Alert.alert('Login Failed', 'Invalid API key or network error. Make sure the key was created in web onboarding.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const result = await handleGoogleOAuth();
+      if (result.success) {
+        const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+        if (onboardingCompleted === 'true') {
+          router.replace('/(tabs)/dashboard');
+        } else {
+          router.replace('/(auth)/onboarding');
+        }
+      } else {
+        Alert.alert('OAuth Failed', result.error || 'Failed to sign in with Google');
+      }
+    } catch (error: any) {
+      Alert.alert('OAuth Failed', error.message || 'Failed to sign in with Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setLoading(true);
+    try {
+      const result = await handleGitHubOAuth();
+      if (result.success) {
+        const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+        if (onboardingCompleted === 'true') {
+          router.replace('/(tabs)/dashboard');
+        } else {
+          router.replace('/(auth)/onboarding');
+        }
+      } else {
+        Alert.alert('OAuth Failed', result.error || 'Failed to sign in with GitHub');
+      }
+    } catch (error: any) {
+      Alert.alert('OAuth Failed', error.message || 'Failed to sign in with GitHub');
     } finally {
       setLoading(false);
     }
@@ -273,7 +350,12 @@ The system will automatically include relevant history from that LLM's dedicated
         (async () => {
           await AsyncStorage.setItem('authToken', key);
           await AsyncStorage.setItem('userId', 'from-scanned-key');
-          router.replace('/(tabs)/dashboard');
+          const onboardingCompleted = await AsyncStorage.getItem('onboardingCompleted');
+          if (onboardingCompleted === 'true') {
+            router.replace('/(tabs)/dashboard');
+          } else {
+            router.replace('/(auth)/onboarding');
+          }
         })();
       } else {
         Alert.alert('Invalid QR', 'This QR does not contain a valid Unimatrix connect link.');
@@ -384,6 +466,26 @@ The system will automatically include relevant history from that LLM's dedicated
               <Text className="text-[#0A0F1C] font-semibold text-center text-lg">Sign In</Text>
             )}
           </TouchableOpacity>
+
+          <View className="flex-row items-center mb-4">
+            <View className="flex-1 h-px bg-gray-600" />
+            <Text className="mx-4 text-gray-500 text-sm">or continue with</Text>
+            <View className="flex-1 h-px bg-gray-600" />
+          </View>
+
+          <OAuthButton
+            provider="google"
+            onPress={handleGoogleSignIn}
+            loading={loading}
+          />
+
+          <View className="h-3" />
+
+          <OAuthButton
+            provider="github"
+            onPress={handleGitHubSignIn}
+            loading={loading}
+          />
         </>
       ) : (
         <>
@@ -423,13 +525,13 @@ The system will automatically include relevant history from that LLM's dedicated
 
       <TouchableOpacity onPress={() => router.push('/register')}>
         <Text className="text-gray-400 text-center">
-          Don't have an account? <Text className="text-[#00F5FF] font-semibold">Sign up on web first (recommended for full setup)</Text>
+          Don&apos;t have an account? <Text className="text-[#00F5FF] font-semibold">Sign up on web first (recommended for full setup)</Text>
         </Text>
       </TouchableOpacity>
 
       {mode === 'apikey' && (
         <Text className="text-center text-[10px] text-gray-500 mt-4">
-          Perfect for the "super easy installer" flow: set up everything (including LLM logins) on web/desktop, then use the key here for instant mobile access.
+          Perfect for the &quot;super easy installer&quot; flow: set up everything (including LLM logins) on web/desktop, then use the key here for instant mobile access.
         </Text>
       )}
     </View>

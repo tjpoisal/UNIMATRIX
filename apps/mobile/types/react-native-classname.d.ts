@@ -1,5 +1,4 @@
 import "react";
-import type { TextProps, ViewProps, ImageProps, TextInputProps, TouchableOpacityProps } from "react-native";
 
 declare module "react-native" {
   interface ViewProps {

@@ -56,7 +56,14 @@
         }
       ],
       "expo-background-fetch",
-      "expo-task-manager"
+      "expo-task-manager",
+      "expo-font",
+      "expo-router",
+      "expo-splash-screen",
+      "expo-sqlite",
+      "expo-web-browser",
+      "expo-auth-session",
+      "expo-random"
     ],
     "extra": {
       "router": {

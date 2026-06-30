@@ -3,7 +3,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, ScrollView, StyleSheet, StatusBar, TouchableOpacity, ActivityIndicator,
+  View, Text, ScrollView, StyleSheet, StatusBar, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { mcpClient } from '@/lib/mcp-client';

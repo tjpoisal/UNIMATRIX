@@ -112,7 +112,7 @@
     } else if (SITE === 'perplexity') {
       // Perplexity: questions in inputs, answers in prose blocks
       const answers = document.querySelectorAll('.prose, [class*="answer"], [data-testid="answer"]');
-      answers.forEach((el, i) => {
+      answers.forEach((el, _i) => {
         const text = el.innerText?.trim();
         if (text) messages.push({ role: 'assistant', content: text });
       });
@@ -261,7 +261,7 @@
 
     const content = formatConversationForStorage(messages);
     const title   = getPageTitle();
-    const summary = messages[messages.length - 1]?.content?.slice(0, 120) || title;
+    const _summary = messages[messages.length - 1]?.content?.slice(0, 120) || title;
 
     const result = await new Promise(resolve =>
       chrome.runtime.sendMessage({
@@ -483,7 +483,7 @@
 
   // Listen for intercepted memory events from page context
   window.addEventListener('__umx_intercept_memory', async (e) => {
-    const { content, source } = e.detail || {};
+    const { content, _source } = e.detail || {};
     if (!content) return;
 
     // Check if intercept is enabled in settings

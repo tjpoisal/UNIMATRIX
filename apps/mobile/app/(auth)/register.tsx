@@ -3,6 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert } fro
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiClient } from '@/lib/api';
+import { handleGoogleOAuth, handleGitHubOAuth } from '@/lib/oauth';
+import { OAuthButton } from '@/components/OAuthButton';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
@@ -32,9 +34,41 @@ export default function RegisterScreen() {
       const response = await apiClient.register(email, password, name);
       await AsyncStorage.setItem('authToken', response.token);
       await AsyncStorage.setItem('userId', response.user.id);
-      router.replace('/(tabs)/dashboard');
+      router.replace('/(auth)/onboarding');
     } catch (error: any) {
       Alert.alert('Registration Failed', error.response?.data?.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const result = await handleGoogleOAuth();
+      if (result.success) {
+        router.replace('/(auth)/onboarding');
+      } else {
+        Alert.alert('OAuth Failed', result.error || 'Failed to sign in with Google');
+      }
+    } catch (error: any) {
+      Alert.alert('OAuth Failed', error.message || 'Failed to sign in with Google');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGitHubSignIn = async () => {
+    setLoading(true);
+    try {
+      const result = await handleGitHubOAuth();
+      if (result.success) {
+        router.replace('/(auth)/onboarding');
+      } else {
+        Alert.alert('OAuth Failed', result.error || 'Failed to sign in with GitHub');
+      }
+    } catch (error: any) {
+      Alert.alert('OAuth Failed', error.message || 'Failed to sign in with GitHub');
     } finally {
       setLoading(false);
     }
@@ -106,8 +140,28 @@ export default function RegisterScreen() {
         )}
       </TouchableOpacity>
 
+      <View className="flex-row items-center mb-4">
+        <View className="flex-1 h-px bg-gray-600" />
+        <Text className="mx-4 text-gray-500 text-sm">or continue with</Text>
+        <View className="flex-1 h-px bg-gray-600" />
+      </View>
+
+      <OAuthButton
+        provider="google"
+        onPress={handleGoogleSignIn}
+        loading={loading}
+      />
+
+      <View className="h-3" />
+
+      <OAuthButton
+        provider="github"
+        onPress={handleGitHubSignIn}
+        loading={loading}
+      />
+
       <TouchableOpacity onPress={() => router.back()}>
-        <Text className="text-gray-400 text-center">
+        <Text className="text-gray-400 text-center mt-4">
           Already have an account? <Text className="text-[#00F5FF] font-semibold">Sign in</Text>
         </Text>
       </TouchableOpacity>

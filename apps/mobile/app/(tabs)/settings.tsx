@@ -68,7 +68,7 @@ export default function SettingsScreen() {
           keyboardType="url"
           selectionColor="#00F5FF"
         />
-        <Text style={styles.hint}>Use http://localhost:8765 for the desktop app's local proxy</Text>
+        <Text style={styles.hint}>Use http://localhost:8765 for the desktop app&apos;s local proxy</Text>
 
         <Text style={styles.label}>MCP Token</Text>
         <TextInput

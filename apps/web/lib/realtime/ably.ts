@@ -58,6 +58,64 @@ export async function publishToRoom(
 }
 
 /**
+ * Publish a memory update to a user's personal sync channel.
+ * This enables real-time sync across all devices for a single user.
+ * 
+ * Channel pattern: `user:{userId}:memories`
+ * Events: 'memory.created', 'memory.updated', 'memory.deleted'
+ */
+export async function publishMemoryUpdate(
+  userId: string,
+  event: 'memory.created' | 'memory.updated' | 'memory.deleted',
+  data: {
+    memoryId: string;
+    content?: string;
+    hint?: string;
+    summary?: string;
+    source?: string;
+    tags?: string[];
+    spaceId?: string;
+    timestamp: string;
+  }
+) {
+  const client = getAblyClient();
+  if (!client) return;
+
+  try {
+    const channel = client.channels.get(`user:${userId}:memories`);
+    await channel.publish(event, data);
+  } catch (err) {
+    console.warn('[ably] memory publish error (non-fatal):', (err as Error)?.message);
+  }
+}
+
+/**
+ * Publish a palace/workspace update to a user's personal sync channel.
+ * Channel pattern: `user:{userId}:palaces`
+ * Events: 'palace.created', 'palace.updated', 'palace.deleted'
+ */
+export async function publishPalaceUpdate(
+  userId: string,
+  event: 'palace.created' | 'palace.updated' | 'palace.deleted',
+  data: {
+    palaceId: string;
+    name: string;
+    description?: string;
+    timestamp: string;
+  }
+) {
+  const client = getAblyClient();
+  if (!client) return;
+
+  try {
+    const channel = client.channels.get(`user:${userId}:palaces`);
+    await channel.publish(event, data);
+  } catch (err) {
+    console.warn('[ably] palace publish error (non-fatal):', (err as Error)?.message);
+  }
+}
+
+/**
  * For client-side (browser / agent):
  * Use Ably's JS SDK with token auth (recommended) or API key (dev only).
  *
@@ -65,4 +123,8 @@ export async function publishToRoom(
  * const ably = new Ably.Realtime({ key: '...' });
  * const channel = ably.channels.get(`collab:room:${roomId}`);
  * channel.subscribe('message.created', (msg) => { ... });
+ * 
+ * For memory sync:
+ * const memoryChannel = ably.channels.get(`user:{userId}:memories`);
+ * memoryChannel.subscribe('memory.created', (msg) => { ... });
  */

@@ -2,23 +2,41 @@
 
 **Current target: Fly.io** (best for persistent long-lived processes, WS Collab, dedicated MCP server, background worker).
 
-**Best services stack for optimal Unimatrix performance:**
-- **Compute/Hosting**: Fly.io (persistent Machines, global anycast, autoscaling, cheap dedicated CPU options for low-latency MCP/WS).
-- **Database**: Neon Postgres (serverless, pgvector for embeddings, branching for dev/prod, excellent perf/cost, works perfectly with Prisma).
-- **Realtime/Collab**: Ably (managed, scales better than raw WS+Redis for multi-LLM rooms with presence/history; already integrated in lib/realtime/ably.ts and collab system - prefer this in prod over self-hosted WS).
-- **Background Jobs/Worker**: Polling worker on Fly (simple); for production scale use Upstash QStash (already referenced in code) or Inngest to trigger librarian jobs reliably instead of DB poll.
-- **Embeddings**: Voyage AI (specialized, high quality for semantic memory).
-- **Auth**: Clerk (for MCP tokens) + NextAuth (web) with bridge (in progress unification).
-- **Email/Payments**: Resend + Stripe (standard).
-- **Caching/Rate limit/PubSub**: Upstash Redis (already in deps for rate-limit and redis-pubsub fallback).
+**Complete deployment guide:** See `DEPLOYMENT_FLY.md` for step-by-step instructions with all secrets and configuration.
 
-This setup gives: low latency for LLMs, reliable real-time collab, efficient background processing, serverless DB scaling, global low-latency hosting.
+**Quick start:**
+```bash
+# Install flyctl and login
+curl -L https://fly.io/install.sh | sh
+fly auth login
 
-The autonomous migration agent + our work has prepared everything portable for this (custom server, Docker, Prisma unification, etc.).
+# Run pre-deploy checks
+chmod +x scripts/predeploy-check.sh
+./scripts/predeploy-check.sh
 
-Render files kept as alt if billing fixed. Railway/VPS also viable but Fly is best balance for perf/cost/simplicity here.
+# Deploy all services
+chmod +x scripts/fly-deploy.sh
+./scripts/fly-deploy.sh all
+```
 
-**Complete list of accounts + every secret (with exact subtraction from the Vercel list you pasted):** See `ACCOUNTS_AND_SECRETS.md` — it now leads with the **REMAINING DELTA** section answering "subtract everything you have secrets for or is connected properly". Only EXPO_TOKEN + 4x STRIPE_PRICE_* + the URL vars that depend on Fly hostnames remain as things needing new secrets/connections. All your other pasted keys (DATABASE_URL, CLERK_*, VOYAGE, MASTER, GOOGLE_*, etc.) are already wired in code, documented, and reusable — just copy the values and `fly secrets set` them after apps exist.
+**Services deployed:**
+- `unimatrix-web` - Next.js dashboard + WebSocket Collab Room
+- `unimatrix-mcp` - Fastify MCP server (what LLMs connect to)
+- `unimatrix-worker` - Background job processor (embeddings, summarization)
+
+**Configuration files:**
+- `fly.web.toml` - Web app config (performance CPU, 2GB RAM)
+- `fly.mcp.toml` - MCP server config (performance CPU, 2GB RAM, 2 CPUs)
+- `fly.worker.toml` - Worker config (shared CPU, 512MB RAM)
+
+**Best services stack:**
+- **Database**: Neon Postgres (serverless, pgvector)
+- **Realtime**: Ably (managed, scales better than raw WS)
+- **Jobs**: Upstash QStash (recommended) or polling worker
+- **Embeddings**: Voyage AI
+- **Auth**: Clerk (MCP) + NextAuth (web)
+- **Email**: Resend
+- **Payments**: Stripe
 
 ## Why We Moved Away From Vercel (and why it's hard to go back)
 
@@ -54,220 +72,14 @@ This is exactly why the custom server, Dockerfiles, and worker were built, and w
 
 **Strongly recommended DB:** Keep using your existing **Neon Postgres** (with pgvector). It works from anywhere and you don't need to migrate the database when switching hosts.
 
-## Recommended Platforms (in order of ease for this stack)
+## Alternative Platforms
 
-### 1. Fly.io (Current target - let's migrate Vercel to Fly.io)
+### Railway (Alternative - if billing resolved)
 
-Fly.io is excellent for long-lived Node processes, WebSockets, background workers, and Docker. Generous free tier, often cheaper than Render for always-on.
+See `RENDER.md` for Railway deployment instructions. The configuration is similar to Render with Dockerfiles.
 
-**Recommended app names:** unimatrix-web, unimatrix-mcp, unimatrix-worker.
+### Self-Hosted VPS + Docker Compose (Cheapest / full control)
 
-**Step-by-step (from repo root):**
-
-1. Install flyctl and login:
-   ```bash
-   curl -L https://fly.io/install.sh | sh
-   fly auth login
-   ```
-
-2. Create apps:
-   ```bash
-   fly apps create unimatrix-web
-   fly apps create unimatrix-mcp
-   fly apps create unimatrix-worker  # for background jobs
-   ```
-
-3. Deploy using provided tomls (easiest):
-   ```bash
-   # Web (Next.js + custom server.ts for WS Collab)
-   cp fly.web.toml fly.toml
-   fly deploy --config fly.toml --app unimatrix-web
-
-   # MCP server (Fastify, what LLMs connect to)
-   cp fly.mcp.toml fly.toml
-   fly deploy --config fly.toml --app unimatrix-mcp
-   ```
-
-   Use the helper script:
-   ```bash
-   chmod +x scripts/fly-deploy.sh
-   ./scripts/fly-deploy.sh web
-   ./scripts/fly-deploy.sh mcp
-   ./scripts/fly-deploy.sh worker
-   ```
-
-4. Set secrets (critical - use your Neon + other keys):
-   ```bash
-   fly secrets set \
-     DATABASE_URL="your-neon-pooled-url" \
-     DIRECT_URL="your-neon-direct-url" \
-     NEXTAUTH_SECRET="long-random-string" \
-     NEXTAUTH_URL="https://unimatrix-web.fly.dev" \
-     # Google, GitHub, Resend, Stripe etc.
-     --app unimatrix-web
-
-   fly secrets set \
-     DATABASE_URL="..." DIRECT_URL="..." \
-     CLERK_SECRET_KEY="sk_..." \
-     VOYAGE_API_KEY="..." \
-     MASTER_ENCRYPTION_KEY="32-byte-hex" \
-     --app unimatrix-mcp
-
-   # Same for worker
-   fly secrets set ... --app unimatrix-worker
-   ```
-
-5. After deploy:
-   - Web: https://unimatrix-web.fly.dev
-   - MCP: https://unimatrix-mcp.fly.dev/mcp (use in Claude Desktop etc. with token from web UI)
-   - Update MCP client configs.
-
-**Worker on Fly:** After deploy, run persistently e.g.:
-```bash
-fly machine run --app unimatrix-worker --vm-memory 512 node dist/worker.js
-```
-
-See `fly.*.toml` for regions, VM sizes, healthchecks (already configured for /api/health and /health).
-
-**Database:** Your existing Neon (no change needed).
-
-**Local dev:** `docker compose up --build` (uses remote Neon).
-
-### 2. Railway (Easiest "Render-like" experience)
-Fly.io is very strong for exactly this kind of workload (custom servers, WebSockets, background processes). It has a generous free allowance and is often cheaper than Render for always-on services.
-
-**Recommended app names:** `unimatrix-web` and `unimatrix-mcp` (you can change).
-
-**Step-by-step deployment:**
-
-1. Install flyctl and authenticate:
-   ```bash
-   curl -L https://fly.io/install.sh | sh
-   fly auth login
-   ```
-
-2. Create the two apps (run from repo root):
-   ```bash
-   fly apps create unimatrix-web
-   fly apps create unimatrix-mcp
-   ```
-
-3. **Best way: Use the provided toml configs** (they are pre-tuned for our Dockerfiles, healthchecks, and PORT=8080 which our apps respect via `server.ts` and the Fastify server).
-
-   For web (Collab + dashboard):
-   ```bash
-   cp fly.web.toml fly.toml
-   fly deploy --config fly.toml --app unimatrix-web
-   ```
-
-   For MCP server:
-   ```bash
-   cp fly.mcp.toml fly.toml
-   fly deploy --config fly.toml --app unimatrix-mcp
-   ```
-
-   (You can keep separate tomls and always use `--config`.)
-
-4. Set all secrets (do this for each app; use your real values from Neon, etc.):
-   ```bash
-   # For web
-   fly secrets set \
-     DATABASE_URL="your-neon-db-url" \
-     DIRECT_URL="your-neon-direct-url" \
-     NEXTAUTH_SECRET="random-32+chars" \
-     NEXTAUTH_URL="https://unimatrix-web.fly.dev" \
-     # add GOOGLE_*, GITHUB_*, RESEND_API_KEY, STRIPE_*, etc.
-     --app unimatrix-web
-
-   # For mcp
-   fly secrets set \
-     DATABASE_URL="your-neon-db-url" \
-     DIRECT_URL="your-neon-direct-url" \
-     CLERK_SECRET_KEY="sk_..." \
-     CLERK_WEBHOOK_SECRET="whsec_..." \
-     VOYAGE_API_KEY="..." \
-     MASTER_ENCRYPTION_KEY="32-byte-hex-here" \
-     # any other keys the MCP server needs
-     --app unimatrix-mcp
-   ```
-
-5. (Optional but recommended) Deploy the background worker.
-
-   We've included `fly.worker.toml` for this.
-
-   ```bash
-   fly apps create unimatrix-worker
-   cp fly.worker.toml fly.toml
-   fly deploy --config fly.toml --app unimatrix-worker
-   fly secrets set \
-     DATABASE_URL="..." \
-     DIRECT_URL="..." \
-     VOYAGE_API_KEY="..." \
-     MASTER_ENCRYPTION_KEY="..." \
-     # other keys the worker needs (same as mcp)
-     --app unimatrix-worker
-   ```
-
-   To run the worker persistently (it loops and processes jobs):
-
-   - The simplest reliable way on Fly is to start a machine with the worker command:
-     ```bash
-     fly machine run \
-       --app unimatrix-worker \
-       --region iad \
-       --vm-memory 512 \
-       --env NODE_ENV=production \
-       $(fly apps list | grep unimatrix-worker | awk '{print $1}') \
-       node dist/worker.js
-     ```
-
-   - Or use `fly console --app unimatrix-worker` and run `node dist/worker.js` inside (for testing).
-
-   - For production always-on worker without public exposure, the toml + a dedicated cheap machine works well. You can scale the machine count if needed.
-
-   The worker will poll for pending librarian/AgentRun jobs and process embeddings etc. using your Neon DB.
-
-   See packages/server/src/worker.ts for details.
-
-6. After first deploy, you can scale:
-   ```bash
-   fly scale count 1 --app unimatrix-web   # or more for WS
-   fly scale vm shared-cpu-1x --memory 1024 --app unimatrix-mcp
-   ```
-
-7. Get your URLs:
-   - Web: https://unimatrix-web.fly.dev
-   - MCP: https://unimatrix-mcp.fly.dev/mcp   (use this in your Claude Desktop / Cursor mcp.json)
-
-**Best practices for Fly.io (optimal perf):**
-- Use `performance` CPU kind + dedicated resources for MCP (low latency LLM calls) and web (WS Collab) as in the tomls.
-- For worker: shared is fine; run as always-on machine with `fly machine update` or dedicated cheap VM.
-- Prefer Ably for Collab Room in production (see lib/realtime/ably.ts + lib/collab/ - handles auth, presence, history, scales without managing your own WS/Redis).
-- Raw WS + Upstash Redis pubsub (in server.ts) is fallback for self-hosted.
-- Worker: Current DB poll works for MVP; for best, integrate Upstash QStash to enqueue librarian jobs from handlers (see comments in code) for reliable async without constant polling.
-- Healthchecks, auto_start/stop (add to toml for web/worker to save $), multi-region if global users.
-- Secrets via `fly secrets`, not env in toml.
-- Monitor with `fly logs`, `fly metrics`, add Sentry if needed.
-- Our custom `server.ts` and Fastify server already listen on `process.env.PORT || 3000`. The toml files set `PORT=8080` which is standard for Fly.
-- Healthchecks are configured in the tomls (`/api/health` and `/health`).
-- For the Collab WebSocket: it will be available at `wss://unimatrix-web.fly.dev/ws/collab?roomId=xxx` (but use Ably for prod).
-- No volumes needed (we use Neon for DB, no local persistent files required).
-- Update `NEXTAUTH_URL` to the actual Fly URL after first deploy.
-- The `docker-compose.yml` still works locally against the same Neon DB.
-
-See the full `fly.web.toml` and `fly.mcp.toml` in the repo root for more options (regions, concurrency, VM sizes).
-
-There's also a helper script: `scripts/fly-deploy.sh` (make it executable with `chmod +x`).
-
-Example:
-```bash
-./scripts/fly-deploy.sh web
-./scripts/fly-deploy.sh mcp
-```
-
-Fly will automatically rebuild on `git push` if you connect the repo (or use `fly deploy` from CI).
-
-### 3. Self-Hosted VPS + Docker Compose (Cheapest / full control)
 If you want to avoid PaaS billing surprises entirely:
 
 1. Get a cheap VPS (Hetzner Cloud CPX11 or similar ~€3-6/mo, Ubuntu 22.04/24.04, 2GB+ RAM recommended).
@@ -299,7 +111,7 @@ This setup uses exactly the Dockerfiles and `docker-compose.yml` that were creat
 **Pros:** Cheapest long-term, no platform lock-in.
 **Cons:** You handle OS updates, SSL (Caddy makes this trivial), and basic ops.
 
-### 4. Other Options
+### Other Options
 - DigitalOcean App Platform (very similar to Render/Railway — use the Dockerfiles).
 - Coolify (install on a VPS — gives you a nice Render-like UI on your own hardware).
 - Keep Vercel for the *web* frontend only and run the MCP server + worker elsewhere (possible but more split).
@@ -316,6 +128,7 @@ This setup uses exactly the Dockerfiles and `docker-compose.yml` that were creat
 - Update any hardcoded old Vercel URLs in client configs or docs to your new URLs.
 
 ## Environment Variables Checklist
+
 See `RENDER.md` (or the old Render section) for the full lists. The critical ones are the same across platforms.
 
 ## Local Development (unchanged)
@@ -325,19 +138,17 @@ docker compose up --build
 Web on 3000, MCP on 3001 (by default in compose).
 
 ## What to Do Next
-1. Pick a platform (Railway is the smoothest transition if you liked Render's style).
-2. Deploy the two Dockerfiles as separate services/apps.
-3. Copy your secrets (especially from Neon + auth keys).
-4. Update your MCP client configs and any custom domains.
-5. Test the health endpoints and a memory write/read via MCP.
 
-If you tell me **which platform** you want to use right now (Railway, Fly.io, VPS, DigitalOcean, etc.), I will immediately generate the exact additional config files (specific `fly.toml` files, Railway service templates, production Caddy config, deploy scripts, etc.) and walk through the precise commands.
+1. Follow the complete Fly.io deployment guide in `DEPLOYMENT_FLY.md`
+2. Deploy the three services (web, mcp, worker)
+3. Copy your secrets (especially from Neon + auth keys)
+4. Update your MCP client configs and any custom domains
+5. Test the health endpoints and a memory write/read via MCP
 
-The hard engineering work (custom server, Docker, worker, schema/bridge work, etc.) is already done. Switching hosts is now mostly wiring + env vars.
+The hard engineering work (custom server, Docker, worker, schema/bridge work, etc.) is already done. Deploying to Fly.io is now mostly wiring + env vars.
 
-Which one do you want to go with? I'll execute the tailored files and updates right away.
-**Ready-made config files in this repo (for the alternatives):**
-- `fly.web.toml` + `fly.mcp.toml` — copy/rename and use with `fly deploy --config ...`
-- `railway.toml` — reference for Railway (most config happens in the dashboard when pointing services at the Dockerfiles)
-- `docker-compose.prod.yml` — override for VPS/production (`docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d`)
-- This `DEPLOYMENT.md` is the current primary guide when Render is not available.
+**Ready-made config files in this repo:**
+- `fly.web.toml` + `fly.mcp.toml` + `fly.worker.toml` — pre-configured for deployment
+- `scripts/fly-deploy.sh` — automated deployment script
+- `scripts/predeploy-check.sh` — pre-deploy validation
+- `DEPLOYMENT_FLY.md` — complete step-by-step guide

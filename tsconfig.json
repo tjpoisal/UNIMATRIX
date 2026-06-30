@@ -20,7 +20,7 @@
       "@unimatrix/ui": ["packages/ui/src"],
       "@unimatrix/llm": ["packages/llm/src"]
     },
-    "ignoreDeprecations": "6.0"
+    "ignoreDeprecations": "5.0"
   },
   "include": [
     "packages/**/*.ts",

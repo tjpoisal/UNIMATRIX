@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { publishMemoryUpdate, publishPalaceUpdate } from "@/lib/realtime/ably";
 
 interface SyncChange {
   type: "palace" | "location" | "memory";
@@ -82,18 +83,41 @@ export async function POST(request: NextRequest) {
                 },
               });
               results.push({ id: change.id ?? palace.id, cloudId: palace.id, type: "palace" });
+              
+              // Publish real-time update
+              await publishPalaceUpdate(session.user.id, 'palace.created', {
+                palaceId: palace.id,
+                name: palace.name,
+                description: palace.description,
+                timestamp: new Date().toISOString(),
+              });
             } else if (change.operation === "update") {
               await prisma.palace.update({
                 where: { id: change.id! },
                 data: { name: str(d.name), description: strOrNull(d.description) },
               });
               results.push({ id: change.id!, type: "palace" });
+              
+              // Publish real-time update
+              await publishPalaceUpdate(session.user.id, 'palace.updated', {
+                palaceId: change.id!,
+                name: str(d.name),
+                description: strOrNull(d.description),
+                timestamp: new Date().toISOString(),
+              });
             } else if (change.operation === "delete") {
               await prisma.palace.update({
                 where: { id: change.id! },
                 data: { deletedAt: new Date() },
               });
               results.push({ id: change.id!, type: "palace" });
+              
+              // Publish real-time update
+              await publishPalaceUpdate(session.user.id, 'palace.deleted', {
+                palaceId: change.id!,
+                name: str(d.name),
+                timestamp: new Date().toISOString(),
+              });
             }
             break;
 
@@ -145,6 +169,17 @@ export async function POST(request: NextRequest) {
               }
 
               results.push({ id: change.id ?? memory.id, cloudId: memory.id, type: "memory" });
+              
+              // Publish real-time update
+              await publishMemoryUpdate(session.user.id, 'memory.created', {
+                memoryId: memory.id,
+                content: str(d.content),
+                hint: strOrNull(d.hint),
+                source: 'sync',
+                tags: Array.isArray(d.tags) ? d.tags.map(String) : [],
+                spaceId: change.locationId,
+                timestamp: new Date().toISOString(),
+              });
             } else if (change.operation === "update") {
               const updatePayload: Record<string, unknown> = {};
               if (d.content != null) updatePayload.content = new Uint8Array(Buffer.from(str(d.content), 'utf8'));
@@ -156,12 +191,27 @@ export async function POST(request: NextRequest) {
                 });
               }
               results.push({ id: change.id!, type: "memory" });
+              
+              // Publish real-time update
+              await publishMemoryUpdate(session.user.id, 'memory.updated', {
+                memoryId: change.id!,
+                content: d.content != null ? str(d.content) : undefined,
+                hint: strOrNull(d.hint),
+                tags: Array.isArray(d.tags) ? d.tags.map(String) : undefined,
+                timestamp: new Date().toISOString(),
+              });
             } else if (change.operation === "delete") {
               await prisma.memory.update({
                 where: { id: change.id! },
                 data: { deletedAt: new Date() },
               });
               results.push({ id: change.id!, type: "memory" });
+              
+              // Publish real-time update
+              await publishMemoryUpdate(session.user.id, 'memory.deleted', {
+                memoryId: change.id!,
+                timestamp: new Date().toISOString(),
+              });
             }
             break;
         }

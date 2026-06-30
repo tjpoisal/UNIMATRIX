@@ -125,6 +125,19 @@ unimatrix/
 | OAuth (Google, GitHub), Stripe, etc. | Fly secrets | Same as before |
 | `CLERK_SECRET_KEY` | Fly secrets | For MCP server auth (hybrid with NextAuth during bridge) |
 | `VOYAGE_API_KEY`, `MASTER_ENCRYPTION_KEY` | Fly secrets | For embeddings + memory crypto in MCP/server |
+| `SENTRY_DSN` | Fly secrets | For server-side error tracking (web, MCP) |
+| `NEXT_PUBLIC_SENTRY_DSN` | Fly secrets | For client-side error tracking (web) |
+| `EXPO_PUBLIC_SENTRY_DSN` | Mobile env vars | For mobile error tracking |
+| `ABLY_API_KEY` | Fly secrets | For real-time sync (Ably) |
+| `UPSTASH_REDIS_REST_URL` | Fly secrets | For Redis/Rate limiting (Upstash) |
+
+### Mobile Environment Variables
+- `EXPO_PUBLIC_API_URL` - API endpoint for mobile (defaults to `http://localhost:3000/api`)
+- `EXPO_PUBLIC_GOOGLE_CLIENT_ID` - Google OAuth client ID for mobile
+- `EXPO_PUBLIC_GOOGLE_CLIENT_SECRET` - Google OAuth client secret for mobile
+- `EXPO_PUBLIC_GITHUB_CLIENT_ID` - GitHub OAuth client ID for mobile
+- `EXPO_PUBLIC_GITHUB_CLIENT_SECRET` - GitHub OAuth client secret for mobile
+- `EXPO_PUBLIC_SENTRY_DSN` - Sentry DSN for mobile error tracking
 
 ---
 
@@ -169,19 +182,24 @@ git push origin main
 - Mobile screens: login, register, forgot-password, reset-password
 - Mobile ApiClient (full REST coverage)
 - DNS + email forwarding: deployunimatrix.com via ImprovMX
+- **MCP Protocol & Auth Bridge** — Cross-LLM memory continuity with token management, mcp_tokens table, web settings UI
+- **Web Onboarding Flow** — 5-step guided wizard (Welcome, Encryption, Workspace, First Memory, Completion)
+- **Mobile Memory Viewer** — Context/device filtering, source selection, memory detail modals, search/recall
+- **Real-time Sync** — Ably-powered real-time memory updates across devices, web hooks, mobile client
+- **Mobile Onboarding Flow** — Native mobile tutorial and setup wizard with API key connection
+- **Fly.io Deployment Configuration** — Complete deployment configs (web, mcp, worker), scripts, documentation
+- **Security Hardening** — RBAC system (user/admin/superadmin), audit logging, admin UI
+- **Desktop App** — Collaborative multi-LLM conversation room integration (collab-window.js)
+- **Mobile OAuth** — Google and GitHub OAuth login for mobile (expo-auth-session)
+- **Error Tracking** — Comprehensive Sentry error tracking across web, mobile, and MCP server
 
 ### ⏳ In Progress / Next
-- **MCP protocol completeness** — ensure the MCP server exposes: `remember`, `recall`, `list_contexts`, `continue_from`, `get_recent` (handlers exist in packages/server/src/handlers/*)
-- **Cross-LLM handoff + auth bridge** — MCP tokens from web (NextAuth) now bridge to MCP server (clerk + rich schema) via user stub + shared mcp_tokens table. See lib/mcp-bridge.ts + settings/mcp-tokens UI + /api/mcp-tokens
-- **Mobile memory viewer** — show what the AI remembers, by context/device
-- **Real-time sync** (WebSocket) — push new memories to all connected clients immediately (custom server + redis-pubsub + ably option live)
-- **Collaborative desktop app** (Electron) — multi-LLM simultaneous conversation UI (planned)
+- MCP protocol completeness — ensure the MCP server exposes: `remember`, `recall`, `list_contexts`, `continue_from`, `get_recent` (handlers exist in packages/server/src/handlers/*)
 - Migration to persistent platforms complete (Vercel legacy only; custom server, worker, Docker parity, schema unification via @unimatrix/db + @@maps, auth bridge for MCP tokens, builds enforced). Current target Fly.io; Render alternative ready.
 
 ### 📋 Deferred
-- Desktop app full build (Electron + WebSocket multi-LLM room)
+- Desktop app full build (Electron + WebSocket multi-LLM room UI - collab window exists, needs full UI)
 - Self-hosted Docker packaging + one-click deploy
-- OAuth on mobile
 - Home server discovery (mDNS/local network)
 - Data migration from AWS (old DynamoDB + AppSync stack — do NOT reactivate)
 
@@ -225,13 +243,34 @@ apps/web/
 ├── lib/
 │   ├── api.ts                ← API client (web)
 │   ├── email.ts              ← Resend email utility
-│   └── prisma.ts             ← Prisma client singleton
+│   ├── prisma.ts             ← Prisma client singleton
+│   ├── rbac.ts               ← RBAC system
+│   ├── audit-log.ts          ← Audit logging
+│   ├── mcp-bridge.ts         ← MCP auth bridge
+│   └── realtime/             ← Real-time sync (Ably)
 └── prisma/schema.prisma      ← DB schema
 
 apps/mobile/
-├── app/(auth)/               ← Auth screens
+├── app/(auth)/               ← Auth screens (with OAuth)
 ├── app/(tabs)/               ← Main app tabs
-└── lib/api.ts                ← Mobile ApiClient (Axios)
+├── lib/
+│   ├── api.ts                ← Mobile ApiClient (Axios)
+│   ├── oauth.ts              ← OAuth helpers
+│   ├── mcp-client.ts         ← MCP client
+│   └── realtime-sync.ts      ← Real-time sync client
+└── components/
+    └── OAuthButton.tsx       ← OAuth button component
+
+packages/server/
+├── src/
+│   ├── sentry.ts             ← Error tracking
+│   ├── handlers/             ← MCP tool handlers
+│   └── db/                   ← Database client
+
+apps/desktop/
+└── src/
+    ├── main.js               ← Main desktop app
+    └── collab-window.js      ← Collab room window
 ```
 
 ---
@@ -259,12 +298,108 @@ Enterprise = self-hosted Docker option + priority support + team sharing.
    - postinstall scripts set `PRISMA_HIDE_UPDATE_MESSAGE=true` to reduce noise.
 
 2. **No CLAUDE.md existed before** — this is the first one. Check it every session.
-2. **Vercel `framework` shows "fastify"** in the API but builds as Next.js — this is a stale API field, ignore it.
-3. **`EMAIL_FROM` must use `onboarding@resend.dev`** until a custom domain is verified on Resend.
-4. **Mobile API URL** is set via `EXPO_PUBLIC_API_URL` env var (defaults to `http://localhost:3000/api`).
-5. **Git lock files** sometimes appear — run `rm -f .git/*.lock` before committing if git fails.
-6. **Old AWS stack** (DynamoDB, AppSync, Lambda) is documented in `CLAUDE_CODE_SYSTEM_PROMPT.md` — that's the old architecture. We are on Neon PG + Fly.io (or Render when billing resolved); Vercel is legacy only.
-7. **`pnpm-lock.yaml` conflicts** — always use `pnpm install --frozen-lockfile` in CI.
+3. **Vercel `framework` shows "fastify"** in the API but builds as Next.js — this is a stale API field, ignore it.
+4. **`EMAIL_FROM` must use `onboarding@resend.dev`** until a custom domain is verified on Resend.
+5. **Mobile API URL** is set via `EXPO_PUBLIC_API_URL` env var (defaults to `http://localhost:3000/api`).
+6. **Git lock files** sometimes appear — run `rm -f .git/*.lock` before committing if git fails.
+7. **Old AWS stack** (DynamoDB, AppSync, Lambda) is documented in `CLAUDE_CODE_SYSTEM_PROMPT.md` — that's the old architecture. We are on Neon PG + Fly.io (or Render when billing resolved); Vercel is legacy only.
+8. **`pnpm-lock.yaml` conflicts** — always use `pnpm install --frozen-lockfile` in CI.
+9. **Sentry error tracking** - All apps now have Sentry integration. Set SENTRY_DSN environment variables to enable.
+10. **OAuth on mobile** - Requires expo-auth-session plugin and EXPO_PUBLIC_* client secrets.
+11. **Real-time sync** - Uses Ably by default. Set ABLY_API_KEY to enable. Falls back to polling if not configured.
+12. **RBAC system** - Default role is 'user'. Admins can view audit logs. Superadmins can manage all roles.
+
+---
+
+## Recent Major Features (2026 Session)
+
+### MCP Protocol & Auth Bridge
+- **Cross-LLM memory continuity** - Start with ChatGPT, continue with Claude
+- **Token management** - mcp_tokens table with API key authentication
+- **Web settings UI** - Settings page to manage MCP tokens
+- **Bridge logic** - lib/mcp-bridge.ts connects NextAuth to MCP server
+
+### Web Onboarding Flow
+- **5-step wizard** - Welcome, Encryption, Workspace, First Memory, Completion
+- **Fade animations** - Smooth transitions between steps
+- **Progress indicator** - 5-dot progress bar
+- **Skip functionality** - Optional steps (workspace, memory creation)
+- **Form validation** - Required field validation
+- **API integration** - Creates palaces and memories via API
+
+### Mobile Memory Viewer
+- **Context/device filtering** - Filter memories by source (Claude, ChatGPT, etc.)
+- **Source selection** - Dynamic source extraction from memories
+- **Memory count display** - Shows total memory count
+- **Enhanced memory cards** - Improved visuals with source badges
+- **Pull-to-refresh** - Refresh memory feed
+- **Context-aware empty states** - Helpful messages when no memories
+- **Memory detail modal** - Full-screen modal with complete metadata
+- **Search/recall screen** - Semantic search with source filtering
+
+### Real-time Sync
+- **Ably integration** - Ably-powered real-time memory updates
+- **Publish memory updates** - publishMemoryUpdate() function
+- **Publish palace updates** - publishPalaceUpdate() function
+- **User-specific channels** - user:{userId}:memories, user:{userId}:palaces
+- **Event types** - created, updated, deleted for both memories and palaces
+- **Web React hook** - useRealtimeSync() for web dashboard
+- **Mobile client** - realtime-sync.ts module for React Native
+- **Mobile integration** - Integrated into mobile memory feed
+
+### Mobile Onboarding Flow
+- **Native mobile wizard** - Same 5 steps as web but native UI
+- **Tutorial screen** - Explains product value
+- **API key connection** - Connect to web onboarding via API key
+- **QR code scanning** - In-app camera for QR code from web
+- **Persistence** - Onboarding completion saved in AsyncStorage
+- **Auth flow integration** - Redirects to onboarding after login
+
+### Fly.io Deployment Configuration
+- **fly.web.toml** - Web app config (performance CPU, 2GB RAM)
+- **fly.mcp.toml** - MCP server config (performance CPU, 2GB RAM, 2 CPUs)
+- **fly.worker.toml** - Worker config (shared CPU, 512MB RAM)
+- **Deployment scripts** - scripts/fly-deploy.sh for automated deployment
+- **Pre-deploy checks** - scripts/predeploy-check.sh for validation
+- **Complete documentation** - DEPLOYMENT_FLY.md with step-by-step guide
+- **Best services stack** - Neon, Ably, Upstash, Voyage recommendations
+
+### Security Hardening
+- **RBAC system** - lib/rbac.ts with user/admin/superadmin roles
+- **30+ permissions** - Fine-grained permission definitions
+- **Permission helpers** - hasPermission(), hasAnyPermission(), hasAllPermissions()
+- **Audit logging** - lib/audit-log.ts with 40+ audit actions
+- **RBAC middleware** - lib/middleware/rbac.ts for API route protection
+- **Admin audit log viewer** - /settings/audit-logs page
+- **Role management UI** - /settings/roles page for admin-only role changes
+- **Database updates** - role field in User model, enhanced AuditLog model
+
+### Desktop App
+- **Collab window module** - collab-window.js for multi-LLM collaboration
+- **Tray menu integration** - "Open Collab Room" option
+- **Separate window** - 1400x900 dedicated collaboration window
+- **Web app loading** - Loads /collab endpoint from web app
+- **Window management** - Proper show/hide/close handling
+
+### Mobile OAuth
+- **Google OAuth** - handleGoogleOAuth() with expo-auth-session
+- **GitHub OAuth** - handleGitHubOAuth() with expo-auth-session
+- **OAuth endpoints** - /api/auth/oauth/google and /api/auth/oauth/github
+- **Token verification** - Backend verifies tokens with provider APIs
+- **User creation/linking** - Creates or links user accounts
+- **OAuth button component** - Styled buttons for Google and GitHub
+- **Login screen integration** - OAuth buttons added to login
+- **Register screen integration** - OAuth buttons added to register
+
+### Error Tracking
+- **Web app Sentry** - @sentry/nextjs with client/server configs
+- **Mobile Sentry** - @sentry/react-native with mobile config
+- **MCP server Sentry** - @sentry/node with server config
+- **Performance monitoring** - Traces sample rate (10% production, 100% dev)
+- **Session replay** - Records user sessions for debugging
+- **Error boundaries** - Dashboard error boundary with fallback UI
+- **PII filtering** - Removes sensitive data before sending
+- **Environment-specific** - Different configurations for dev/prod
 
 ---
 
@@ -282,4 +417,4 @@ The MCP protocol is the key — it's the standard interface that makes this work
 
 ---
 
-Last updated: 2026-05-20
+Last updated: 2026-05-20 (Updated with 10 major features from 2026 session)

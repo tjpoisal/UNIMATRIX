@@ -54,15 +54,13 @@ case "$1" in
   mcp)
     create_if_needed $APP_MCP
     echo "Deploying MCP to $APP_MCP..."
-
-    flyctl deploy --config fly.toml --app $APP_MCP
+    flyctl deploy --config fly.mcp.toml --app $APP_MCP
     ;;
   worker)
     create_if_needed $APP_WORKER
     echo "Deploying worker to $APP_WORKER..."
-
-    flyctl deploy --config fly.toml --app $APP_WORKER
-    echo "Start worker persistently (example):"
+    flyctl deploy --config fly.worker.toml --app $APP_WORKER
+    echo "Worker deployed. Start persistently:"
     echo "  fly machine run --app $APP_WORKER --vm-memory 512 node dist/worker.js"
     ;;
   all)

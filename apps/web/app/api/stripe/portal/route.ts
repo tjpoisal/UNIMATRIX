@@ -21,11 +21,16 @@ export async function POST(request: NextRequest) {
 
   const origin = request.headers.get("origin") ?? process.env.NEXTAUTH_URL ?? "https://deployunimatrix.com";
 
-  const stripe = getStripe();
-  const portalSession = await stripe.billingPortal.sessions.create({
-    customer: user.stripeCustomerId,
-    return_url: `${origin}/settings`,
-  });
+  try {
+    const stripe = getStripe();
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: user.stripeCustomerId,
+      return_url: `${origin}/settings`,
+    });
 
-  return NextResponse.json({ url: portalSession.url });
+    return NextResponse.json({ url: portalSession.url });
+  } catch (error) {
+    console.error('[stripe] portal error', error);
+    return NextResponse.json({ error: 'Stripe is not configured' }, { status: 503 });
+  }
 }
