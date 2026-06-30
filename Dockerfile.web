@@ -84,9 +84,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --filter @unimatrix/db --prod --frozen-lockfile --ignore-scripts
 
 # Copy built artifacts
-COPY --from=base /app/apps/web/.next ./.next
-COPY --from=base /app/apps/web/public ./public
-COPY --from=base /app/apps/web/prisma ./prisma
+COPY --from=base /app/apps/web/.next ./apps/web/.next
+COPY --from=base /app/apps/web/public ./apps/web/public
+COPY --from=base /app/apps/web/prisma ./apps/web/prisma
 COPY --from=base /app/packages/db ./packages/db
 
 EXPOSE 8080
