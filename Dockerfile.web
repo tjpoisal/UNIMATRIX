@@ -99,11 +99,9 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 
 # ── Copy built artifacts from base ───────────────────────────────────────────
 COPY --from=base /app/apps/web/.next          ./.next
-COPY --from=base /app/apps/web/dist           ./dist
 COPY --from=base /app/apps/web/public         ./public
 COPY --from=base /app/apps/web/package.json   ./
 COPY --from=base /app/apps/web/prisma         ./prisma
-COPY --from=base /app/apps/web/next.config.ts ./
 
 # @unimatrix/db built output + its generated Prisma client
 COPY --from=base /app/packages/db/dist                  /app/packages/db/dist
