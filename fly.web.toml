@@ -1,4 +1,4 @@
-# Fly.io config for the web service (Next.js custom server + Collab WS)
+# Fly.io config for the web service (Next.js standard server)
 # Usage: cp fly.web.toml fly.toml && fly deploy --config fly.toml --app your-app-name
 app = "unimatrix-web"
 primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "fra", "lhr")
@@ -8,7 +8,7 @@ primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "
 
 [env]
   NODE_ENV = "production"
-  PORT = "8080"   # Fly routes to 8080 internally; our server.ts respects process.env.PORT
+  PORT = "8080"   # Fly routes to 8080 internally; Next.js respects process.env.PORT
 
 [[services]]
   protocol = "tcp"
@@ -24,7 +24,7 @@ primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "
   soft_limit = 500
 
 [[vm]]
-  cpu_kind = "performance"  # Better for WebSocket Collab Room low latency
+  cpu_kind = "performance"  # Better for performance
   cpus = 1
   memory_mb = 2048  # Fly minimum for performance VMs in some cases; was 1024
 
