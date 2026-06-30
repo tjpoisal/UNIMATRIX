@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { apiClient } from '@/lib/api';
 
@@ -23,22 +23,26 @@ export default function PalaceScreen() {
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadPalace();
-  }, [id]);
-
-  const loadPalace = async () => {
+  const loadPalace = useCallback(async () => {
     try {
       const data = await apiClient.getPalace(id as string);
-      setPalace(data);
-      setLocations(data.locations || []);
+      setTimeout(() => {
+        setPalace(data);
+        setLocations(data.locations || []);
+      }, 0);
     } catch (error) {
       Alert.alert('Error', 'Failed to load palace');
       router.back();
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 0);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadPalace();
+  }, [loadPalace]);
 
   const renderLocationItem = (location: Location, depth = 0) => {
     return (

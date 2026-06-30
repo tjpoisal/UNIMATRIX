@@ -3,12 +3,6 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  organizationSchema,
-  softwareApplicationSchema,
-  faqSchema,
-  websiteSchema,
-} from '@/lib/homepage-schema';
 
 export const metadata = {
   title: 'Unimatrix | Persistent AI Memory via MCP',
@@ -249,7 +243,7 @@ export default async function Home() {
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Connect your tools</h2>
               <p className="text-[#94A3B8] text-lg max-w-xl mx-auto">
-                Pick your client. Copy the config. You're connected.
+                Pick your client. Copy the config. You&apos;re connected.
               </p>
             </div>
 
@@ -337,7 +331,7 @@ export default async function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 {
-                  quote: "I switch between Claude Desktop and Cursor constantly. Before Unimatrix I'd spend the first 5 minutes of every session re-explaining my codebase. Now I just start working.",
+                  quote: "I switch between Claude Desktop and Cursor constantly. Before Unimatrix I&apos;d spend the first 5 minutes of every session re-explaining my codebase. Now I just start working.",
                   name: 'Marcus T.',
                   role: 'Senior Full-Stack Engineer',
                   company: 'Remote startup',

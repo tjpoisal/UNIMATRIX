@@ -96,7 +96,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       .map(([id, d]) => {
         let score = d.rrf_score;
         if (d.embedding) {
-          try { const sv = new Float32Array(d.embedding.replace(/[\[\]]/g, '').split(',').map(Number)); score = cosineSim(qFloat, sv) * 0.7 + d.rrf_score * 0.3; } catch { /**/ }
+    try { const sv = new Float32Array(d.embedding.replaceAll('[', '').replaceAll(']', '').split(',').map(Number)); score = cosineSim(qFloat, sv) * 0.7 + d.rrf_score * 0.3; } catch (e) { console.debug('parse embedding failed', e); }
         }
         return { id, summary: d.summary, score };
       })

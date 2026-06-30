@@ -31,7 +31,7 @@ export default function RegisterForm() {
       });
       const data = await response.json();
       if (!response.ok) { setError(data.error || 'Registration failed'); return; }
-      router.push('/auth/login?registered=true');
+      router.push('/onboarding');
     } catch {
       setError('An error occurred. Please try again.');
     } finally {

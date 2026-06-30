@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '');
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? '';
 
 export const runtime = 'nodejs';
@@ -17,6 +17,11 @@ function subFieldDate(sub: Stripe.Subscription, key: string) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!stripe) {
+    console.error('[stripe:webhook] STRIPE_SECRET_KEY not set');
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 });
+  }
+
   const buf = await req.arrayBuffer();
   const raw = Buffer.from(buf);
   const sig = req.headers.get('stripe-signature') ?? req.headers.get('Stripe-Signature') ?? '';

@@ -9,6 +9,10 @@
 
 import { buildApp }  from './app.js';
 import { closePool } from './db/client.js';
+import { initSentry } from './sentry.js';
+
+// Initialize Sentry
+initSentry();
 
 const fastify = buildApp();
 

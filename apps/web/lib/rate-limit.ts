@@ -47,6 +47,8 @@ export async function checkRateLimit(
   identifier: string,
   _options?: { limit?: number; window?: string }
 ) {
+  // Reference _options to avoid unused var linter warnings in this utility.
+  void _options;
   const limiter = getRatelimit();
   if (!limiter) {
     return { success: true, remaining: 999, reset: Date.now() + 60_000 };

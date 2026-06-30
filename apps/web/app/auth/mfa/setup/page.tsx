@@ -11,7 +11,7 @@ export default function MFASetupPage() {
   const router = useRouter();
   const [state, setState] = useState<SetupState>('loading');
 
-  const [_otpauthUrl, _setOtpauthUrl] = useState('');
+  // otpauthUrl is obtained from the server response but not stored for UI beyond QR generation
   const [secret, setSecret]         = useState('');
   const [qrDataUrl, setQrDataUrl]   = useState('');
   const [token, setToken]           = useState('');
@@ -26,7 +26,7 @@ export default function MFASetupPage() {
     fetch('/api/auth/mfa/enable', { method: 'POST' })
       .then((r) => r.json())
       .then(async (data) => {
-  _setOtpauthUrl(data.otpauthUrl);
+        // otpauthUrl is only used to generate the QR image
         setSecret(data.secret);
         const url = await QRCode.toDataURL(data.otpauthUrl, { width: 220, margin: 2 });
         setQrDataUrl(url);
@@ -112,7 +112,6 @@ export default function MFASetupPage() {
               </p>
               {qrDataUrl && (
                 <div className="flex justify-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={qrDataUrl} alt="TOTP QR Code" className="rounded-xl border border-[#334155]/40 bg-white p-2" width={220} height={220} />
                 </div>
               )}
@@ -181,7 +180,7 @@ export default function MFASetupPage() {
               </div>
 
               <button onClick={handleFinish} disabled={loading} className={btnPrimary}>
-                {loading ? 'Saving…' : 'Done — I\'ve saved my codes'}
+                {loading ? 'Saving…' : 'Done — I&apos;ve saved my codes'}
               </button>
             </div>
           )}

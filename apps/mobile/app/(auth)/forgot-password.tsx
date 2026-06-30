@@ -30,14 +30,14 @@ export default function ForgotPasswordScreen() {
       <Text className="text-3xl font-bold text-white mb-2 text-center">Unimatrix</Text>
       <Text className="text-white text-xl font-semibold text-center mb-2">Reset Password</Text>
       <Text className="text-gray-400 text-center mb-8 text-sm">
-        Enter your email and we'll send you a link to reset your password.
+        Enter your email and we&apos;ll send you a link to reset your password.
       </Text>
 
       {submitted ? (
         <View className="bg-[#00F5FF]/10 border border-[#00F5FF]/30 rounded-lg p-5 mb-6">
           <Text className="text-[#00F5FF] font-semibold text-center mb-1">Check your inbox</Text>
           <Text className="text-gray-400 text-center text-sm">
-            If an account exists for {email}, you'll receive a reset link shortly.
+            If an account exists for {email}, you&apos;ll receive a reset link shortly.
           </Text>
         </View>
       ) : (

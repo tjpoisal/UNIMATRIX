@@ -14,7 +14,6 @@
 import { generateText } from 'ai';
 import { decryptApiKey } from './crypto';
 import { prisma } from './prisma';
-import { bytesToText, textToBytes } from './prisma-utils';
 
 // ─── AI Gateway synthesis (uses Vercel OIDC — no API key needed) ─────────────
 async function synthesizeWithGateway(system: string, prompt: string): Promise<string> {
@@ -59,7 +58,7 @@ async function getMemoryContext(userId: string, palaceId: string, task: string):
   // Pull the most recent 20 memories from the palace, filtered by basic relevance
   const keywords = task.toLowerCase().split(/\s+/).filter(w => w.length > 3);
 
-  const memoriesRaw = await prisma.memory.findMany({
+  const memories = await prisma.memory.findMany({
     where: {
       deletedAt: null,
       location: {
@@ -80,39 +79,62 @@ async function getMemoryContext(userId: string, palaceId: string, task: string):
       location: { select: { name: true } },
     },
   });
+  // Prisma schema stores memory content as Bytes and tags as MemoryTag[].
+  // Normalize here so the rest of the code can treat content as string and tags as string[].
+  const decodedMemories = (memories as any[]).map(m => {
+    // decode content from Buffer/Uint8Array if necessary
+    let contentStr: string;
+    const raw = m.content;
+    try {
+      if (typeof raw === 'string') contentStr = raw;
+      else if (raw instanceof Uint8Array) contentStr = new TextDecoder().decode(raw);
+      else if (Buffer.isBuffer(raw)) contentStr = raw.toString('utf8');
+      else contentStr = String(raw ?? '');
+    } catch (err) {
+      // Log decoding failures for debugging; avoid unused catch binding (ESLint)
+      console.debug('Failed to decode memory content', err);
+      contentStr = String(raw ?? '');
+    }
 
-  // Normalize types we expect from Prisma
-  const memories = memoriesRaw as Array<{
-    id: string;
-    content: unknown;
-    tags?: Array<{ tag?: string } | string> | null;
-    location?: { name?: string } | null;
-  }>;
+    // normalize tags: could be array of strings or array of { tag: string }
+    let tagsArr: string[] = [];
+    if (Array.isArray(m.tags)) {
+      tagsArr = m.tags
+        .map((t: unknown) => {
+          if (typeof t === 'string') return t;
+          if (typeof t === 'object' && t !== null && 'tag' in (t as Record<string, unknown>)) {
+            const maybe = (t as Record<string, unknown>).tag;
+            return typeof maybe === 'string' ? maybe : String(maybe);
+          }
+          return String(t);
+        })
+        .filter(Boolean) as string[];
+    }
+
+    return {
+      id: m.id,
+      content: contentStr,
+      tags: tagsArr,
+      location: m.location ?? { name: 'unknown' },
+    };
+  });
 
   // Score by keyword overlap
-  type MemoryItem = typeof memories[number];
-  type ScoredMemory = MemoryItem & { score: number; contentStr: string };
-
-  const scored = (memories
-    .map<ScoredMemory>(m => {
-      const contentStr = bytesToText(m.content);
-      const tagsArr = Array.isArray(m.tags)
-        ? m.tags.map(t => (typeof t === 'string' ? t : (t && (t as { tag?: string }).tag) ?? String(t)))
-        : [];
-      const text = (contentStr + ' ' + tagsArr.join(' ')).toLowerCase();
+  const scored = decodedMemories
+    .map(m => {
+      const text = (m.content + ' ' + m.tags.join(' ')).toLowerCase();
       const hits = keywords.filter(k => text.includes(k)).length;
-      return { ...m, score: hits, contentStr } as ScoredMemory;
+      return { ...m, score: hits };
     })
-    .filter((m): m is ScoredMemory => m.score > 0)
+    .filter(m => m.score > 0)
     .sort((a, b) => b.score - a.score)
-    .slice(0, 10));
+    .slice(0, 10);
 
   if (scored.length === 0) return '';
 
-  const lines = scored.map(m => {
-    const contentStr = m.contentStr ?? bytesToText(m.content);
-    return `[${(m.location && m.location.name) || 'unknown'}] ${contentStr.slice(0, 300)}${contentStr.length > 300 ? '…' : ''}`;
-  });
+  const lines = scored.map(m =>
+    `[${m.location.name}] ${m.content.slice(0, 300)}${m.content.length > 300 ? '…' : ''}`
+  );
   return `\n\nRelevant memories from your palace:\n${lines.join('\n---\n')}`;
 }
 
@@ -444,14 +466,26 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
     }
 
   const providerNames = providers.map((p: { provider: string }) => p.provider).join(', ');
-    const memory = await prisma.memory.create({
+    const contentBytes = new Uint8Array(Buffer.from(`**Task:** ${task}\n\n**Mode:** ${mode} (${providerNames})\n\n**Synthesis:**\n${synthesis}`, 'utf8'));
+    const mem = await prisma.memory.create({
       data: {
         locationId: location.id,
-        content: textToBytes(`**Task:** ${task}\n\n**Mode:** ${mode} (${providerNames})\n\n**Synthesis:**\n${synthesis}`),
-  tags: { create: ['agent', mode, ...providers.map((p: { provider: string }) => p.provider)].map(t => ({ tag: t })) },
+        content: contentBytes,
+        contentIv: new Uint8Array(16),
+        source: 'api',
+        status: 'active',
       },
     });
-    memoryId = memory.id;
+    memoryId = mem.id;
+
+    // write tags as MemoryTag rows
+    const agentTags = ['agent', mode, ...providers.map((p: { id: string; provider: string; model: string; apiKey: string }) => p.provider)];
+    if (agentTags.length > 0 && memoryId) {
+      await prisma.memoryTag.createMany({
+        data: agentTags.map((t: string) => ({ memoryId: memoryId as string, tag: t })),
+        skipDuplicates: true,
+      });
+    }
   }
 
   // Auto-magic: also store each individual LLM's response into its dedicated History location
@@ -484,12 +518,20 @@ export async function runAgentTask(options: AgentRunOptions): Promise<AgentResul
             });
           }
 
-          await prisma.memory.create({
+          const respContent = `**Task:** ${task}\n**Provider:** ${resp.provider} (${resp.model})\n\n${resp.response}`;
+          const respBytes = new Uint8Array(Buffer.from(respContent, 'utf8'));
+          const created = await prisma.memory.create({
             data: {
               locationId: histLoc.id,
-              content: textToBytes(`**Task:** ${task}\n**Provider:** ${resp.provider} (${resp.model})\n\n${resp.response}`),
-              tags: { create: ['llm-history', resp.provider, 'agent', mode].map(t => ({ tag: t })) },
+              content: respBytes,
+              contentIv: new Uint8Array(16),
+              source: 'api',
+              status: 'active',
             },
+          });
+          await prisma.memoryTag.createMany({
+            data: ['llm-history', resp.provider, 'agent', mode].map(t => ({ memoryId: created.id, tag: t })),
+            skipDuplicates: true,
           });
         }
       } catch (e) {

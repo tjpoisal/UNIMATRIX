@@ -38,7 +38,11 @@ export default function SettingsScreen() {
     Alert.alert('Clear all data?', 'This removes your local settings. Your memories on the server are not affected.', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Clear', style: 'destructive', onPress: async () => {
-        await AsyncStorage.multiRemove(['unimatrix_server_url','unimatrix_mcp_token','unimatrix_bg_sync']);
+        await Promise.all([
+          AsyncStorage.removeItem('unimatrix_server_url'),
+          AsyncStorage.removeItem('unimatrix_mcp_token'),
+          AsyncStorage.removeItem('unimatrix_bg_sync'),
+        ]);
         setServerUrl('https://deployunimatrix.com');
         setMcpToken('');
         setBgSync(true);
@@ -64,7 +68,7 @@ export default function SettingsScreen() {
           keyboardType="url"
           selectionColor="#00F5FF"
         />
-        <Text style={styles.hint}>Use http://localhost:8765 for the desktop app's local proxy</Text>
+        <Text style={styles.hint}>Use http://localhost:8765 for the desktop app&apos;s local proxy</Text>
 
         <Text style={styles.label}>MCP Token</Text>
         <TextInput

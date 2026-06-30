@@ -107,7 +107,7 @@ export function MemoryCreator() {
             className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500"
           />
           <p className="text-xs text-gray-400 mt-1">
-            🔐 Your password is never sent to the server. It&apos;s used only to derive your encryption key.
+                🔐 Your password is never sent to the server. It&apos;s used only to derive your encryption key.
           </p>
         </div>
 
@@ -167,7 +167,7 @@ export function MemoryCreator() {
       {/* Info Box */}
       <div className="mt-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded text-sm text-blue-300">
         <p className="font-semibold mb-2">How it works:</p>
-          <ul className="list-disc list-inside space-y-1 text-xs">
+        <ul className="list-disc list-inside space-y-1 text-xs">
           <li>Your password derives a 256-bit encryption key using PBKDF2</li>
           <li>Content is encrypted with AES-256-GCM before leaving your device</li>
           <li>Server stores only ciphertext, never plaintext or password</li>

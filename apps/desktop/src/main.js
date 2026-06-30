@@ -22,12 +22,13 @@ const https          = require('https');
 const path           = require('path');
 const fs             = require('fs');
 const os             = require('os');
-const { execSync }   = require('child_process');
+const { execSync: _execSync }   = require('child_process');
+const { createCollabWindow } = require('./collab-window');
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const APP_URL          = 'https://deployunimatrix.com';
 const MCP_PROXY_PORT   = 8765;       // localhost port for the embedded MCP proxy
-const PRODUCT_NAME     = 'Unimatrix';
+const _PRODUCT_NAME     = 'Unimatrix';
 const CONFIG_DIR       = path.join(os.homedir(), '.config', 'unimatrix');
 const CONFIG_FILE      = path.join(CONFIG_DIR, 'config.json');
 
@@ -102,7 +103,7 @@ function createWindow() {
 }
 
 // ── Tray icon & context menu ──────────────────────────────────────────────────
-function getTrayIconPath(status = 'idle') {
+function getTrayIconPath(_status = 'idle') {
   // Use the same png but in production would swap for status variants
   // status: 'idle' | 'syncing' | 'error'
   const base = path.join(__dirname, '..', 'assets', 'icon.png');
@@ -119,6 +120,10 @@ function buildTrayMenu(syncStatus = 'Idle') {
     {
       label: 'Open Unimatrix',
       click: () => createWindow(),
+    },
+    {
+      label: 'Open Collab Room',
+      click: () => createCollabWindow(),
     },
     {
       label: `MCP Proxy: localhost:${MCP_PROXY_PORT}`,
@@ -922,8 +927,8 @@ function startOpenAIProxy() {
 
         let pendingToolCallName  = '';
         let pendingToolCallArgs  = '';
-        let pendingToolCallId    = '';
-        let pendingToolCallIdx   = -1;
+        let _pendingToolCallId    = '';
+        let _pendingToolCallIdx   = -1;
         let isUnimatrixCall      = false;
 
         upstreamRes.on('data', async (chunk) => {

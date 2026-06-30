@@ -17,6 +17,7 @@ model User {
   tier                 String  @default("free") // free | pro
   stripeCustomerId     String? @unique
   stripeSubscriptionId String?
+  role                 String  @default("user") // user | admin | superadmin for system-wide RBAC
 
   // ── MFA / 2FA (SOC2 CC6.1, HIPAA §164.312(d)) ────────────────────────
   mfaEnabled         Boolean  @default(false)
@@ -24,6 +25,9 @@ model User {
   mfaIv              String?  // IV for mfaSecret decryption
   recoveryCodes      String[] // bcrypt-hashed recovery codes (consumed on use)
   trustedPersonEmail String?  // email of a trusted person for account recovery
+
+  // ── Onboarding ─────────────────────────────────────────────────────────
+  onboardingCompleted Boolean @default(false)
 
   // Relations
   accounts             Account[]
@@ -34,6 +38,7 @@ model User {
   agentRuns            AgentRun[]
   authAttempts         AuthAttempt[]
   mfaRecoveryRequests  MfaRecoveryRequest[]
+  userAuditLogs        AuditLog[] @relation("UserAuditLogs")
 
   // Social
   friendRequestsSent     Friendship[]  @relation("FriendRequests")
@@ -50,6 +55,7 @@ model User {
 
   @@index([email])
   @@index([tier])
+  @@index([role])
 }
 
 // OAuth accounts linked to users
@@ -467,20 +473,26 @@ model PendingAction {
 
 model AuditLog {
   id             String   @id @default(cuid())
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  
+  userId        String?
+  user          User?     @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: SetNull)
 
   actorId     String?  // user who performed the action
   actorName   String?
-  action      String   // e.g. "pending_action.approved", "agent_config.updated", "spend_limit.exceeded"
-  targetType  String?  // "PendingAction", "AgentConfig", etc.
+  actorEmail  String?
+  action      String   // e.g. "pending_action.approved", "agent_config.updated", "spend_limit.exceeded", "user.role_changed", "palace.shared"
+  targetType  String?  // "PendingAction", "AgentConfig", "User", "Palace", etc.
   targetId    String?
 
   metadata    Json     @default("{}")
   createdAt   DateTime @default(now())
 
   @@index([organizationId, createdAt])
+  @@index([userId, createdAt])
   @@index([action, createdAt])
+  @@index([actorId, createdAt])
 }
 
 // Webhook delivery attempts (for retry visibility and dead-letter analysis)

@@ -29,7 +29,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Memories',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, _size }) => (
             <TabIcon icon="🧠" color={color} />
           ),
         }}

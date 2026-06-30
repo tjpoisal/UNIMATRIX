@@ -110,3 +110,7 @@ app.json
 .env*
 
 /generated/prisma
+
+# Ignore local JDK bundles accidentally placed in the repo
+oracleJdk-26.jdk/
+*.jdk/

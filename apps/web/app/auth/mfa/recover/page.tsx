@@ -24,29 +24,30 @@ function RecoverPageContent() {
   // Auto-apply when token is present (trusted person clicked the link)
   useEffect(() => {
     if (!token) return;
-    // Defer setStatus to avoid synchronous setState inside effect (prevents cascading renders)
-    const t = setTimeout(() => setStatus('loading'), 0);
-    fetch('/api/auth/mfa/recover', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ action: 'apply', token }),
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success) {
-          setStatus('applied');
-          // Redirect to login so the user can sign in without MFA and then re-enroll
-          setTimeout(() => router.push('/auth/login?mfaReset=1'), 3000);
-        } else {
+    // Defer state updates to avoid synchronous setState inside effect
+    Promise.resolve().then(() => {
+      setStatus('loading');
+      fetch('/api/auth/mfa/recover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'apply', token }),
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.success) {
+            setStatus('applied');
+            // Redirect to login so the user can sign in without MFA and then re-enroll
+            setTimeout(() => router.push('/auth/login?mfaReset=1'), 3000);
+          } else {
+            setStatus('error');
+            setMessage(d.error ?? 'Recovery failed. The link may have expired.');
+          }
+        })
+        .catch(() => {
           setStatus('error');
-          setMessage(d.error ?? 'Recovery failed. The link may have expired.');
-        }
-      })
-      .catch(() => {
-        setStatus('error');
-        setMessage('An error occurred. Please try again.');
-      })
-      .finally(() => clearTimeout(t));
+          setMessage('An error occurred. Please try again.');
+        });
+    });
   }, [token, router]);
 
   const handleRequest = async () => {

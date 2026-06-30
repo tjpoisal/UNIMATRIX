@@ -107,9 +107,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           let score = d.rrf_score;
           if (d.embedding) {
             try {
-              const sv = new Float32Array(d.embedding.replace(/[\[\]]/g, '').split(',').map(Number));
-              score = cosineSim(qFloat, sv) * 0.7 + d.rrf_score * 0.3;
-            } catch { /* use rrf score */ }
+                const sv = new Float32Array(d.embedding.replaceAll('[', '').replaceAll(']', '').split(',').map(Number));
+                score = cosineSim(qFloat, sv) * 0.7 + d.rrf_score * 0.3;
+              } catch (e) { console.debug('embedding parse failed, using RRF score', e); }
           }
           return { id, summary: d.summary, score, source: d.source, tags: d.tags, createdAt: d.created_at };
         })
