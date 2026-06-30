@@ -13,6 +13,7 @@ primary_region = "iad"   # Change to your preferred region (e.g. "ams", "sjc", "
 [[services]]
   protocol = "tcp"
   internal_port = 8080
+  processes = ["app"]
   ports = [
     { port = 80, handlers = ["http"] },
     { port = 443, handlers = ["tls", "http"] }
