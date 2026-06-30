@@ -5,18 +5,31 @@ WORKDIR /app
 # Install sqlite3 CLI for PRAGMA commands
 RUN apk add --no-cache sqlite
 
-# Copy entrypoint script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Copy package files for server and its dependencies
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY packages/server/package.json ./packages/server/
+COPY packages/db/package.json ./packages/db/
+COPY packages/types/package.json ./packages/types/
 
-# Copy entire monorepo
-COPY . .
-
-# Install dependencies
+# Install dependencies with workspace support
 RUN corepack enable pnpm && pnpm install --frozen-lockfile
 
-# Build all packages
-RUN pnpm run build
+# Copy source files for server and dependencies
+COPY packages/server ./packages/server
+COPY packages/db ./packages/db
+COPY packages/types ./packages/types
+
+# Build @unimatrix/types first
+WORKDIR /app/packages/types
+RUN pnpm build
+
+# Build @unimatrix/db second
+WORKDIR /app/packages/db
+RUN pnpm build
+
+# Build the server
+WORKDIR /app/packages/server
+RUN pnpm build
 
 # Ensure data directory
 RUN mkdir -p /app/data
@@ -24,11 +37,15 @@ RUN mkdir -p /app/data
 # Expose port
 EXPOSE 3000
 
+# Copy entrypoint script from root
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Set entrypoint to run SQLite optimizations before app
 ENTRYPOINT ["/entrypoint.sh"]
 
 # Start the server
-CMD ["node", "packages/server/dist/index.js"]
+CMD ["node", "dist/index.js"]
 
 # --- Production image ---
 FROM node:20-slim AS production
@@ -38,13 +55,32 @@ ENV NODE_ENV=production
 ENV PORT=8080
 RUN apt-get update && apt-get install -y postgresql-client openssl curl && rm -rf /var/lib/apt/lists/*
 
-# Copy everything needed from builder
-COPY --from=base /app/packages/server/dist ./dist
-COPY --from=base /app/packages/server/package.json ./
-COPY --from=base /app/node_modules ./node_modules
+# Copy package files
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+COPY packages/server/package.json ./packages/server/
+COPY packages/db/package.json ./packages/db/
+COPY packages/types/package.json ./packages/types/
+
+# Install production dependencies
+RUN corepack enable pnpm && pnpm install --frozen-lockfile --prod
+
+# Copy built artifacts
+COPY --from=base /app/packages/server/dist ./packages/server/dist
+COPY --from=base /app/packages/db/dist ./packages/db/dist
+COPY --from=base /app/packages/types/dist ./packages/types/dist
+COPY --from=base /app/packages/db/generated ./packages/db/generated
+
+# Copy entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set working directory
+WORKDIR /app/packages/server
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8080/health || exit 1
 
+# Set entrypoint and start the server
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["node", "dist/index.js"]
