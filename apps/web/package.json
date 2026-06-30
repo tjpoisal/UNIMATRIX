@@ -50,7 +50,7 @@
     "resend": "^4.1.2",
     "stripe": "^22.2.1",
     "tailwindcss": "^4",
-    "typescript": "^5",
+    "typescript": "^6",
     "ws": "^8.18.0",
     "zod": "^4.4.3"
   },
