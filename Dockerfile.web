@@ -23,11 +23,10 @@ WORKDIR /app
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma
-COPY packages/db/package.json ./packages/db/
 
 # Install dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --frozen-lockfile
+    pnpm install --filter web --frozen-lockfile
 
 # Copy source files
 COPY apps/web ./apps/web
@@ -63,18 +62,15 @@ WORKDIR /app
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma
-COPY packages/db/package.json ./packages/db/
 
 # Install production dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
-    pnpm install --prod --frozen-lockfile --ignore-scripts
+    pnpm install --filter web --prod --frozen-lockfile --ignore-scripts
 
 # Copy built artifacts
 COPY --from=base /app/apps/web/.next ./.next
 COPY --from=base /app/apps/web/public ./public
 COPY --from=base /app/apps/web/prisma ./prisma
-COPY --from=base /app/packages/db/dist /app/packages/db/dist
-COPY --from=base /app/packages/db/generated /app/packages/db/generated
 
 EXPOSE 8080
 
