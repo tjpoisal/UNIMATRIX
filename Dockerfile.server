@@ -31,6 +31,9 @@ RUN pnpm build
 WORKDIR /app/packages/server
 RUN pnpm build
 
+# Set working directory back to app root
+WORKDIR /app
+
 # Ensure data directory
 RUN mkdir -p /app/data
 
@@ -44,8 +47,8 @@ RUN chmod +x /entrypoint.sh
 # Set entrypoint to run SQLite optimizations before app
 ENTRYPOINT ["/entrypoint.sh"]
 
-# Start the server
-CMD ["node", "dist/index.js"]
+# Start the server from app root
+CMD ["node", "packages/server/dist/index.js"]
 
 # --- Production image ---
 FROM node:20-slim AS production
@@ -74,8 +77,8 @@ COPY --from=base /app/packages/db/generated ./packages/db/generated
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Set working directory
-WORKDIR /app/packages/server
+# Set working directory to app root
+WORKDIR /app
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
@@ -83,4 +86,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Set entrypoint and start the server
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["node", "dist/index.js"]
+CMD ["node", "packages/server/dist/index.js"]
