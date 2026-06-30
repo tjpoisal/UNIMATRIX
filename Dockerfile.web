@@ -23,15 +23,25 @@ WORKDIR /app
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma
+COPY packages/db/package.json ./packages/db/
+COPY packages/db/prisma ./packages/db/prisma
 
 # Install dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --filter web --frozen-lockfile
 
+# Install @unimatrix/db
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --filter @unimatrix/db --frozen-lockfile
+
 # Copy source files
 COPY apps/web ./apps/web
 COPY packages ./packages
 COPY tsconfig.json ./
+
+# Build @unimatrix/db first
+WORKDIR /app/packages/db
+RUN pnpm build
 
 # Build the app
 WORKDIR /app/apps/web
@@ -62,15 +72,22 @@ WORKDIR /app
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml .npmrc ./
 COPY apps/web/package.json ./apps/web/
 COPY apps/web/prisma ./apps/web/prisma
+COPY packages/db/package.json ./packages/db/
+COPY packages/db/prisma ./packages/db/prisma
 
 # Install production dependencies
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --filter web --prod --frozen-lockfile --ignore-scripts
 
+# Install @unimatrix/db production dependencies
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --filter @unimatrix/db --prod --frozen-lockfile --ignore-scripts
+
 # Copy built artifacts
 COPY --from=base /app/apps/web/.next ./.next
 COPY --from=base /app/apps/web/public ./public
 COPY --from=base /app/apps/web/prisma ./prisma
+COPY --from=base /app/packages/db ./packages/db
 
 EXPOSE 8080
 
@@ -79,4 +96,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD curl -sf http://localhost:8080/api/health || exit 1
 
 # Start Next.js
+WORKDIR /app/apps/web
 CMD ["pnpm", "start"]
