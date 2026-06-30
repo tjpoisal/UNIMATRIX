@@ -43,6 +43,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 # ── Source copy ───────────────────────────────────────────────────────────────
 COPY apps/web ./apps/web
 COPY packages ./packages
+COPY tsconfig.json ./
+COPY tsconfig.server.json ./
 
 # Install @unimatrix/db deps (Prisma CLI needed for its build)
 RUN pnpm install --filter @unimatrix/db --frozen-lockfile
@@ -57,8 +59,8 @@ WORKDIR /app/apps/web
 # Generate Prisma client (uses the openssl binary we installed above)
 RUN pnpm prisma generate
 
-# Next.js production build + custom WebSocket server compilation
-RUN pnpm build
+# Next.js production build (without custom server compilation)
+RUN npx next build
 
 
 # ─── Production runner stage ─────────────────────────────────────────────────
