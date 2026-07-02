@@ -1,37 +1,33 @@
-# Fly.io config for the background worker (librarian jobs, embeddings, AgentRun processing)
-# Deploy as a separate cheap/low-resource app.
-# Usage example:
-#   cp fly.worker.toml fly.toml
-#   fly apps create unimatrix-worker
-#   fly deploy --config fly.toml --app unimatrix-worker
-#   fly secrets set ... (same as mcp: DATABASE_URL, VOYAGE etc.)
-# Then run the worker process (it will loop forever):
-#   fly console --app unimatrix-worker
-#   # inside container: node dist/worker.js
+# fly.toml app configuration file generated for unimatrix on 2026-07-02T02:51:31Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "unimatrix-worker"
-primary_region = "iad"
+app = 'unimatrix'
+primary_region = 'ams'
 
 [build]
-  builder = "docker"
-  dockerfile = "Dockerfile.server"
-
-[env]
-  NODE_ENV = "production"
-  PORT = "8080"
-
-[processes]
-  app = "node dist/index.js"
-
-[[vm]]
-  cpu_kind = "shared"
-  cpus = 1
-  memory_mb = 512   # Worker is background, keep cheap; scale machines if backlog
-
-# No public services needed for a pure worker
-# It will just run the process in the machine
+  builder = 'docker'
+  dockerfile = 'Dockerfile.server'
 
 [deploy]
-  # We will run it manually or via a machine command that executes the worker
-  # For always-on worker, you can use:
-  # fly machine update <id> --command "node dist/worker.js" or use a process in toml
+
+[env]
+  NODE_ENV = 'production'
+  PORT = '8080'
+
+[processes]
+  app = 'node dist/index.js'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 512
